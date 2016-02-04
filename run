@@ -19,6 +19,11 @@ case $COMMAND in
     exec ./run babel-node devel.js build
     ;;
 
+  devserver)
+    set -x
+    exec ./run babel-node devel.js devserver
+    ;;
+
   *)
     echo "Unknown command $COMMAND"
     ;;
