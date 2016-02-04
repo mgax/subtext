@@ -1,5 +1,7 @@
-import { React } from './vendor.js'
+import { React, ReactRedux } from './vendor.js'
 import { random_keypair } from './messages.js'
+import { create as createStore, loadInitial } from './store.js'
+const { Provider, connect } = ReactRedux
 
 const App = ({ contacts }) => (
   <div>
@@ -35,9 +37,16 @@ window.main = function() {
       keypair: random_keypair(),
     })
   }
-  let state = JSON.parse(localStorage.subtext)
-  state.contacts = [{publicKey: state.keypair.public}]
+  let _initial = JSON.parse(localStorage.subtext)
+  window.store = createStore()
+  window.store.dispatch(loadInitial({
+    contacts: [{publicKey: _initial.keypair.public}],
+    ... _initial
+  }))
+  const ConnectedApp = connect((state) => state)(App)
   window.app = ReactDOM.render((
-    <App { ... state } />
+    <Provider store={window.store}>
+      <ConnectedApp />
+    </Provider>
   ), document.querySelector('#app'))
 }

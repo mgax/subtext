@@ -8,5 +8,7 @@ else {
     sodium: window.sodium,
     React: window.React,
     ReactDOM: window.ReactDOM,
+    Redux: window.Redux,
+    ReactRedux: window.ReactRedux,
   }
 }
