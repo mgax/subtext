@@ -6,5 +6,7 @@ if(typeof window == 'undefined') {
 else {
   module.exports = {
     sodium: window.sodium,
+    React: window.React,
+    ReactDOM: window.ReactDOM,
   }
 }
