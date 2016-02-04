@@ -3,8 +3,9 @@ import { random_keypair } from './messages.js'
 import { create as createStore, loadInitial } from './store.js'
 const { Provider, connect } = ReactRedux
 
-const App = ({ contacts }) => (
+const App = ({ keypair, contacts }) => (
   <div>
+    <p>public key: <tt>{keypair.public.key}</tt></p>
     {contacts.map((contact) =>
       <Conversation key={contact.publicKey.key} {... contact} />
     )}
