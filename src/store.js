@@ -12,6 +12,12 @@ export const addContact = (publicKey) => ({
   publicKey: publicKey,
 })
 
+const RECEIVE_MESSAGE_BOX = 'RECEIVE_MESSAGE_BOX'
+export const receiveMessageBox = (messagebox) => ({
+  type: RECEIVE_MESSAGE_BOX,
+  messagebox: messagebox,
+})
+
 function reduce(state, action) {
   switch(action.type) {
 
@@ -28,6 +34,20 @@ function reduce(state, action) {
           publicKey: action.publicKey,
           messages: [],
         }]),
+      }
+
+    case RECEIVE_MESSAGE_BOX:
+      return {
+        ...state,
+        contacts: state.contacts.map((contact) => {
+          if(contact.publicKey.key != action.messagebox.sender.key) {
+            return contact
+          }
+          return {
+            ... contact,
+            messages: [].concat(contact.messages, [action.messagebox]),
+          }
+        })
       }
 
     default:

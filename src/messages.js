@@ -54,3 +54,8 @@ export function random_keypair() {
     private: to_privatekey(privateKey),
   }
 }
+
+export function box_id(cryptobox) {
+  let [ciphertext] = from_cryptobox(cryptobox)
+  return sodium.to_base64(sodium.crypto_hash(ciphertext).slice(0, 32))
+}
