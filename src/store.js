@@ -6,11 +6,29 @@ export const loadInitial = (state) => ({
   state: state,
 })
 
+const ADD_CONTACT = 'ADD_CONTACT'
+export const addContact = (publicKey) => ({
+  type: ADD_CONTACT,
+  publicKey: publicKey,
+})
+
 function reduce(state, action) {
   switch(action.type) {
 
     case LOAD_INITIAL:
       return action.state
+
+    case ADD_CONTACT:
+      let isOpen = !! state.contacts.find((c) =>
+        c.publicKey.key == action.publicKey.key)
+      if(isOpen) return state
+      return {
+        ... state,
+        contacts: [].concat(state.contacts, [{
+          publicKey: action.publicKey,
+          messages: [],
+        }]),
+      }
 
     default:
       return state

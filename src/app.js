@@ -1,6 +1,6 @@
-import { React, ReactRedux } from './vendor.js'
+import { React, ReactRedux, sodium } from './vendor.js'
 import { random_keypair } from './messages.js'
-import { create as createStore, loadInitial } from './store.js'
+import { create as createStore, loadInitial, addContact } from './store.js'
 const { Provider, connect } = ReactRedux
 
 const App = ({ keypair, contacts }) => (
@@ -36,18 +36,23 @@ window.main = function() {
   if(! localStorage.subtext) {
     localStorage.subtext = JSON.stringify({
       keypair: random_keypair(),
+      contacts: [],
     })
   }
-  let _initial = JSON.parse(localStorage.subtext)
   window.store = createStore()
-  window.store.dispatch(loadInitial({
-    contacts: [{publicKey: _initial.keypair.public}],
-    ... _initial
-  }))
+  window.store.dispatch(loadInitial(JSON.parse(localStorage.subtext)))
+  store.subscribe(() => {
+    localStorage.subtext = JSON.stringify(store.getState())
+  })
   const ConnectedApp = connect((state) => state)(App)
   window.app = ReactDOM.render((
     <Provider store={window.store}>
       <ConnectedApp />
     </Provider>
   ), document.querySelector('#app'))
+
+  window.talk = (key) => {
+    if(sodium.from_base64(key).length != 32) throw new Error("invalid key")
+    window.store.dispatch(addContact({type: 'publickey', key: key}))
+  }
 }
