@@ -2,6 +2,7 @@ import express from 'express'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpack from 'webpack'
 import fs from 'fs'
+import broker from './src/broker.js'
 
 const WEBAPP_OPTIONS = {
   entry: './src/app.js',
@@ -42,7 +43,8 @@ async function devserver() {
   let app = express()
   app.use(webpackDevMiddleware(webpack(WEBAPP_OPTIONS), {publicPath: '/'}))
   app.get('/', function(req, res) { res.send(index_html()) })
-  var server = app.listen(8000)
+  let server = app.listen(8000)
+  broker(server)
 }
 
 (async function() {

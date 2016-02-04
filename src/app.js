@@ -52,10 +52,12 @@ window.main = function() {
     localStorage.subtext = JSON.stringify(store.getState())
   })
 
+  const socket = io.connect('/')
+
   const mapDispatchToProps = (dispatch) => ({
     send: (recipientPublicKey, message) => {
       let me = store.getState().keypair
-      console.log('message', {
+      socket.emit('messagebox', {
         type: 'messagebox',
         box: create_box(message, me.private, recipientPublicKey),
         sender: me.public,

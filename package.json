@@ -11,6 +11,7 @@
     "express": "^4.13.4",
     "libsodium-wrappers": "^0.2.12",
     "mocha": "^2.4.5",
+    "socket.io": "^1.4.5",
     "webpack": "^1.12.12",
     "webpack-dev-middleware": "^1.5.1"
   }
