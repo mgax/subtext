@@ -1,3 +1,5 @@
 import messages from './messages.js'
 
-console.log('hello from the app', messages)
+window.main = function() {
+  console.log('hello from the app')
+}

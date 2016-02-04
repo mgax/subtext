@@ -1,4 +1,5 @@
 import webpack from 'webpack'
+import fs from 'fs'
 
 function webpackBuild(options) {
   return new Promise((resolve, reject) => {
@@ -7,6 +8,12 @@ function webpackBuild(options) {
       resolve(stats)
     })
   })
+}
+
+function buildIndex(options) {
+  let src = fs.readFileSync('./src/index.html', 'utf8')
+  let indexHtml = src.replace('{{ webappHash }}', options.webappHash)
+  fs.writeFileSync('./build/index.html', indexHtml, 'utf8')
 }
 
 (async function() {
@@ -24,4 +31,5 @@ function webpackBuild(options) {
     },
   })
   console.log(stats.toString({colors: true}))
-})()
+  buildIndex({webappHash: stats.toJson().chunks[0].hash})
+})().catch((e) => { console.error(e) })
