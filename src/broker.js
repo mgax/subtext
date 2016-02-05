@@ -1,21 +1,21 @@
 import SocketIO from 'socket.io'
-import { box_id } from './messages.js'
+import { boxId } from './messages.js'
 
 let clients = {}
 
 function connection(socket) {
-  socket.on('authenticate', (publicKey) => {
+  socket.on('Authenticate', (publicKey) => {
     clients[publicKey.key] = {send: send}
   })
 
-  socket.on('messagebox', (messagebox) => {
-    let key = messagebox.recipient.key
+  socket.on('MessageBox', (messageBox) => {
+    let key = messageBox.recipient.key
     let client = clients[key]
-    if(client) client.send(messagebox)
+    if(client) client.send(messageBox)
   })
 
-  function send(messagebox) {
-    socket.emit('messagebox', messagebox)
+  function send(messageBox) {
+    socket.emit('MessageBox', messageBox)
   }
 }
 

@@ -1,5 +1,5 @@
 import { React, ReactRedux, sodium } from './vendor.js'
-import { random_keypair, create_box, open_box, box_id } from './messages.js'
+import { randomKeyPair, createBox, openBox, boxId } from './messages.js'
 import {
   create as createStore,
   loadInitial,
@@ -8,15 +8,15 @@ import {
 } from './store.js'
 const { Provider, connect } = ReactRedux
 
-const App = ({ keypair, contacts, send }) => (
+const App = ({ keyPair, contacts, send }) => (
   <div>
-    <p>public key: <tt>{keypair.public.key}</tt></p>
+    <p>public key: <tt>{keyPair.publicKey.key}</tt></p>
     {contacts.map((contact) =>
       <Conversation
         key={contact.publicKey.key}
         send={send}
         openMessageBox={(messagebox) =>
-          open_box(messagebox.box, keypair.private, messagebox.sender)
+          openBox(messagebox.box, keyPair.privateKey, messagebox.sender)
         }
         {... contact}
         />
@@ -42,7 +42,7 @@ class Conversation extends React.Component {
         <p>{publicKey.key}</p>
         <ul>
           {messages.map((m) =>
-            <li key={box_id(m.box)}>{openMessageBox(m).text}</li>
+            <li key={boxId(m.box)}>{openMessageBox(m).text}</li>
           )}
         </ul>
         <input placeholder='message ...' ref='text' />
@@ -55,7 +55,7 @@ class Conversation extends React.Component {
 window.main = function() {
   if(! localStorage.subtext) {
     localStorage.subtext = JSON.stringify({
-      keypair: random_keypair(),
+      keyPair: randomKeyPair(),
       contacts: [],
     })
   }
@@ -66,19 +66,19 @@ window.main = function() {
   })
 
   const socket = io.connect('/')
-  socket.emit('authenticate', store.getState().keypair.public)
+  socket.emit('Authenticate', store.getState().keyPair.publicKey)
 
-  socket.on('messagebox', (messagebox) => {
-    window.store.dispatch(receiveMessageBox(messagebox))
+  socket.on('MessageBox', (messageBox) => {
+    window.store.dispatch(receiveMessageBox(messageBox))
   })
 
   const mapDispatchToProps = (dispatch) => ({
     send: (recipientPublicKey, message) => {
-      let me = store.getState().keypair
-      socket.emit('messagebox', {
-        type: 'messagebox',
-        box: create_box(message, me.private, recipientPublicKey),
-        sender: me.public,
+      let me = store.getState().keyPair
+      socket.emit('MessageBox', {
+        type: 'MessageBox',
+        box: createBox(message, me.privateKey, recipientPublicKey),
+        sender: me.publicKey,
         recipient: recipientPublicKey,
       })
     }

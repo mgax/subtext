@@ -1,32 +1,31 @@
 import { assert } from 'chai'
-import { random_keypair, create_box, open_box } from '../src/messages.js'
+import { randomKeyPair, createBox, openBox } from '../src/messages.js'
 
 describe('identity', function() {
 
   it('should exchange messages', function() {
-    let alice = random_keypair()
-    let bob = random_keypair()
-    let cryptobox = create_box({hello: 'world'}, alice.private, bob.public)
-    let payload = open_box(cryptobox, bob.private, alice.public)
+    let alice = randomKeyPair()
+    let bob = randomKeyPair()
+    let cryptobox = createBox({hello: 'world'}, alice.privateKey, bob.publicKey)
+    let payload = openBox(cryptobox, bob.privateKey, alice.publicKey)
     assert.deepEqual(payload, {hello: 'world'})
   })
 
   it('should read messages in standard format', function() {
-
     let alicePublicKey = {
-      type: 'publickey',
+      type: 'PublicKey',
       key: 'j/f5Is/1wuq/Md/NDX9F/4cmpHaiAgaoiILb9pWcuig=',
     }
     let bobPrivateKey = {
-      type: 'privatekey',
+      type: 'PrivateKey',
       key: '4ROZBrZFj1yedGogzIvI0Q4ZTDnvdbh9WvaQkozTW7M=',
     }
     let cryptobox = {
-      type: 'cryptobox',
+      type: 'CryptoBox',
       ciphertext: 'aPxoDYldHBo4HlJQaAAj1G9mdiiEv9JyQ0KzRxQdza4V',
       nonce: '4thKliPbaeA3LM1r/YLiRo7xjZXgSs9j',
     }
-    let payload = open_box(cryptobox, bobPrivateKey, alicePublicKey)
+    let payload = openBox(cryptobox, bobPrivateKey, alicePublicKey)
     assert.deepEqual(payload, {hello: 'world'})
   })
 

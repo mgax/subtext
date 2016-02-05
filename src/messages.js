@@ -1,29 +1,29 @@
 import { sodium } from './vendor.js'
 
-const to_publickey = (key) => ({type: 'publickey', key: sodium.to_base64(key)})
-const to_privatekey = (key) => ({type: 'privatekey', key: sodium.to_base64(key)})
+const to_publickey = (key) => ({type: 'PublicKey', key: sodium.to_base64(key)})
+const to_privatekey = (key) => ({type: 'PrivateKey', key: sodium.to_base64(key)})
 const to_cryptobox = (ciphertext, nonce) => ({
-  type: 'cryptobox',
+  type: 'CryptoBox',
   ciphertext: sodium.to_base64(ciphertext),
   nonce: sodium.to_base64(nonce),
 })
 
 function from_publickey({type, key}) {
-  if(type != 'publickey') throw new Error("Not a public key")
+  if(type != 'PublicKey') throw new Error("Not a PublicKey")
   return sodium.from_base64(key)
 }
 
 function from_privatekey({type, key}) {
-  if(type != 'privatekey') throw new Error("Not a private key")
+  if(type != 'PrivateKey') throw new Error("Not a PrivateKey")
   return sodium.from_base64(key)
 }
 
 function from_cryptobox({type, ciphertext, nonce}) {
-  if(type != 'cryptobox') throw new Error("Not a cryptobox")
+  if(type != 'CryptoBox') throw new Error("Not a CryptoBox")
   return [sodium.from_base64(ciphertext), sodium.from_base64(nonce)]
 }
 
-export function create_box(payload, senderPrivateKey, recipientPublicKey) {
+export function createBox(payload, senderPrivateKey, recipientPublicKey) {
   let sender = from_privatekey(senderPrivateKey)
   let recipient = from_publickey(recipientPublicKey)
   let nonce = random_nonce()
@@ -32,10 +32,10 @@ export function create_box(payload, senderPrivateKey, recipientPublicKey) {
   return to_cryptobox(ciphertext, nonce)
 }
 
-export function open_box(cryptobox, recipientPrivateKey, senderPublicKey) {
+export function openBox(cryptoBox, recipientPrivateKey, senderPublicKey) {
   let recipient = from_privatekey(recipientPrivateKey)
   let sender = from_publickey(senderPublicKey)
-  let [ciphertext, nonce] = from_cryptobox(cryptobox)
+  let [ciphertext, nonce] = from_cryptobox(cryptoBox)
   let plaintext = sodium.crypto_box_open_easy(ciphertext, nonce, sender, recipient)
   return JSON.parse(sodium.to_string(plaintext))
 }
@@ -44,17 +44,17 @@ function random_nonce() {
   return sodium.randombytes_buf(sodium.crypto_box_NONCEBYTES)
 }
 
-export function random_keypair() {
+export function randomKeyPair() {
   let { publicKey, privateKey, keyType } = sodium.crypto_box_keypair()
   if(keyType != 'curve25519') throw new Error("Unexpected key type")
   return {
-    type: 'keypair',
-    public: to_publickey(publicKey),
-    private: to_privatekey(privateKey),
+    type: 'KeyPair',
+    publicKey: to_publickey(publicKey),
+    privateKey: to_privatekey(privateKey),
   }
 }
 
-export function box_id(cryptobox) {
-  let [ciphertext] = from_cryptobox(cryptobox)
+export function boxId(cryptoBox) {
+  let [ciphertext] = from_cryptobox(cryptoBox)
   return sodium.to_base64(sodium.crypto_hash(ciphertext).slice(0, 32))
 }
