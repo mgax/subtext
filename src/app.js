@@ -1,10 +1,11 @@
 import { React, ReactRedux, sodium } from './vendor.js'
-import { randomKeyPair, createBox } from './messages.js'
+import { randomKeyPair, createBox, boxId } from './messages.js'
 import {
   create as createStore,
   loadInitial,
   addContact,
   receiveMessageBox,
+  saveLogEntry,
 } from './store.js'
 const { Provider, connect } = ReactRedux
 
@@ -73,9 +74,16 @@ window.main = function() {
   const mapDispatchToProps = (dispatch) => ({
     send: (recipientPublicKey, message) => {
       let me = store.getState().keyPair
+      let messageBox = createBox(message, me.privateKey, recipientPublicKey)
+      dispatch(saveLogEntry(recipientPublicKey, {
+        type: 'LogEntry',
+        id: boxId(messageBox),
+        from: me.publicKey,
+        message: message,
+      }))
       socket.emit('MessageBox', {
         type: 'MessageBox',
-        box: createBox(message, me.privateKey, recipientPublicKey),
+        box: messageBox,
         sender: me.publicKey,
         recipient: recipientPublicKey,
       })
