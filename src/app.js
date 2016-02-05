@@ -31,7 +31,7 @@ class Conversation extends React.Component {
           let text = this.refs.text.value
           this.refs.text.value = ''
           this.props.send(publicKey, {
-            type: 'message',
+            type: 'Text',
             text: text,
           })
         }}
