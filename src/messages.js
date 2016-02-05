@@ -49,7 +49,6 @@ export function random_keypair() {
   if(keyType != 'curve25519') throw new Error("Unexpected key type")
   return {
     type: 'keypair',
-    cipher: keyType,
     public: to_publickey(publicKey),
     private: to_privatekey(privateKey),
   }
