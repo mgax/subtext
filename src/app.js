@@ -1,5 +1,5 @@
 import { React, ReactRedux, sodium } from './vendor.js'
-import { randomKeyPair, createBox, openBox, boxId } from './messages.js'
+import { randomKeyPair, createBox } from './messages.js'
 import {
   create as createStore,
   loadInitial,
@@ -15,9 +15,6 @@ const App = ({ keyPair, contacts, send }) => (
       <Conversation
         key={contact.publicKey.key}
         send={send}
-        openMessageBox={(messagebox) =>
-          openBox(messagebox.box, keyPair.privateKey, messagebox.sender)
-        }
         {... contact}
         />
     )}
@@ -26,7 +23,7 @@ const App = ({ keyPair, contacts, send }) => (
 
 class Conversation extends React.Component {
   render() {
-    const { publicKey, messages, openMessageBox } = this.props
+    const { publicKey, messages } = this.props
     return (
       <form
         onSubmit={(e) => {
@@ -41,8 +38,8 @@ class Conversation extends React.Component {
         ref='form'>
         <p>{publicKey.key}</p>
         <ul>
-          {messages.map((m) =>
-            <li key={boxId(m.box)}>{openMessageBox(m).text}</li>
+          {messages.map(({ id, message }) =>
+            <li key={id}>{message.text}</li>
           )}
         </ul>
         <input placeholder='message ...' ref='text' />
@@ -68,8 +65,8 @@ window.main = function() {
   const socket = io.connect('/')
   socket.emit('Authenticate', store.getState().keyPair.publicKey)
 
-  socket.on('MessageBox', (messageBox) => {
-    window.store.dispatch(receiveMessageBox(messageBox))
+  socket.on('MessageBox', ({ box, sender }) => {
+    window.store.dispatch(receiveMessageBox(box, sender))
   })
 
   const mapDispatchToProps = (dispatch) => ({
@@ -93,6 +90,6 @@ window.main = function() {
 
   window.talk = (key) => {
     if(sodium.from_base64(key).length != 32) throw new Error("invalid key")
-    window.store.dispatch(addContact({type: 'publickey', key: key}))
+    window.store.dispatch(addContact({type: 'PublicKey', key: key}))
   }
 }

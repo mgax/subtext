@@ -1,4 +1,5 @@
 import { Redux } from './vendor.js'
+import { openBox, boxId } from './messages.js'
 
 const LOAD_INITIAL = 'LOAD_INITIAL'
 export const loadInitial = (state) => ({
@@ -13,9 +14,10 @@ export const addContact = (publicKey) => ({
 })
 
 const RECEIVE_MESSAGE_BOX = 'RECEIVE_MESSAGE_BOX'
-export const receiveMessageBox = (messagebox) => ({
+export const receiveMessageBox = (messageBox, senderPublicKey) => ({
   type: RECEIVE_MESSAGE_BOX,
-  messagebox: messagebox,
+  messageBox: messageBox,
+  senderPublicKey: senderPublicKey,
 })
 
 function reduce(state, action) {
@@ -37,15 +39,21 @@ function reduce(state, action) {
       }
 
     case RECEIVE_MESSAGE_BOX:
+      let { messageBox, senderPublicKey } = action
+      let myPrivateKey = state.keyPair.privateKey
       return {
         ...state,
         contacts: state.contacts.map((contact) => {
-          if(contact.publicKey.key != action.messagebox.sender.key) {
+          if(contact.publicKey.key != senderPublicKey.key) {
             return contact
+          }
+          let message = {
+            id: boxId(messageBox),
+            message: openBox(messageBox, myPrivateKey, senderPublicKey),
           }
           return {
             ... contact,
-            messages: [].concat(contact.messages, [action.messagebox]),
+            messages: [].concat(contact.messages, [message]),
           }
         })
       }
