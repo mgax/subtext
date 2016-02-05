@@ -30,12 +30,13 @@ function reduce(state, action) {
       let isOpen = !! state.contacts.find((c) =>
         c.publicKey.key == action.publicKey.key)
       if(isOpen) return state
+      let contact = {
+        publicKey: action.publicKey,
+        messages: [],
+      }
       return {
         ... state,
-        contacts: [].concat(state.contacts, [{
-          publicKey: action.publicKey,
-          messages: [],
-        }]),
+        contacts: [].concat(state.contacts, [contact]),
       }
 
     case RECEIVE_MESSAGE_BOX:
