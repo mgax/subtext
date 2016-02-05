@@ -23,7 +23,7 @@ const App = ({ keyPair, contacts, send }) => (
 
 class Conversation extends React.Component {
   render() {
-    const { publicKey, messages } = this.props
+    const { publicKey, log } = this.props
     return (
       <form
         onSubmit={(e) => {
@@ -38,7 +38,7 @@ class Conversation extends React.Component {
         ref='form'>
         <p>{publicKey.key}</p>
         <ul>
-          {messages.map(({ id, message }) =>
+          {log.map(({ id, message }) =>
             <li key={id}>{message.text}</li>
           )}
         </ul>

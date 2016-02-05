@@ -41,7 +41,7 @@ function reduce(state, action) {
       if(isOpen) return state
       let contact = {
         publicKey: action.publicKey,
-        messages: [],
+        log: [],
       }
       return {
         ... state,
@@ -57,7 +57,7 @@ function reduce(state, action) {
           }
           return {
             ... contact,
-            messages: [].concat(contact.messages, [action.envelope]),
+            log: [].concat(contact.log, [action.envelope]),
           }
         })
       }
