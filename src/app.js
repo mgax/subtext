@@ -66,7 +66,8 @@ window.main = function() {
   socket.emit('Authenticate', store.getState().keyPair.publicKey)
 
   socket.on('MessageBox', ({ box, sender }) => {
-    window.store.dispatch(receiveMessageBox(box, sender))
+    let myPrivateKey = store.getState().keyPair.privateKey
+    window.store.dispatch(receiveMessageBox(box, myPrivateKey, sender))
   })
 
   const mapDispatchToProps = (dispatch) => ({

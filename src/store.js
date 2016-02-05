@@ -13,11 +13,20 @@ export const addContact = (publicKey) => ({
   publicKey: publicKey,
 })
 
-const RECEIVE_MESSAGE_BOX = 'RECEIVE_MESSAGE_BOX'
-export const receiveMessageBox = (messageBox, senderPublicKey) => ({
-  type: RECEIVE_MESSAGE_BOX,
-  messageBox: messageBox,
-  senderPublicKey: senderPublicKey,
+export const receiveMessageBox = (messageBox, myPrivateKey, senderPublicKey) => (
+  saveMessage(senderPublicKey, {
+    type: 'Envelope',
+    id: boxId(messageBox),
+    from: senderPublicKey,
+    message: openBox(messageBox, myPrivateKey, senderPublicKey),
+  })
+)
+
+const SAVE_MESSAGE = 'SAVE_MESSAGE'
+export const saveMessage = (contact, envelope) => ({
+  type: SAVE_MESSAGE,
+  contact: contact,
+  envelope: envelope,
 })
 
 function reduce(state, action) {
@@ -39,23 +48,16 @@ function reduce(state, action) {
         contacts: [].concat(state.contacts, [contact]),
       }
 
-    case RECEIVE_MESSAGE_BOX:
-      let { messageBox, senderPublicKey } = action
-      let myPrivateKey = state.keyPair.privateKey
+    case SAVE_MESSAGE:
       return {
         ...state,
         contacts: state.contacts.map((contact) => {
-          if(contact.publicKey.key != senderPublicKey.key) {
+          if(contact.publicKey.key != action.contact.key) {
             return contact
-          }
-          let message = {
-            id: boxId(messageBox),
-            from: senderPublicKey,
-            message: openBox(messageBox, myPrivateKey, senderPublicKey),
           }
           return {
             ... contact,
-            messages: [].concat(contact.messages, [message]),
+            messages: [].concat(contact.messages, [action.envelope]),
           }
         })
       }
