@@ -50,6 +50,7 @@ function reduce(state, action) {
           }
           let message = {
             id: boxId(messageBox),
+            from: senderPublicKey,
             message: openBox(messageBox, myPrivateKey, senderPublicKey),
           }
           return {
