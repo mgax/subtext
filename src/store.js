@@ -14,19 +14,19 @@ export const addContact = (publicKey) => ({
 })
 
 export const receiveMessageBox = (messageBox, myPrivateKey, senderPublicKey) => (
-  saveMessage(senderPublicKey, {
-    type: 'Envelope',
+  saveLogEntry(senderPublicKey, {
+    type: 'LogEntry',
     id: boxId(messageBox),
     from: senderPublicKey,
     message: openBox(messageBox, myPrivateKey, senderPublicKey),
   })
 )
 
-const SAVE_MESSAGE = 'SAVE_MESSAGE'
-export const saveMessage = (contact, envelope) => ({
-  type: SAVE_MESSAGE,
+const SAVE_LOG_ENTRY = 'SAVE_LOG_ENTRY'
+export const saveLogEntry = (contact, logEntry) => ({
+  type: SAVE_LOG_ENTRY,
   contact: contact,
-  envelope: envelope,
+  logEntry: logEntry,
 })
 
 function reduce(state, action) {
@@ -48,7 +48,7 @@ function reduce(state, action) {
         contacts: [].concat(state.contacts, [contact]),
       }
 
-    case SAVE_MESSAGE:
+    case SAVE_LOG_ENTRY:
       return {
         ...state,
         contacts: state.contacts.map((contact) => {
@@ -57,7 +57,7 @@ function reduce(state, action) {
           }
           return {
             ... contact,
-            log: [].concat(contact.log, [action.envelope]),
+            log: [].concat(contact.log, [action.logEntry]),
           }
         })
       }
