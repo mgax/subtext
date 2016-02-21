@@ -1,3 +1,4 @@
+require('babel-polyfill')
 import { React, ReactRedux, sodium } from './vendor.js'
 import { randomKeyPair, createBox, boxId } from './messages.js'
 import {
@@ -50,7 +51,8 @@ class Conversation extends React.Component {
   }
 }
 
-window.main = function() {
+window.main = function() { (async function() {
+
   if(! localStorage.subtext) {
     localStorage.subtext = JSON.stringify({
       keyPair: randomKeyPair(),
@@ -108,4 +110,5 @@ window.main = function() {
     if(sodium.from_base64(key).length != 32) throw new Error("invalid key")
     window.store.dispatch(addContact({type: 'PublicKey', key: key}))
   }
-}
+
+})().catch((e) => { console.error(e.stack) }) }
