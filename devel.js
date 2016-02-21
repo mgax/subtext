@@ -3,6 +3,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpack from 'webpack'
 import fs from 'fs'
 import broker from './src/broker.js'
+import { randomKeyPair } from './src/messages.js'
 
 const WEBAPP_OPTIONS = {
   entry: './src/app.js',
@@ -47,6 +48,13 @@ async function devserver() {
   broker(server)
 }
 
+function init(path) {
+  fs.mkdirSync(path)
+  fs.writeFileSync(path + '/config.json', JSON.stringify({
+    keyPair: randomKeyPair(),
+  }, null, 2), {mode: 0o600})
+}
+
 (async function() {
   let cmd = process.argv[2]
 
@@ -57,6 +65,9 @@ async function devserver() {
 
     case 'devserver':
       return await devserver()
+
+    case 'init':
+      return init(process.argv[3])
 
     default:
       throw new Error("Unknown command " + cmd)

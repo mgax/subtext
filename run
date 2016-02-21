@@ -29,6 +29,11 @@ case $COMMAND in
     exec ./run babel-node server.js
     ;;
 
+  init)
+    set -x
+    exec ./run babel-node devel.js init "$@"
+    ;;
+
   *)
     echo "Unknown command $COMMAND"
     ;;
