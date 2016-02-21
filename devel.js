@@ -2,8 +2,10 @@ import express from 'express'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpack from 'webpack'
 import fs from 'fs'
-import broker from './src/broker.js'
+import request from 'request'
 import { randomKeyPair } from './src/messages.js'
+import identityServer from './src/identityserver.js'
+import nodeAsync from './src/nodeAsync.js'
 
 const WEBAPP_OPTIONS = {
   entry: './src/app.js',
@@ -18,6 +20,7 @@ const WEBAPP_OPTIONS = {
     ],
   },
 }
+
 
 function webpackBuild(options) {
   return new Promise((resolve, reject) => {
@@ -40,12 +43,12 @@ async function build() {
   fs.writeFileSync('./build/index.html', indexHtml, 'utf8')
 }
 
-async function devserver() {
+async function devserver(path) {
   let app = express()
+  app.use(identityServer(path))
   app.use(webpackDevMiddleware(webpack(WEBAPP_OPTIONS), {publicPath: '/'}))
   app.get('/', function(req, res) { res.send(index_html()) })
   let server = app.listen(8000)
-  broker(server)
 }
 
 function init(path) {
@@ -53,6 +56,25 @@ function init(path) {
   fs.writeFileSync(path + '/config.json', JSON.stringify({
     keyPair: randomKeyPair(),
   }, null, 2), {mode: 0o600})
+}
+
+async function send(identityPath, finger, text) {
+
+  async function get(url) {
+    let res = await nodeAsync(request.get)(url, {json: true})
+    return res.body
+  }
+
+  async function post(url, body) {
+    let res = await nodeAsync(request.post)(url, {json: true, body: body})
+    return res.body
+  }
+
+  let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
+  let peer = await get(finger)
+  let result = await post(peer.messageUrl, {foo: 'bar'})
+  console.assert(result.ok, 'error sending message: ' + JSON.stringify(result))
+
 }
 
 (async function() {
@@ -64,10 +86,13 @@ function init(path) {
       return await build()
 
     case 'devserver':
-      return await devserver()
+      return await devserver(process.argv[3])
 
     case 'init':
       return init(process.argv[3])
+
+    case 'send':
+      return send(process.argv[3], process.argv[4], process.argv[5])
 
     default:
       throw new Error("Unknown command " + cmd)

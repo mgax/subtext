@@ -21,7 +21,7 @@ case $COMMAND in
 
   devserver)
     set -x
-    exec ./run babel-node devel.js devserver
+    exec ./run babel-node devel.js devserver "$@"
     ;;
 
   server)
@@ -32,6 +32,11 @@ case $COMMAND in
   init)
     set -x
     exec ./run babel-node devel.js init "$@"
+    ;;
+
+  send)
+    set -x
+    exec ./run babel-node devel.js send "$@"
     ;;
 
   *)
