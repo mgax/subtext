@@ -98,4 +98,4 @@ async function send(identityPath, finger, text) {
       throw new Error("Unknown command " + cmd)
 
   }
-})().catch((e) => { console.error(e) })
+})().catch((e) => { console.error(e.stack) })
