@@ -1,16 +1,46 @@
 import fs from 'fs'
 import express from 'express'
 import bodyParser from 'body-parser'
-import { openBox } from './messages.js'
+import { openBox, boxId } from './messages.js'
+
+class Store {
+
+  constructor() {
+    this.conversations = {}
+  }
+
+  log(peer, box) {
+    let messages = this.conversations[peer.key]
+    if(! messages) messages = this.conversations[peer.key] = []
+    let logEntry = {
+      type: 'LogEntry',
+      id: boxId(box),
+      from: peer,
+      box: box,
+    }
+    messages.push(logEntry)
+  }
+
+}
 
 export default function(identityPath) {
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
   let { keyPair, messageUrl } = config
+  let store = new Store()
 
   function receive({ box, from, to }) {
-    if(to.key != keyPair.publicKey.key) return {error: "Message is not for me"}
-    console.log(openBox(box, keyPair.privateKey, from))
+
+    if(to.key != keyPair.publicKey.key) {
+      return {error: "Message is not for me"}
+    }
+
+    try { openBox(box, keyPair.privateKey, from) } catch(e) {
+      return {error: "Could not decrypt message"}
+    }
+
+    store.log(from, box)
     return {ok: true}
+
   }
 
   let app = express()
