@@ -63,8 +63,15 @@ window.main = function() {
     localStorage.subtext = JSON.stringify(store.getState())
   })
 
+  let keyPair = JSON.parse(localStorage.keyPair)
+
   const socket = io.connect('/')
-  socket.emit('Authenticate', store.getState().keyPair.publicKey)
+  socket.emit('Authenticate', keyPair.privateKey)
+
+  socket.on('AuthenticationResult', ({ ok, error }) => {
+    if(ok) console.log('server auth success')
+    else console.error('server auth error:', error)
+  })
 
   socket.on('MessageBox', ({ box, sender }) => {
     let myPrivateKey = store.getState().keyPair.privateKey

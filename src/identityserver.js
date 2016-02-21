@@ -1,6 +1,7 @@
 import fs from 'fs'
 import express from 'express'
 import bodyParser from 'body-parser'
+import SocketIO from 'socket.io'
 import { openBox, boxId } from './messages.js'
 
 class Store {
@@ -58,5 +59,27 @@ export default function(identityPath) {
     res.send(result)
   })
 
-  return app
+  function websocket(server) {
+    SocketIO(server).on('connection', function(socket) {
+      let authenticated = false
+
+      socket.on('Authenticate', (privateKey) => {
+        function respond(value) {
+          socket.emit('AuthenticationResult', value)
+        }
+
+        try { if(privateKey.key != keyPair.privateKey.key) throw new Error }
+        catch(e) { return respond({error: "invalid authentication key"}) }
+
+        authenticated = true
+        return respond({ok: true})
+      })
+
+    })
+  }
+
+  return {
+    middleware: app,
+    websocket: websocket,
+  }
 }
