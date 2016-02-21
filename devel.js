@@ -3,7 +3,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpack from 'webpack'
 import fs from 'fs'
 import request from 'request'
-import { randomKeyPair } from './src/messages.js'
+import { randomKeyPair, createBox } from './src/messages.js'
 import identityServer from './src/identityserver.js'
 import nodeAsync from './src/nodeAsync.js'
 
@@ -72,7 +72,12 @@ async function send(identityPath, finger, text) {
 
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
   let peer = await get(finger)
-  let result = await post(peer.messageUrl, {foo: 'bar'})
+  let message = {type: 'text', text: text}
+  let result = await post(peer.messageUrl, {
+    box: createBox(message, config.keyPair.privateKey, peer.publicKey),
+    from: config.keyPair.publicKey,
+    to: peer.publicKey,
+  })
   console.assert(result.ok, 'error sending message: ' + JSON.stringify(result))
 
 }
