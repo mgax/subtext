@@ -2,7 +2,7 @@ import fs from 'fs'
 import express from 'express'
 import bodyParser from 'body-parser'
 import SocketIO from 'socket.io'
-import { openBox, boxId } from './messages.js'
+import {openBox, boxId} from './messages.js'
 import request from 'request'
 import sqlite3 from 'sqlite3'
 import nodeAsync from './nodeAsync.js'
@@ -34,7 +34,7 @@ async function fetchProfile(profileUrl) {
 
 export default async function(identityPath, fetchProfile = fetchProfile) {
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
-  let { keyPair, publicUrl } = config
+  let {keyPair, publicUrl} = config
   let store = new Store()
 
   async function db(query, ...args) {
@@ -62,7 +62,7 @@ export default async function(identityPath, fetchProfile = fetchProfile) {
     return profile
   }
 
-  async function receive({ box, from, to }) {
+  async function receive({box, from, to }) {
 
     if(to != publicUrl + '/profile') {
       return {error: "Message is not for me"}
@@ -135,5 +135,5 @@ export default async function(identityPath, fetchProfile = fetchProfile) {
     res.send({peers: peers})
   }))
 
-  return { publicApp, privateApp, websocket }
+  return {publicApp, privateApp, websocket}
 }
