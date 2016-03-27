@@ -90,6 +90,14 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
       url TEXT UNIQUE, profile TEXT
     )`)
 
+  await db(`CREATE TABLE IF NOT EXISTS message (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      peer_id INTEGER,
+      time TEXT,
+      message TEXT,
+      FOREIGN KEY(peer_id) REFERENCES peer(id)
+    )`)
+
   let publicApp = express()
   publicApp.use(bodyParser.json())
 
@@ -149,6 +157,12 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
     return {id, url, profile}
   }
 
+  async function saveMessage(peer, message) {
+    await db(`INSERT INTO message(peer_id, message, time)
+      VALUES(?, ?, datetime())`,
+      peer, JSON.stringify(message))
+  }
+
   privateApp.post('/peers/:id/messages', _wrap(async (req, res) => {
     let peer = await getPeer(+req.params.id)
     let message = req.body
@@ -158,8 +172,21 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
       from: myPublicUrl,
       to: peer.url,
     }
+    saveMessage(peer.id, message)
     send(peer.profile.inboxUrl, envelope)
     res.send({ok: true})
+  }))
+
+  privateApp.get('/peers/:id/messages', _wrap(async (req, res) => {
+    let peer = await getPeer(+req.params.id)
+    let rows = await db(`SELECT * FROM message WHERE peer_id = ?
+      ORDER BY id DESC LIMIT 10`, peer.id)
+    let messages = rows.map(({id, message, time}) => ({
+      id: id,
+      time: time,
+      message: JSON.parse(message),
+    }))
+    res.send({messages: messages})
   }))
 
   return {publicApp, privateApp, websocket}

@@ -64,6 +64,9 @@ describe('private api', function() {
     let boxedMessage = openBox(envelope.box,
       BOB.keyPair.privateKey, ALICE.keyPair.publicKey)
     assert.deepEqual(boxedMessage, msg)
+
+    let {body: resp2} = await this.ui.get('/peers/1/messages')
+    assert.deepEqual(resp2.messages[0].message, msg)
   })
 
 })
