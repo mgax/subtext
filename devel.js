@@ -46,7 +46,7 @@ async function build() {
 async function devserver(path) {
   let app = express()
   let identity = identityServer(path)
-  app.use(identity.middleware)
+  app.use(identity.publicApp)
   app.use(webpackDevMiddleware(webpack(WEBAPP_OPTIONS), {publicPath: '/'}))
   app.get('/', function(req, res) { res.send(index_html()) })
   let server = app.listen(+(process.env.PORT || 8000))

@@ -10,7 +10,7 @@ describe('public api', function() {
     }
     let lookupProfile = (url) => this.profiles[url]
     this.tmp = temporaryIdentity(ALICE)
-    this.app = identityserver(this.tmp.path, lookupProfile).middleware
+    this.app = identityserver(this.tmp.path, lookupProfile).publicApp
   })
 
   after(function() {

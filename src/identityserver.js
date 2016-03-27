@@ -53,18 +53,18 @@ export default function(identityPath, lookupProfile = lookupProfile) {
 
   }
 
-  let app = express()
-  app.use(bodyParser.json())
+  let publicApp = express()
+  publicApp.use(bodyParser.json())
 
   let _wrap = (fn) => (...args) => fn(...args).catch(args[2])
-  app.get('/profile', (req, res) => {
+  publicApp.get('/profile', (req, res) => {
     res.send({
       publicKey: keyPair.publicKey,
       inboxUrl: publicUrl + '/message',
     })
   })
 
-  app.post('/message', _wrap(async (req, res) => {
+  publicApp.post('/message', _wrap(async (req, res) => {
     let result = await receive(req.body)
     res.send(result)
   }))
@@ -88,8 +88,5 @@ export default function(identityPath, lookupProfile = lookupProfile) {
     })
   }
 
-  return {
-    middleware: app,
-    websocket: websocket,
-  }
+  return { publicApp, websocket }
 }
