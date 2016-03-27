@@ -34,6 +34,12 @@ describe('private api', function() {
     })
     assert.isTrue(resp2.ok)
 
+    // add bob again; operation should be idempotent
+    let { body: resp3 } = await client(this.app).post('/peers', {
+      profile: bobUrl,
+    })
+    assert.isTrue(resp3.ok)
+
     // see what we have
     let { body: resp } = await client(this.app).get('/peers')
     let summary = resp.peers.map(p => ({id: p.id, url: p.url}))

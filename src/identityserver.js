@@ -51,6 +51,17 @@ export default async function(identityPath, fetchProfile = fetchProfile) {
     return rows
   }
 
+  async function getProfile(url) {
+    let [ row ] = await db('SELECT profile FROM peers WHERE url = ?', url)
+    if(row) return JSON.parse(row.profile)
+
+    let profile = await fetchProfile(url)
+    await db('INSERT INTO peers(url, profile) VALUES (?, ?)',
+      url, JSON.stringify(profile))
+
+    return profile
+  }
+
   async function receive({ box, from, to }) {
 
     if(to != publicUrl + '/profile') {
@@ -110,11 +121,7 @@ export default async function(identityPath, fetchProfile = fetchProfile) {
   privateApp.use(bodyParser.json())
 
   privateApp.post('/peers', _wrap(async (req, res) => {
-    let peers = await db('SELECT * FROM peers')
-    let profileUrl = req.body.profile
-    let profile = await fetchProfile(profileUrl)
-    await db('INSERT INTO peers(url, profile) VALUES (?, ?)',
-      profileUrl, JSON.stringify(profile))
+    await getProfile(req.body.profile)
     res.send({ok: true})
   }))
 
