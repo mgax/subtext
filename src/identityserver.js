@@ -47,14 +47,14 @@ export default function(identityPath) {
   let app = express()
   app.use(bodyParser.json())
 
-  app.get('/finger', (req, res) => {
+  app.get('/public/finger', (req, res) => {
     res.send({
       publicKey: keyPair.publicKey,
       messageUrl: messageUrl,
     })
   })
 
-  app.post('/message', (req, res) => {
+  app.post('/public/message', (req, res) => {
     let result = receive(req.body)
     res.send(result)
   })

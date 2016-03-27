@@ -105,7 +105,7 @@ describe('server', function() {
   })
 
   it('should respond to finger', async function() {
-    let { body } = await client(this.app).get('/finger')
+    let { body } = await client(this.app).get('/public/finger')
     assert.equal(body.publicKey.key,
       'YRgaMPzdZPAQiWFiiCggx5qppkN5LNsFTvuoXFF5kDA=')
     assert.equal(body.messageUrl, ALICE.messageUrl)
@@ -117,7 +117,7 @@ describe('server', function() {
       from: BOB.keyPair.publicKey,
       to: ALICE.keyPair.publicKey,
     }
-    let { body } = await client(this.app).post('/message', message)
+    let { body } = await client(this.app).post('/public/message', message)
     assert.isTrue(body.ok)
   })
 
@@ -127,7 +127,7 @@ describe('server', function() {
       from: BOB.keyPair.publicKey,
       to: EVE.keyPair.publicKey,
     }
-    let { body } = await client(this.app).post('/message', message)
+    let { body } = await client(this.app).post('/public/message', message)
     assert.equal(body.error, 'Message is not for me')
   })
 
@@ -137,7 +137,7 @@ describe('server', function() {
       from: BOB.keyPair.publicKey,
       to: ALICE.keyPair.publicKey,
     }
-    let { body } = await client(this.app).post('/message', message)
+    let { body } = await client(this.app).post('/public/message', message)
     assert.equal(body.error, 'Could not decrypt message')
   })
 
