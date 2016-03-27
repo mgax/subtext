@@ -7,26 +7,6 @@ import request from 'request'
 import sqlite3 from 'sqlite3'
 import nodeAsync from './nodeAsync.js'
 
-class Store {
-
-  constructor() {
-    this.conversations = {}
-  }
-
-  log(peer, box) {
-    let messages = this.conversations[peer.key]
-    if(! messages) messages = this.conversations[peer.key] = []
-    let logEntry = {
-      type: 'LogEntry',
-      id: boxId(box),
-      from: peer,
-      box: box,
-    }
-    messages.push(logEntry)
-  }
-
-}
-
 async function fetchProfile(profileUrl) {
   let res = await nodeAsync(request.get)(profileUrl, {json: true})
   return res.body
@@ -40,7 +20,6 @@ async function send(url, envelope) {
 export default async function(identityPath, fetchProfile=fetchProfile, send=send) {
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
   let {keyPair, publicUrl} = config
-  let store = new Store()
   let myPublicUrl = publicUrl + '/profile'
 
   async function db(query, ...args) {
@@ -85,7 +64,6 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
     }
     catch(e) { return {error: "Could not decrypt message"} }
 
-    store.log(from, box)
     saveMessage(peer.id, message)
     return {ok: true}
 
