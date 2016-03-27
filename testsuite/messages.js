@@ -3,7 +3,7 @@ import { randomKeyPair, createBox, openBox } from '../src/messages.js'
 
 describe('identity', function() {
 
-  it('should exchange messages', function() {
+  it('exchanges messages', function() {
     let alice = randomKeyPair()
     let bob = randomKeyPair()
     let cryptobox = createBox({hello: 'world'}, alice.privateKey, bob.publicKey)
@@ -11,7 +11,7 @@ describe('identity', function() {
     assert.deepEqual(payload, {hello: 'world'})
   })
 
-  it('should read messages in standard format', function() {
+  it('reads messages in standard format', function() {
     let alicePublicKey = {
       type: 'PublicKey',
       key: 'j/f5Is/1wuq/Md/NDX9F/4cmpHaiAgaoiILb9pWcuig=',

@@ -121,26 +121,26 @@ describe('public api', function() {
     this.tmp.cleanup()
   })
 
-  it('should respond to profile', async function() {
+  it('responds to profile', async function() {
     let { body } = await client(this.app).get('/profile')
     assert.equal(body.publicKey.key,
       'YRgaMPzdZPAQiWFiiCggx5qppkN5LNsFTvuoXFF5kDA=')
     assert.equal(body.inboxUrl, 'http://alice.example.com/message')
   })
 
-  it('should accept valid incoming message', async function() {
+  it('accepts valid incoming message', async function() {
     let msg = message(BOB, ALICE, "hi")
     let { body } = await client(this.app).post('/message', msg)
     assert.isTrue(body.ok)
   })
 
-  it('should reject message that is not for me', async function() {
+  it('rejects message that is not for me', async function() {
     let msg = message(BOB, EVE, "hi")
     let { body } = await client(this.app).post('/message', msg)
     assert.equal(body.error, 'Message is not for me')
   })
 
-  it('should reject message that does not decrypt', async function() {
+  it('rejects message that does not decrypt', async function() {
     let msg = message(BOB, EVE, "hi")
     msg.to = ALICE.publicUrl + '/profile'
     let { body } = await client(this.app).post('/message', msg)
