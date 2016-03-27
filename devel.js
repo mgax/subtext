@@ -60,7 +60,7 @@ function createidentity(path) {
   }, null, 2), {mode: 0o600})
 }
 
-async function send(identityPath, finger, text) {
+async function send(identityPath, profile, text) {
 
   async function get(url) {
     let res = await nodeAsync(request.get)(url, {json: true})
@@ -73,9 +73,9 @@ async function send(identityPath, finger, text) {
   }
 
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
-  let peer = await get(finger)
+  let peer = await get(profile)
   let message = {type: 'text', text: text}
-  let result = await post(peer.messageUrl, {
+  let result = await post(peer.inboxUrl, {
     box: createBox(message, config.keyPair.privateKey, peer.publicKey),
     from: config.keyPair.publicKey,
     to: peer.publicKey,

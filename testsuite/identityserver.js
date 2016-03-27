@@ -17,7 +17,8 @@ const ALICE = {
       key: "yjwWdAYTsOrUW12amKnT1J1R6TIu0FmjZ+JXCmzyW4A=",
     },
   },
-  messageUrl: "http://localhost:8000/message",
+  name: "Alice",
+  publicUrl: "http://alice.example.com",
 }
 
 const BOB = {
@@ -32,6 +33,8 @@ const BOB = {
       key: "0ghwEILbUNJ8rCiSFWRv4aMqZxDfzvpgQ6/Pp2K+v2g=",
     },
   },
+  name: "Bob",
+  publicUrl: "http://bob.example.com",
 }
 
 const EVE = {
@@ -46,6 +49,8 @@ const EVE = {
       key: "ikS/vxtoiM8u9VUoDTROsEaKEQrbSwwySO9ZiXE8dg8=",
     },
   },
+  name: "Eve",
+  publicUrl: "http://eve.example.com",
 }
 
 function temporaryIdentity() {
@@ -112,11 +117,11 @@ describe('server', function() {
     this.tmp.cleanup()
   })
 
-  it('should respond to finger', async function() {
-    let { body } = await client(this.app).get('/public/finger')
+  it('should respond to profile', async function() {
+    let { body } = await client(this.app).get('/public/profile')
     assert.equal(body.publicKey.key,
       'YRgaMPzdZPAQiWFiiCggx5qppkN5LNsFTvuoXFF5kDA=')
-    assert.equal(body.messageUrl, ALICE.messageUrl)
+    assert.equal(body.inboxUrl, 'http://alice.example.com/public/message')
   })
 
   it('should accept valid incoming message', async function() {

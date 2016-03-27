@@ -26,7 +26,7 @@ class Store {
 
 export default function(identityPath) {
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
-  let { keyPair, messageUrl } = config
+  let { keyPair, publicUrl } = config
   let store = new Store()
 
   function receive({ box, from, to }) {
@@ -47,10 +47,10 @@ export default function(identityPath) {
   let app = express()
   app.use(bodyParser.json())
 
-  app.get('/public/finger', (req, res) => {
+  app.get('/public/profile', (req, res) => {
     res.send({
       publicKey: keyPair.publicKey,
-      messageUrl: messageUrl,
+      inboxUrl: publicUrl + '/public/message',
     })
   })
 
