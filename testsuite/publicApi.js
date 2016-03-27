@@ -106,7 +106,7 @@ function message(from, to, content) {
   }
 }
 
-describe('server', function() {
+describe('public api', function() {
 
   before(function() {
     this.profiles = {
