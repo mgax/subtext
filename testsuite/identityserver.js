@@ -100,17 +100,21 @@ function client(app) {
 
 function message(from, to, content) {
   return {
-    box: createBox(content, from.privateKey, to.publicKey),
-    from: from.publicKey,
-    to: to.publicKey,
+    box: createBox(content, from.keyPair.privateKey, to.keyPair.publicKey),
+    from: from.publicUrl + '/profile',
+    to: to.publicUrl + '/profile',
   }
 }
 
 describe('server', function() {
 
   before(function() {
+    this.profiles = {
+      [BOB.publicUrl + '/profile']: {publicKey: BOB.keyPair.publicKey},
+    }
+    let lookupProfile = (url) => this.profiles[url]
     this.tmp = temporaryIdentity()
-    this.app = identityserver(this.tmp.path).middleware
+    this.app = identityserver(this.tmp.path, lookupProfile).middleware
   })
 
   after(function() {
@@ -125,20 +129,20 @@ describe('server', function() {
   })
 
   it('should accept valid incoming message', async function() {
-    let msg = message(BOB.keyPair, ALICE.keyPair, "hi")
+    let msg = message(BOB, ALICE, "hi")
     let { body } = await client(this.app).post('/message', msg)
     assert.isTrue(body.ok)
   })
 
   it('should reject message that is not for me', async function() {
-    let msg = message(BOB.keyPair, EVE.keyPair, "hi")
+    let msg = message(BOB, EVE, "hi")
     let { body } = await client(this.app).post('/message', msg)
     assert.equal(body.error, 'Message is not for me')
   })
 
   it('should reject message that does not decrypt', async function() {
-    let msg = message(BOB.keyPair, EVE.keyPair, "hi")
-    msg.to = ALICE.keyPair.publicKey
+    let msg = message(BOB, EVE, "hi")
+    msg.to = ALICE.publicUrl + '/profile'
     let { body } = await client(this.app).post('/message', msg)
     assert.equal(body.error, 'Could not decrypt message')
   })

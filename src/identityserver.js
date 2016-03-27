@@ -3,6 +3,8 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import SocketIO from 'socket.io'
 import { openBox, boxId } from './messages.js'
+import request from 'request'
+import nodeAsync from './nodeAsync.js'
 
 class Store {
 
@@ -24,18 +26,25 @@ class Store {
 
 }
 
-export default function(identityPath) {
+async function lookupProfile(profileUrl) {
+  let res = await nodeAsync(request.get)(profileUrl, {json: true})
+  return res.body
+}
+
+export default function(identityPath, lookupProfile = lookupProfile) {
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
   let { keyPair, publicUrl } = config
   let store = new Store()
 
-  function receive({ box, from, to }) {
+  async function receive({ box, from, to }) {
 
-    if(to.key != keyPair.publicKey.key) {
+    if(to != publicUrl + '/profile') {
       return {error: "Message is not for me"}
     }
 
-    try { openBox(box, keyPair.privateKey, from) } catch(e) {
+    let peer = await lookupProfile(from)
+
+    try { openBox(box, keyPair.privateKey, peer.publicKey) } catch(e) {
       return {error: "Could not decrypt message"}
     }
 
@@ -47,6 +56,7 @@ export default function(identityPath) {
   let app = express()
   app.use(bodyParser.json())
 
+  let _wrap = (fn) => (...args) => fn(...args).catch(args[2])
   app.get('/profile', (req, res) => {
     res.send({
       publicKey: keyPair.publicKey,
@@ -54,10 +64,10 @@ export default function(identityPath) {
     })
   })
 
-  app.post('/message', (req, res) => {
-    let result = receive(req.body)
+  app.post('/message', _wrap(async (req, res) => {
+    let result = await receive(req.body)
     res.send(result)
-  })
+  }))
 
   function websocket(server) {
     SocketIO(server).on('connection', function(socket) {
