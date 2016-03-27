@@ -131,4 +131,14 @@ describe('server', function() {
     assert.equal(body.error, 'Message is not for me')
   })
 
+  it('should reject message that does not decrypt', async function() {
+    let message = {
+      box: createBox("hi", BOB.keyPair.privateKey, EVE.keyPair.publicKey),
+      from: BOB.keyPair.publicKey,
+      to: ALICE.keyPair.publicKey,
+    }
+    let { body } = await client(this.app).post('/message', message)
+    assert.equal(body.error, 'Could not decrypt message')
+  })
+
 })
