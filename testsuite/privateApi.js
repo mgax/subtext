@@ -1,20 +1,26 @@
 import {assert} from 'chai'
 import {ALICE, BOB, temporaryIdentity, client} from './common.js'
 import identityserver from '../src/identityserver.js'
+import {openBox} from '../src/messages.js'
 
 describe('private api', function() {
 
-  before(async function() {
+  beforeEach(async function() {
     let profiles = {
-      [BOB.publicUrl + '/profile']: {publicKey: BOB.keyPair.publicKey},
+      [BOB.publicUrl + '/profile']: {
+        inboxUrl: BOB.publicUrl + '/message',
+        publicKey: BOB.keyPair.publicKey,
+      },
     }
+    let sent = this.sent = []
     let fetchProfile = (url) => profiles[url]
+    let send = (url, envelope) => { sent.push({url, envelope}) }
     this.tmp = temporaryIdentity(ALICE)
-    let server = await identityserver(this.tmp.path, fetchProfile)
+    let server = await identityserver(this.tmp.path, fetchProfile, send)
     this.ui = client(server.privateApp)
   })
 
-  after(function() {
+  afterEach(function() {
     this.tmp.cleanup()
   })
 
@@ -45,6 +51,19 @@ describe('private api', function() {
     let summary = resp.peers.map(p => ({id: p.id, url: p.url}))
     assert.deepEqual(summary, [{id: 1, url: bobUrl}, {id: 2, url: eveUrl}])
     assert.equal(resp.peers[0].profile.publicKey.key, BOB.keyPair.publicKey.key)
+  })
+
+  it('sends message', async function() {
+    await this.ui.post('/peers', {profile: BOB.publicUrl + '/profile'})
+    let msg = {type: 'Message', text: "hi"}
+    let {body: resp1} = await this.ui.post('/peers/1/messages', msg)
+
+    let {url, envelope} = this.sent[0]
+    assert.equal(url, BOB.publicUrl + '/message')
+    assert.equal(envelope.to, BOB.publicUrl + '/profile')
+    let boxedMessage = openBox(envelope.box,
+      BOB.keyPair.privateKey, ALICE.keyPair.publicKey)
+    assert.deepEqual(boxedMessage, msg)
   })
 
 })

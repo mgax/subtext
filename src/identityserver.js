@@ -2,7 +2,7 @@ import fs from 'fs'
 import express from 'express'
 import bodyParser from 'body-parser'
 import SocketIO from 'socket.io'
-import {openBox, boxId} from './messages.js'
+import {createBox, openBox, boxId} from './messages.js'
 import request from 'request'
 import sqlite3 from 'sqlite3'
 import nodeAsync from './nodeAsync.js'
@@ -32,10 +32,16 @@ async function fetchProfile(profileUrl) {
   return res.body
 }
 
-export default async function(identityPath, fetchProfile = fetchProfile) {
+async function send(url, envelope) {
+  let res = await nodeAsync(request.post)(url, {json: true, body: envelope})
+  return res.body
+}
+
+export default async function(identityPath, fetchProfile=fetchProfile, send=send) {
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
   let {keyPair, publicUrl} = config
   let store = new Store()
+  let myPublicUrl = publicUrl + '/profile'
 
   async function db(query, ...args) {
     let conn = await new Promise((resolve, reject) => {
@@ -64,7 +70,7 @@ export default async function(identityPath, fetchProfile = fetchProfile) {
 
   async function receive({box, from, to }) {
 
-    if(to != publicUrl + '/profile') {
+    if(to != myPublicUrl) {
       return {error: "Message is not for me"}
     }
 
@@ -133,6 +139,25 @@ export default async function(identityPath, fetchProfile = fetchProfile) {
       profile: JSON.parse(profile),
     }))
     res.send({peers: peers})
+  }))
+
+  async function getPeer(id) {
+    let [{url, profile}] = await db('SELECT * FROM peer WHERE id = ?', id)
+    profile = JSON.parse(profile)
+    return {id, url, profile}
+  }
+
+  privateApp.post('/peers/:id/messages', _wrap(async (req, res) => {
+    let peer = await getPeer(+req.params.id)
+    let message = req.body
+    let envelope = {
+      type: 'Envelope',
+      box: createBox(message, keyPair.privateKey, peer.profile.publicKey),
+      from: myPublicUrl,
+      to: peer.url,
+    }
+    send(peer.profile.inboxUrl, envelope)
+    res.send({ok: true})
   }))
 
   return {publicApp, privateApp, websocket}
