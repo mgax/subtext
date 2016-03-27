@@ -151,7 +151,7 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
     res.send({peers: peers})
   }))
 
-  async function getPeer(id) {
+  async function getPeerById(id) {
     let [{url, profile}] = await db('SELECT * FROM peer WHERE id = ?', id)
     profile = JSON.parse(profile)
     return {id, url, profile}
@@ -164,7 +164,7 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
   }
 
   privateApp.post('/peers/:id/messages', _wrap(async (req, res) => {
-    let peer = await getPeer(+req.params.id)
+    let peer = await getPeerById(+req.params.id)
     let message = req.body
     let envelope = {
       type: 'Envelope',
@@ -178,7 +178,7 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
   }))
 
   privateApp.get('/peers/:id/messages', _wrap(async (req, res) => {
-    let peer = await getPeer(+req.params.id)
+    let peer = await getPeerById(+req.params.id)
     let rows = await db(`SELECT * FROM message WHERE peer_id = ?
       ORDER BY id DESC LIMIT 10`, peer.id)
     let messages = rows.map(({id, message, time}) => ({
