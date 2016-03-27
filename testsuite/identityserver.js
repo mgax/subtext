@@ -118,28 +118,28 @@ describe('server', function() {
   })
 
   it('should respond to profile', async function() {
-    let { body } = await client(this.app).get('/public/profile')
+    let { body } = await client(this.app).get('/profile')
     assert.equal(body.publicKey.key,
       'YRgaMPzdZPAQiWFiiCggx5qppkN5LNsFTvuoXFF5kDA=')
-    assert.equal(body.inboxUrl, 'http://alice.example.com/public/message')
+    assert.equal(body.inboxUrl, 'http://alice.example.com/message')
   })
 
   it('should accept valid incoming message', async function() {
     let msg = message(BOB.keyPair, ALICE.keyPair, "hi")
-    let { body } = await client(this.app).post('/public/message', msg)
+    let { body } = await client(this.app).post('/message', msg)
     assert.isTrue(body.ok)
   })
 
   it('should reject message that is not for me', async function() {
     let msg = message(BOB.keyPair, EVE.keyPair, "hi")
-    let { body } = await client(this.app).post('/public/message', msg)
+    let { body } = await client(this.app).post('/message', msg)
     assert.equal(body.error, 'Message is not for me')
   })
 
   it('should reject message that does not decrypt', async function() {
     let msg = message(BOB.keyPair, EVE.keyPair, "hi")
     msg.to = ALICE.keyPair.publicKey
-    let { body } = await client(this.app).post('/public/message', msg)
+    let { body } = await client(this.app).post('/message', msg)
     assert.equal(body.error, 'Could not decrypt message')
   })
 
