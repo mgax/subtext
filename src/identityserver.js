@@ -4,6 +4,7 @@ import bodyParser from 'body-parser'
 import SocketIO from 'socket.io'
 import { openBox, boxId } from './messages.js'
 import request from 'request'
+import sqlite3 from 'sqlite3'
 import nodeAsync from './nodeAsync.js'
 
 class Store {
@@ -35,6 +36,20 @@ export default function(identityPath, lookupProfile = lookupProfile) {
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
   let { keyPair, publicUrl } = config
   let store = new Store()
+
+  async function db(query, ...args) {
+    let conn = await new Promise((resolve, reject) => {
+      let db = new sqlite3.Database(identityPath + '/db.sqlite', (err) => {
+        if(err) reject(err); else resolve(db)
+      })
+    })
+    let rows = await new Promise((resolve, reject) => {
+      conn.all(query, ...args, (err, rows) => {
+        if(err) reject(err); else resolve(rows)
+      })
+    })
+    return rows
+  }
 
   async function receive({ box, from, to }) {
 
@@ -88,5 +103,28 @@ export default function(identityPath, lookupProfile = lookupProfile) {
     })
   }
 
-  return { publicApp, websocket }
+  let privateApp = express()
+  privateApp.use(bodyParser.json())
+
+  privateApp.post('/peers', _wrap(async (req, res) => {
+    await db('CREATE TABLE IF NOT EXISTS peers (url TEXT PRIMARY KEY, profile TEXT)')
+    let peers = await db('SELECT * FROM peers')
+    let profileUrl = req.body.profile
+    let profile = await lookupProfile(profileUrl)
+    await db('INSERT INTO peers(url, profile) VALUES (?, ?)',
+      profileUrl, JSON.stringify(profile))
+    res.send({ok: true})
+  }))
+
+  privateApp.get('/peers', _wrap(async (req, res) => {
+    await db('CREATE TABLE IF NOT EXISTS peers (url TEXT PRIMARY KEY, profile TEXT)')
+    let rows = await db('SELECT * FROM peers')
+    let peers = rows.map(({url, profile}) => ({
+      url: url,
+      profile: JSON.parse(profile),
+    }))
+    res.send({peers: peers})
+  }))
+
+  return { publicApp, privateApp, websocket }
 }
