@@ -51,10 +51,10 @@ export const EVE = {
   publicUrl: "http://eve.example.com",
 }
 
-export function temporaryIdentity() {
+export function temporaryIdentity(config) {
   let tmpdir = tmp.dirSync({unsafeCleanup: true})
 
-  fs.writeFileSync(tmpdir.name + '/config.json', JSON.stringify(ALICE))
+  fs.writeFileSync(tmpdir.name + '/config.json', JSON.stringify(config))
 
   return {
     path: tmpdir.name,

@@ -9,7 +9,7 @@ describe('public api', function() {
       [BOB.publicUrl + '/profile']: {publicKey: BOB.keyPair.publicKey},
     }
     let lookupProfile = (url) => this.profiles[url]
-    this.tmp = temporaryIdentity()
+    this.tmp = temporaryIdentity(ALICE)
     this.app = identityserver(this.tmp.path, lookupProfile).middleware
   })
 
