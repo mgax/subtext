@@ -53,7 +53,7 @@ async function devserver(path) {
   identity.websocket(server)
 }
 
-function init(path) {
+function createidentity(path) {
   fs.mkdirSync(path)
   fs.writeFileSync(path + '/config.json', JSON.stringify({
     keyPair: randomKeyPair(),
@@ -95,8 +95,8 @@ async function send(identityPath, finger, text) {
     case 'devserver':
       return await devserver(process.argv[3])
 
-    case 'init':
-      return init(process.argv[3])
+    case 'createidentity':
+      return createidentity(process.argv[3])
 
     case 'send':
       return send(process.argv[3], process.argv[4], process.argv[5])
