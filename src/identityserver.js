@@ -52,11 +52,11 @@ export default async function(identityPath, fetchProfile = fetchProfile) {
   }
 
   async function getProfile(url) {
-    let [ row ] = await db('SELECT profile FROM peers WHERE url = ?', url)
+    let [ row ] = await db('SELECT profile FROM peer WHERE url = ?', url)
     if(row) return JSON.parse(row.profile)
 
     let profile = await fetchProfile(url)
-    await db('INSERT INTO peers(url, profile) VALUES (?, ?)',
+    await db('INSERT INTO peer(url, profile) VALUES (?, ?)',
       url, JSON.stringify(profile))
 
     return profile
@@ -79,7 +79,7 @@ export default async function(identityPath, fetchProfile = fetchProfile) {
 
   }
 
-  await db('CREATE TABLE IF NOT EXISTS peers ' +
+  await db('CREATE TABLE IF NOT EXISTS peer ' +
     '(id INTEGER PRIMARY KEY AUTOINCREMENT, url TEXT UNIQUE, profile TEXT)')
 
   let publicApp = express()
@@ -126,7 +126,7 @@ export default async function(identityPath, fetchProfile = fetchProfile) {
   }))
 
   privateApp.get('/peers', _wrap(async (req, res) => {
-    let rows = await db('SELECT * FROM peers')
+    let rows = await db('SELECT * FROM peer')
     let peers = rows.map(({id, url, profile}) => ({
       id: id,
       url: url,
