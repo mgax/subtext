@@ -77,9 +77,9 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
       return {error: "Message is not for me"}
     }
 
-    let peer = await fetchProfile(from)
+    let peer = await getPeerByUrl(from)
 
-    try { openBox(box, keyPair.privateKey, peer.publicKey) } catch(e) {
+    try { openBox(box, keyPair.privateKey, peer.profile.publicKey) } catch(e) {
       return {error: "Could not decrypt message"}
     }
 
