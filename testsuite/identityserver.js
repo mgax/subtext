@@ -67,8 +67,8 @@ function client(app) {
       return new Promise((resolve, reject) => {
         request(app)
           .get(url)
-          .expect('Content-Type', /^application\/json/)
           .expect(200)
+          .expect('Content-Type', /^application\/json/)
           .end(function(err, res) {
             if(err) return reject(err)
             resolve(res)
@@ -81,8 +81,8 @@ function client(app) {
         request(app)
           .post(url)
           .send(body)
-          .expect('Content-Type', /^application\/json/)
           .expect(200)
+          .expect('Content-Type', /^application\/json/)
           .end(function(err, res) {
             if(err) return reject(err)
             resolve(res)
