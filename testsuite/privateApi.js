@@ -4,13 +4,14 @@ import identityserver from '../src/identityserver.js'
 
 describe('private api', function() {
 
-  before(function() {
-    this.profiles = {
+  before(async function() {
+    let profiles = {
       [BOB.publicUrl + '/profile']: {publicKey: BOB.keyPair.publicKey},
     }
-    let lookupProfile = (url) => this.profiles[url]
+    let lookupProfile = (url) => profiles[url]
     this.tmp = temporaryIdentity(ALICE)
-    this.app = identityserver(this.tmp.path, lookupProfile).privateApp
+    let server = await identityserver(this.tmp.path, lookupProfile)
+    this.app = server.privateApp
   })
 
   after(function() {

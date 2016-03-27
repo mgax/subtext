@@ -32,7 +32,7 @@ async function lookupProfile(profileUrl) {
   return res.body
 }
 
-export default function(identityPath, lookupProfile = lookupProfile) {
+export default async function(identityPath, lookupProfile = lookupProfile) {
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
   let { keyPair, publicUrl } = config
   let store = new Store()
