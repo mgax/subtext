@@ -2,6 +2,7 @@ import fs from 'fs'
 import tmp from 'tmp'
 import { assert } from 'chai'
 import identityserver from '../src/identityserver.js'
+import { createBox } from '../src/messages.js'
 import request from 'supertest'
 
 const ALICE = {
@@ -19,6 +20,20 @@ const ALICE = {
   messageUrl: "http://localhost:8000/message",
 }
 
+const BOB = {
+  keyPair: {
+    type: "KeyPair",
+    publicKey: {
+      type: "PublicKey",
+      key: "UExBa+Qt9BfVFCfJoBWLyzNPpGkgTPEGKLxdDQwxNhY=",
+    },
+    privateKey: {
+      type: "PrivateKey",
+      key: "0ghwEILbUNJ8rCiSFWRv4aMqZxDfzvpgQ6/Pp2K+v2g=",
+    },
+  },
+}
+
 function temporaryIdentity() {
   let tmpdir = tmp.dirSync({unsafeCleanup: true})
 
@@ -33,6 +48,7 @@ function temporaryIdentity() {
 
 function client(app) {
   return {
+
     get(url) {
       return new Promise((resolve, reject) => {
         request(app)
@@ -44,7 +60,22 @@ function client(app) {
             resolve(res)
           })
       })
-    }
+    },
+
+    post(url, body) {
+      return new Promise((resolve, reject) => {
+        request(app)
+          .post(url)
+          .send(body)
+          .expect('Content-Type', /^application\/json/)
+          .expect(200)
+          .end(function(err, res) {
+            if(err) return reject(err)
+            resolve(res)
+          })
+      })
+    },
+
   }
 }
 
@@ -64,6 +95,16 @@ describe('server', function() {
     assert.equal(body.publicKey.key,
       'YRgaMPzdZPAQiWFiiCggx5qppkN5LNsFTvuoXFF5kDA=')
     assert.equal(body.messageUrl, ALICE.messageUrl)
+  })
+
+  it('should accept valid incoming message', async function() {
+    let message = {
+      box: createBox("hi", BOB.keyPair.privateKey, ALICE.keyPair.publicKey),
+      from: BOB.keyPair.publicKey,
+      to: ALICE.keyPair.publicKey,
+    }
+    let { body } = await client(this.app).post('/message', message)
+    assert.isTrue(body.ok)
   })
 
 })
