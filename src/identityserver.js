@@ -68,7 +68,8 @@ export default async function(identityPath, lookupProfile = lookupProfile) {
 
   }
 
-  await db('CREATE TABLE IF NOT EXISTS peers (url TEXT PRIMARY KEY, profile TEXT)')
+  await db('CREATE TABLE IF NOT EXISTS peers ' +
+    '(id INTEGER PRIMARY KEY AUTOINCREMENT, url TEXT UNIQUE, profile TEXT)')
 
   let publicApp = express()
   publicApp.use(bodyParser.json())
@@ -119,7 +120,8 @@ export default async function(identityPath, lookupProfile = lookupProfile) {
 
   privateApp.get('/peers', _wrap(async (req, res) => {
     let rows = await db('SELECT * FROM peers')
-    let peers = rows.map(({url, profile}) => ({
+    let peers = rows.map(({id, url, profile}) => ({
+      id: id,
       url: url,
       profile: JSON.parse(profile),
     }))
