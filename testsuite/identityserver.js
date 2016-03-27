@@ -93,6 +93,14 @@ function client(app) {
   }
 }
 
+function message(from, to, content) {
+  return {
+    box: createBox(content, from.privateKey, to.publicKey),
+    from: from.publicKey,
+    to: to.publicKey,
+  }
+}
+
 describe('server', function() {
 
   before(function() {
@@ -112,32 +120,21 @@ describe('server', function() {
   })
 
   it('should accept valid incoming message', async function() {
-    let message = {
-      box: createBox("hi", BOB.keyPair.privateKey, ALICE.keyPair.publicKey),
-      from: BOB.keyPair.publicKey,
-      to: ALICE.keyPair.publicKey,
-    }
-    let { body } = await client(this.app).post('/public/message', message)
+    let msg = message(BOB.keyPair, ALICE.keyPair, "hi")
+    let { body } = await client(this.app).post('/public/message', msg)
     assert.isTrue(body.ok)
   })
 
   it('should reject message that is not for me', async function() {
-    let message = {
-      box: createBox("hi", BOB.keyPair.privateKey, EVE.keyPair.publicKey),
-      from: BOB.keyPair.publicKey,
-      to: EVE.keyPair.publicKey,
-    }
-    let { body } = await client(this.app).post('/public/message', message)
+    let msg = message(BOB.keyPair, EVE.keyPair, "hi")
+    let { body } = await client(this.app).post('/public/message', msg)
     assert.equal(body.error, 'Message is not for me')
   })
 
   it('should reject message that does not decrypt', async function() {
-    let message = {
-      box: createBox("hi", BOB.keyPair.privateKey, EVE.keyPair.publicKey),
-      from: BOB.keyPair.publicKey,
-      to: ALICE.keyPair.publicKey,
-    }
-    let { body } = await client(this.app).post('/public/message', message)
+    let msg = message(BOB.keyPair, EVE.keyPair, "hi")
+    msg.to = ALICE.keyPair.publicKey
+    let { body } = await client(this.app).post('/public/message', msg)
     assert.equal(body.error, 'Could not decrypt message')
   })
 
