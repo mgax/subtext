@@ -8,9 +8,9 @@ describe('public api', function() {
     let profiles = {
       [BOB.publicUrl + '/profile']: {publicKey: BOB.keyPair.publicKey},
     }
-    let lookupProfile = (url) => profiles[url]
+    let fetchProfile = (url) => profiles[url]
     this.tmp = temporaryIdentity(ALICE)
-    let server = await identityserver(this.tmp.path, lookupProfile)
+    let server = await identityserver(this.tmp.path, fetchProfile)
     this.app = server.publicApp
   })
 

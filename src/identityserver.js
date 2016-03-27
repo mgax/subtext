@@ -27,12 +27,12 @@ class Store {
 
 }
 
-async function lookupProfile(profileUrl) {
+async function fetchProfile(profileUrl) {
   let res = await nodeAsync(request.get)(profileUrl, {json: true})
   return res.body
 }
 
-export default async function(identityPath, lookupProfile = lookupProfile) {
+export default async function(identityPath, fetchProfile = fetchProfile) {
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
   let { keyPair, publicUrl } = config
   let store = new Store()
@@ -57,7 +57,7 @@ export default async function(identityPath, lookupProfile = lookupProfile) {
       return {error: "Message is not for me"}
     }
 
-    let peer = await lookupProfile(from)
+    let peer = await fetchProfile(from)
 
     try { openBox(box, keyPair.privateKey, peer.publicKey) } catch(e) {
       return {error: "Could not decrypt message"}
@@ -112,7 +112,7 @@ export default async function(identityPath, lookupProfile = lookupProfile) {
   privateApp.post('/peers', _wrap(async (req, res) => {
     let peers = await db('SELECT * FROM peers')
     let profileUrl = req.body.profile
-    let profile = await lookupProfile(profileUrl)
+    let profile = await fetchProfile(profileUrl)
     await db('INSERT INTO peers(url, profile) VALUES (?, ?)',
       profileUrl, JSON.stringify(profile))
     res.send({ok: true})
