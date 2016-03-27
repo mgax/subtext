@@ -34,6 +34,20 @@ const BOB = {
   },
 }
 
+const EVE = {
+  keyPair: {
+    type: "KeyPair",
+    publicKey: {
+      type: "PublicKey",
+      key: "k/IqAX11Yd+iunc+6gbTk+kmxorNXBydDV6muc21FEM=",
+    },
+    privateKey: {
+      type: "PrivateKey",
+      key: "ikS/vxtoiM8u9VUoDTROsEaKEQrbSwwySO9ZiXE8dg8=",
+    },
+  },
+}
+
 function temporaryIdentity() {
   let tmpdir = tmp.dirSync({unsafeCleanup: true})
 
@@ -105,6 +119,16 @@ describe('server', function() {
     }
     let { body } = await client(this.app).post('/message', message)
     assert.isTrue(body.ok)
+  })
+
+  it('should reject message that is not for me', async function() {
+    let message = {
+      box: createBox("hi", BOB.keyPair.privateKey, EVE.keyPair.publicKey),
+      from: BOB.keyPair.publicKey,
+      to: EVE.keyPair.publicKey,
+    }
+    let { body } = await client(this.app).post('/message', message)
+    assert.equal(body.error, 'Message is not for me')
   })
 
 })
