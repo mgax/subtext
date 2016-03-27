@@ -85,8 +85,10 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
 
   }
 
-  await db('CREATE TABLE IF NOT EXISTS peer ' +
-    '(id INTEGER PRIMARY KEY AUTOINCREMENT, url TEXT UNIQUE, profile TEXT)')
+  await db(`CREATE TABLE IF NOT EXISTS peer (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      url TEXT UNIQUE, profile TEXT
+    )`)
 
   let publicApp = express()
   publicApp.use(bodyParser.json())
