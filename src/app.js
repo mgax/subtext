@@ -6,21 +6,14 @@ import {
 } from './store.js'
 const { Provider, connect } = ReactRedux
 
-const App = ({ keyPair, contacts, send }) => (
+const App = ({}) => (
   <div>
-    <p>public key: <tt>{keyPair.publicKey.key}</tt></p>
-    {contacts.map((contact) =>
-      <Conversation
-        key={contact.publicKey.key}
-        send={send}
-        {... contact}
-        />
-    )}
   </div>
 )
 
 window.main = function() { (async function() {
 
+  window.store = createStore()
   const socket = io.connect('/')
 
   const ConnectedApp = connect((state) => state, mapDispatchToProps)(App)
@@ -29,5 +22,8 @@ window.main = function() { (async function() {
       <ConnectedApp />
     </Provider>
   ), document.querySelector('#app'))
+
+  function mapDispatchToProps(dispatch) { return {
+  }}
 
 })().catch((e) => { console.error(e.stack) }) }

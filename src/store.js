@@ -1,6 +1,8 @@
 import { Redux } from './vendor.js'
 
-function reduce(state, action) {
+const INITIAL_STATE = {}
+
+function reduce(state=INITIAL_STATE, action) {
   switch(action.type) {
 
     default:
