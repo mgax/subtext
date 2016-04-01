@@ -7,17 +7,17 @@ import request from 'request'
 import sqlite3 from 'sqlite3'
 import nodeAsync from './nodeAsync.js'
 
-async function fetchProfile(profileUrl) {
+async function defaultFetchProfile(profileUrl) {
   let res = await nodeAsync(request.get)(profileUrl, {json: true})
   return res.body
 }
 
-async function send(url, envelope) {
+async function defaultSend(url, envelope) {
   let res = await nodeAsync(request.post)(url, {json: true, body: envelope})
   return res.body
 }
 
-export default async function(identityPath, fetchProfile=fetchProfile, send=send) {
+export default async function(identityPath, fetchProfile=defaultFetchProfile, send=defaultSend) {
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
   let {keyPair, publicUrl} = config
   let myPublicUrl = publicUrl + '/profile'
