@@ -102,9 +102,9 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
     SocketIO(server).on('connection', function(socket) {
 
       function on(type, callback) {
-        socket.on(type, async function(data, respond) {
+        socket.on(type, async function(args, respond) {
           try {
-            let res = await callback(data)
+            let res = await callback(... args)
             respond([null, res])
           }
           catch(err) {
@@ -128,6 +128,30 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
         return peers
       })
 
+      on('message', async (peerId, message) => {
+        let peer = await getPeerById(peerId)
+        let envelope = {
+          type: 'Envelope',
+          box: createBox(message, keyPair.privateKey, peer.profile.publicKey),
+          from: myPublicUrl,
+          to: peer.url,
+        }
+        saveMessage(peer.id, message)
+        send(peer.profile.inboxUrl, envelope)
+      })
+
+      on('getMessages', async (peerId) => {
+        let peer = await getPeerById(peerId)
+        let rows = await db(`SELECT * FROM message WHERE peer_id = ?
+          ORDER BY id DESC LIMIT 10`, peer.id)
+        let messages = rows.map(({id, message, time}) => ({
+          id: id,
+          time: time,
+          message: JSON.parse(message),
+        }))
+        return messages
+      })
+
     })
     return server
   }
@@ -146,32 +170,6 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
       VALUES(?, ?, datetime())`,
       peer, JSON.stringify(message))
   }
-
-  privateApp.post('/peers/:id/messages', _wrap(async (req, res) => {
-    let peer = await getPeerById(+req.params.id)
-    let message = req.body
-    let envelope = {
-      type: 'Envelope',
-      box: createBox(message, keyPair.privateKey, peer.profile.publicKey),
-      from: myPublicUrl,
-      to: peer.url,
-    }
-    saveMessage(peer.id, message)
-    send(peer.profile.inboxUrl, envelope)
-    res.send({ok: true})
-  }))
-
-  privateApp.get('/peers/:id/messages', _wrap(async (req, res) => {
-    let peer = await getPeerById(+req.params.id)
-    let rows = await db(`SELECT * FROM message WHERE peer_id = ?
-      ORDER BY id DESC LIMIT 10`, peer.id)
-    let messages = rows.map(({id, message, time}) => ({
-      id: id,
-      time: time,
-      message: JSON.parse(message),
-    }))
-    res.send({messages: messages})
-  }))
 
   return {publicApp, privateApp, websocket}
 }

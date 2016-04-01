@@ -1,7 +1,7 @@
 import http from 'http'
 import io from 'socket.io-client'
 import {assert} from 'chai'
-import {ALICE, BOB, temporaryIdentity, client} from './common.js'
+import {ALICE, BOB, temporaryIdentity} from './common.js'
 import identityserver from '../src/identityserver.js'
 import {openBox} from '../src/messages.js'
 
@@ -29,9 +29,9 @@ class SocketClient {
     this.socket = io.connect(`http://localhost:${PORT}`)
   }
 
-  async send(type, data) {
+  async send(type, ... args) {
     let [err, res] = await new Promise((resolve) => {
-      this.socket.emit(type, data, resolve)
+      this.socket.emit(type, args, resolve)
     })
     if(err) throw err
     return res
@@ -57,7 +57,6 @@ describe('private api', function() {
     let send = (url, envelope) => { sent.push({url, envelope}) }
     this.tmp = temporaryIdentity(ALICE)
     let server = await identityserver(this.tmp.path, fetchProfile, send)
-    this.ui = client(server.privateApp)
     let {privateApp, websocket} = server
     this.http = new TestServer(privateApp, websocket)
     await this.http.start()
@@ -92,9 +91,8 @@ describe('private api', function() {
 
   it('sends message', async function() {
     await this.socket.send('addPeer', BOB.publicUrl + '/profile')
-
     let msg = {type: 'Message', text: "hi"}
-    let {body: resp1} = await this.ui.post('/peers/1/messages', msg)
+    await this.socket.send('message', 1, msg)
 
     let {url, envelope} = this.sent[0]
     assert.equal(url, BOB.publicUrl + '/message')
@@ -103,8 +101,8 @@ describe('private api', function() {
       BOB.keyPair.privateKey, ALICE.keyPair.publicKey)
     assert.deepEqual(boxedMessage, msg)
 
-    let {body: resp2} = await this.ui.get('/peers/1/messages')
-    assert.deepEqual(resp2.messages[0].message, msg)
+    let messages = await this.socket.send('getMessages', 1)
+    assert.deepEqual(messages[0].message, msg)
   })
 
 })
