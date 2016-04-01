@@ -156,9 +156,6 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
     return server
   }
 
-  let privateApp = express()
-  privateApp.use(bodyParser.json())
-
   async function getPeerById(id) {
     let [{url, profile}] = await db('SELECT * FROM peer WHERE id = ?', id)
     profile = JSON.parse(profile)
@@ -171,5 +168,5 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
       peer, JSON.stringify(message))
   }
 
-  return {publicApp, privateApp, websocket}
+  return {publicApp, websocket}
 }

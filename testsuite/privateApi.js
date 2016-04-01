@@ -9,8 +9,8 @@ const PORT = 17604
 
 class TestServer {
 
-  constructor(app, websocket) {
-    this.server = websocket(http.createServer(app))
+  constructor(websocket) {
+    this.server = websocket(http.createServer())
   }
 
   start() {
@@ -57,8 +57,7 @@ describe('private api', function() {
     let send = (url, envelope) => { sent.push({url, envelope}) }
     this.tmp = temporaryIdentity(ALICE)
     let server = await identityserver(this.tmp.path, fetchProfile, send)
-    let {privateApp, websocket} = server
-    this.http = new TestServer(privateApp, websocket)
+    this.http = new TestServer(server.websocket)
     await this.http.start()
     this.socket = new SocketClient()
   })
