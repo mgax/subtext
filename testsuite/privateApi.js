@@ -1,7 +1,47 @@
+import http from 'http'
+import io from 'socket.io-client'
 import {assert} from 'chai'
 import {ALICE, BOB, temporaryIdentity, client} from './common.js'
 import identityserver from '../src/identityserver.js'
 import {openBox} from '../src/messages.js'
+
+const PORT = 17604
+
+class TestServer {
+
+  constructor(app, websocket) {
+    this.server = websocket(http.createServer(app))
+  }
+
+  start() {
+    return new Promise((resolve) => { this.server.listen(PORT, resolve) })
+  }
+
+  stop() {
+    return new Promise((resolve) => { this.server.close(resolve) })
+  }
+
+}
+
+class SocketClient {
+
+  constructor() {
+    this.socket = io.connect(`http://localhost:${PORT}`)
+  }
+
+  async send(type, data) {
+    let [err, res] = await new Promise((resolve) => {
+      this.socket.emit(type, data, resolve)
+    })
+    if(err) throw err
+    return res
+  }
+
+  disconnect() {
+    this.socket.disconnect()
+  }
+
+}
 
 describe('private api', function() {
 
@@ -18,9 +58,15 @@ describe('private api', function() {
     this.tmp = temporaryIdentity(ALICE)
     let server = await identityserver(this.tmp.path, fetchProfile, send)
     this.ui = client(server.privateApp)
+    let {privateApp, websocket} = server
+    this.http = new TestServer(privateApp, websocket)
+    await this.http.start()
+    this.socket = new SocketClient()
   })
 
-  afterEach(function() {
+  afterEach(async function() {
+    this.socket.disconnect()
+    await this.http.stop()
     this.tmp.cleanup()
   })
 
@@ -29,32 +75,24 @@ describe('private api', function() {
     const eveUrl = 'http://eve.example.com/profile'
 
     // add peer
-    let {body: resp1} = await this.ui.post('/peers', {
-      profile: bobUrl,
-    })
-    assert.isTrue(resp1.ok)
+    await this.socket.send('addPeer', bobUrl)
 
     // add a different peer
-    let {body: resp2} = await this.ui.post('/peers', {
-      profile: eveUrl,
-    })
-    assert.isTrue(resp2.ok)
+    await this.socket.send('addPeer', eveUrl)
 
     // add bob again; operation should be idempotent
-    let {body: resp3} = await this.ui.post('/peers', {
-      profile: bobUrl,
-    })
-    assert.isTrue(resp3.ok)
+    await this.socket.send('addPeer', bobUrl)
 
     // see what we have
-    let {body: resp} = await this.ui.get('/peers')
-    let summary = resp.peers.map(p => ({id: p.id, url: p.url}))
+    let peers = await this.socket.send('getPeers')
+    let summary = peers.map(p => ({id: p.id, url: p.url}))
     assert.deepEqual(summary, [{id: 1, url: bobUrl}, {id: 2, url: eveUrl}])
-    assert.equal(resp.peers[0].profile.publicKey.key, BOB.keyPair.publicKey.key)
+    assert.equal(peers[0].profile.publicKey.key, BOB.keyPair.publicKey.key)
   })
 
   it('sends message', async function() {
-    await this.ui.post('/peers', {profile: BOB.publicUrl + '/profile'})
+    await this.socket.send('addPeer', BOB.publicUrl + '/profile')
+
     let msg = {type: 'Message', text: "hi"}
     let {body: resp1} = await this.ui.post('/peers/1/messages', msg)
 

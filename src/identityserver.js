@@ -100,26 +100,40 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
 
   function websocket(server) {
     SocketIO(server).on('connection', function(socket) {
+
+      function on(type, callback) {
+        socket.on(type, async function(data, respond) {
+          try {
+            let res = await callback(data)
+            respond([null, res])
+          }
+          catch(err) {
+            respond([err])
+          }
+        })
+      }
+
+      on('addPeer', async (url) => {
+        await getPeerByUrl(url)
+        return 'ok'
+      })
+
+      on('getPeers', async () => {
+        let rows = await db('SELECT * FROM peer')
+        let peers = rows.map(({id, url, profile}) => ({
+          id: id,
+          url: url,
+          profile: JSON.parse(profile),
+        }))
+        return peers
+      })
+
     })
+    return server
   }
 
   let privateApp = express()
   privateApp.use(bodyParser.json())
-
-  privateApp.post('/peers', _wrap(async (req, res) => {
-    await getPeerByUrl(req.body.profile)
-    res.send({ok: true})
-  }))
-
-  privateApp.get('/peers', _wrap(async (req, res) => {
-    let rows = await db('SELECT * FROM peer')
-    let peers = rows.map(({id, url, profile}) => ({
-      id: id,
-      url: url,
-      profile: JSON.parse(profile),
-    }))
-    res.send({peers: peers})
-  }))
 
   async function getPeerById(id) {
     let [{url, profile}] = await db('SELECT * FROM peer WHERE id = ?', id)
