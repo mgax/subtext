@@ -73,7 +73,9 @@ describe('private api', function() {
     const eveUrl = 'http://eve.example.com/profile'
 
     // add peer
-    await this.socket.send('addPeer', bobUrl)
+    let peer = await this.socket.send('addPeer', bobUrl)
+    assert.equal(peer.id, 1)
+    assert.equal(peer.url, bobUrl)
 
     // add a different peer
     await this.socket.send('addPeer', eveUrl)

@@ -114,8 +114,7 @@ export default async function(identityPath, fetchProfile=fetchProfile, send=send
       }
 
       on('addPeer', async (url) => {
-        await getPeerByUrl(url)
-        return 'ok'
+        return await getPeerByUrl(url)
       })
 
       on('getPeers', async () => {
