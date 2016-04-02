@@ -61,12 +61,14 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
     return getPeerByUrl(url)
   }
 
-  async function deletePeerByUrl(url) {
-    let rows = await db('SELECT id FROM peer WHERE url = ?', url)
-    for(let {id} of rows) {
-      await db('DELETE FROM message WHERE peer_id = ?', id)
-      await db('DELETE FROM peer WHERE id = ?', id)
-    }
+  async function getPeer(id) {
+    let [{url, profile}] = await db('SELECT * FROM peer WHERE id = ?', id)
+    return {id, url, profile: JSON.parse(profile)}
+  }
+
+  async function deletePeerById(id) {
+    await db('DELETE FROM message WHERE peer_id = ?', id)
+    await db('DELETE FROM peer WHERE id = ?', id)
   }
 
   async function receive({box, from, to}) {
@@ -136,8 +138,8 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
         return await getPeerByUrl(url)
       })
 
-      on('deletePeer', async (url) => {
-        await deletePeerByUrl(url)
+      on('deletePeer', async (peerId) => {
+        await deletePeerById(peerId)
       })
 
       on('getPeers', async () => {
@@ -150,8 +152,8 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
         return peers
       })
 
-      on('sendMessage', async (peerUrl, message) => {
-        let peer = await getPeerByUrl(peerUrl)
+      on('sendMessage', async (peerId, message) => {
+        let peer = await getPeer(peerId)
         let envelope = {
           type: 'Envelope',
           box: createBox(message, keyPair.privateKey, peer.profile.publicKey),
@@ -162,8 +164,8 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
         await send(peer.profile.inboxUrl, envelope)
       })
 
-      on('getMessages', async (peerUrl) => {
-        let peer = await getPeerByUrl(peerUrl)
+      on('getMessages', async (peerId) => {
+        let peer = await getPeer(peerId)
         let rows = await db(`SELECT * FROM message WHERE peer_id = ?
           ORDER BY id DESC LIMIT 10`, peer.id)
         return rows.map(loadMessage)

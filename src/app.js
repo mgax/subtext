@@ -28,7 +28,7 @@ function sorted(list, keyFunc) {
 function Compose({peer, sendMessage}) {
   function onSubmit(e) {
     let input = e.target.querySelector('[name=text]')
-    waiter(sendMessage(peer.url, {
+    waiter(sendMessage(peer.id, {
       type: 'Message',
       text: input.value,
     }))
@@ -61,7 +61,7 @@ function Messages({peer}) {
 function App({peers, addPeer, deletePeer, sendMessage}) {
   function onDelete(e, peer) {
     if(! confirm(`delete ${peer.url}?`)) return
-      deletePeer(peer.url)
+      deletePeer(peer.id)
   }
 
   return (
@@ -119,13 +119,13 @@ window.main = function() { waiter((async function() {
       dispatch(newPeer(peer))
     },
 
-    deletePeer: async function(url) {
-      await send('deletePeer', url)
+    deletePeer: async function(peerId) {
+      await send('deletePeer', peerId)
       window.location.reload()
     },
 
-    sendMessage: async function(peerUrl, message) {
-      await send('sendMessage', peerUrl, message)
+    sendMessage: async function(peerId, message) {
+      await send('sendMessage', peerId, message)
     },
 
   }}
@@ -141,7 +141,7 @@ window.main = function() { waiter((async function() {
     let peers = await send('getPeers')
     for(let peer of peers) {
       store.dispatch(newPeer(peer))
-      let messages = await send('getMessages', peer.url)
+      let messages = await send('getMessages', peer.id)
       for(let message of messages) {
         store.dispatch(newMessage(peer.id, message))
       }

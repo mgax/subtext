@@ -85,7 +85,7 @@ describe('private api', function() {
     await this.socket.send('addPeer', eveUrl)
 
     // add bob again; operation should be idempotent
-    await this.socket.send('addPeer', bobUrl)
+    let {id: bobId} = await this.socket.send('addPeer', bobUrl)
 
     // see what we have
     let peers = await this.socket.send('getPeers')
@@ -94,7 +94,7 @@ describe('private api', function() {
     assert.equal(peers[0].profile.publicKey.key, BOB.keyPair.publicKey.key)
 
     // delete a peer
-    await this.socket.send('deletePeer', bobUrl)
+    await this.socket.send('deletePeer', bobId)
     let newPeers = await this.socket.send('getPeers')
     let newSummary = newPeers.map(p => ({id: p.id, url: p.url}))
     assert.deepEqual(newSummary, [{id: 2, url: eveUrl}])
@@ -109,9 +109,9 @@ describe('private api', function() {
       notifications.push({peerId, message})
     })
 
-    await this.socket.send('addPeer', bobUrl)
+    let {id: bobId} = await this.socket.send('addPeer', bobUrl)
     let msg = {type: 'Message', text: "hi"}
-    await this.socket.send('sendMessage', bobUrl, msg)
+    await this.socket.send('sendMessage', bobId, msg)
 
     let {url, envelope} = this.sent[0]
     assert.equal(url, BOB.publicUrl + '/message')
@@ -120,7 +120,7 @@ describe('private api', function() {
       BOB.keyPair.privateKey, ALICE.keyPair.publicKey)
     assert.deepEqual(boxedMessage, msg)
 
-    let messages = await this.socket.send('getMessages', bobUrl)
+    let messages = await this.socket.send('getMessages', bobId)
     assert.deepEqual(messages[0].message, msg)
     assert.equal(messages[0].from, aliceUrl)
 
