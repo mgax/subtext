@@ -157,11 +157,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
         let peer = await getPeerByUrl(peerUrl)
         let rows = await db(`SELECT * FROM message WHERE peer_id = ?
           ORDER BY id DESC LIMIT 10`, peer.id)
-        let messages = rows.map(({message, ... row}) => ({
-          ... row,
-          message: JSON.parse(message),
-        }))
-        return messages
+        return rows.map(loadMessage)
       })
 
     })
@@ -172,6 +168,13 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
     await db(`INSERT INTO message(peer_id, time, "from", message)
       VALUES(?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), ?, ?)`,
       peer, from, JSON.stringify(message))
+  }
+
+  function loadMessage({message, ... row}) {
+    return {
+      ... row,
+      message: JSON.parse(message),
+    }
   }
 
   return {publicApp, websocket}
