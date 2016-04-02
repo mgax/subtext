@@ -10,11 +10,29 @@ const { Provider, connect } = ReactRedux
 function h(callback) {
   return function(e) {
     e.preventDefault()
-    callback()
+    callback(e)
   }
 }
 
-function App({peers, addPeer}) { return (
+function Compose({peer, sendMessage}) {
+  function onSubmit(e) {
+    let input = e.target.querySelector('[name=text]')
+    waiter(sendMessage(peer.url, {
+      type: 'Message',
+      text: input.value,
+    }))
+    input.value = ''
+  }
+
+  return (
+    <form onSubmit={h(onSubmit)}>
+      <input name='text' placeholder='message ...' />
+      <button type='submit'>send</button>
+    </form>
+  )
+}
+
+function App({peers, addPeer, sendMessage}) { return (
 
   <div>
     <button
@@ -25,7 +43,10 @@ function App({peers, addPeer}) { return (
       >add peer</button>
     <ul>
       {peers.map((peer) => (
-        <li key={peer.id}>{peer.url}</li>
+        <li key={peer.id}>
+          {peer.url}
+          <Compose peer={peer} sendMessage={sendMessage} />
+        </li>
       ))}
     </ul>
   </div>
@@ -63,6 +84,10 @@ window.main = function() { waiter((async function() {
     addPeer: async function(url) {
       let peer = await send('addPeer', url)
       dispatch(newPeer(peer))
+    },
+
+    sendMessage: async function(peerUrl, message) {
+      await send('sendMessage', peerUrl, message)
     },
 
   }}
