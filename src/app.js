@@ -75,7 +75,7 @@ function Conversation({peer, sendMessage}) {
   )
 }
 
-function Peer({peer, selectPeer, deletePeer}) {
+function Peer({peer, selectPeer, deletePeer, selected}) {
   function onClick() {
     selectPeer(peer.id)
   }
@@ -86,7 +86,8 @@ function Peer({peer, selectPeer, deletePeer}) {
   }
 
   return (
-    <div className='peer' onClick={h(onClick)}>
+    <div onClick={h(onClick)}
+        className={classNames('peer', {'peer-selected': selected})}>
       {peer.url}
       <button onClick={h(onDelete)}>delete</button>
     </div>
@@ -113,6 +114,7 @@ function App({peers, selectedPeerId, selectPeer, addPeer, deletePeer, sendMessag
                   peer={peer}
                   selectPeer={selectPeer}
                   deletePeer={deletePeer}
+                  selected={selectedPeerId == peer.id}
                   />
               </li>
             ))}
