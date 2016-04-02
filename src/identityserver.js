@@ -64,7 +64,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
     }
     catch(e) { return {error: "Could not decrypt message"} }
 
-    saveMessage(peer.id, message)
+    await saveMessage(peer.id, message)
     return {ok: true}
 
   }
@@ -135,8 +135,8 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
           from: myPublicUrl,
           to: peer.url,
         }
-        saveMessage(peer.id, message)
-        send(peer.profile.inboxUrl, envelope)
+        await saveMessage(peer.id, message)
+        await send(peer.profile.inboxUrl, envelope)
       })
 
       on('getMessages', async (peerId) => {
