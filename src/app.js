@@ -47,7 +47,7 @@ window.main = function() { waiter((async function() {
     let [err, res] = await new Promise((resolve) => {
       socket.emit(type, args, resolve)
     })
-    if(err) throw err
+    if(err) throw new Error(err)
     return res
   }
 

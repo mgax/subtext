@@ -108,7 +108,8 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
             respond([null, res])
           }
           catch(err) {
-            respond([err])
+            console.error(err.stack || err)
+            respond([''+err])
           }
         })
       }

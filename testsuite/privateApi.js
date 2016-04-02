@@ -33,7 +33,7 @@ class SocketClient {
     let [err, res] = await new Promise((resolve) => {
       this.socket.emit(type, args, resolve)
     })
-    if(err) throw err
+    if(err) throw new Error(err)
     return res
   }
 
