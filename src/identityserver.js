@@ -50,6 +50,14 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
     return getPeerByUrl(url)
   }
 
+  async function deletePeerByUrl(url) {
+    let rows = await db('SELECT id FROM peer WHERE url = ?', url)
+    for(let {id} of rows) {
+      await db('DELETE FROM message WHERE peer_id = ?', id)
+      await db('DELETE FROM peer WHERE id = ?', id)
+    }
+  }
+
   async function receive({box, from, to }) {
 
     if(to != myPublicUrl) {
@@ -116,6 +124,10 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
 
       on('addPeer', async (url) => {
         return await getPeerByUrl(url)
+      })
+
+      on('deletePeer', async (url) => {
+        await deletePeerByUrl(url)
       })
 
       on('getPeers', async () => {

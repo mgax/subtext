@@ -88,6 +88,12 @@ describe('private api', function() {
     let summary = peers.map(p => ({id: p.id, url: p.url}))
     assert.deepEqual(summary, [{id: 1, url: bobUrl}, {id: 2, url: eveUrl}])
     assert.equal(peers[0].profile.publicKey.key, BOB.keyPair.publicKey.key)
+
+    // delete a peer
+    await this.socket.send('deletePeer', bobUrl)
+    let newPeers = await this.socket.send('getPeers')
+    let newSummary = newPeers.map(p => ({id: p.id, url: p.url}))
+    assert.deepEqual(newSummary, [{id: 2, url: eveUrl}])
   })
 
   it('sends message', async function() {
