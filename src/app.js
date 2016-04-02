@@ -49,6 +49,7 @@ function Messages({peer}) {
     <ul>
       {messages.map((message) => (
         <li key={message.id}>
+          <p className='message-sender'>{message.from}</p>
           <p className='message-time'>{''+message.time}</p>
           <p className='message-text'>{message.message.text}</p>
         </li>
