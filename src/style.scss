@@ -1,3 +1,5 @@
+$composer-height: 50px;
+
 html,
 body,
 #app,
@@ -6,7 +8,36 @@ body,
   height: 100%;
 }
 
-.app-peers, .app-conversation {
+.app-peers {
   height: 100%;
+  overflow-y: auto;
+}
+
+.app-conversation {
+  height: 100%;
+}
+
+.conversation {
+  height: 100%;
+  position: relative;
+}
+
+.conversation-messages {
+  position: absolute;
+  top: 0;
+  bottom: $composer-height;
+  left: 0;
+  right: 0;
+}
+
+.conversation-compose {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: $composer-height;
+}
+
+.conversation-messages {
   overflow-y: auto;
 }

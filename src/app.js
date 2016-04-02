@@ -1,4 +1,5 @@
 import 'babel-polyfill'
+import classNames from 'classnames'
 import './style.scss'
 import { React, ReactRedux, sodium } from './vendor.js'
 import { randomKeyPair, createBox, boxId } from './messages.js'
@@ -26,7 +27,7 @@ function sorted(list, keyFunc=((i) => i)) {
   })
 }
 
-function Compose({peer, sendMessage}) {
+function Compose({className, peer, sendMessage}) {
   function onSubmit(e) {
     let input = e.target.querySelector('[name=text]')
     waiter(sendMessage(peer.id, {
@@ -37,17 +38,18 @@ function Compose({peer, sendMessage}) {
   }
 
   return (
-    <form onSubmit={h(onSubmit)}>
+    <form onSubmit={h(onSubmit)}
+        className={classNames(className, 'compose')}>
       <input name='text' placeholder='message ...' />
       <button type='submit'>send</button>
     </form>
   )
 }
 
-function Messages({peer}) {
+function Messages({className, peer}) {
   let messages = sorted(Object.values(peer.messages), (m) => m.time)
   return (
-    <ul>
+    <ul className={classNames(className, 'messageList')}>
       {messages.map((message) => (
         <li key={message.id}>
           <p className='message-sender'>{message.from}</p>
@@ -56,6 +58,19 @@ function Messages({peer}) {
         </li>
       ))}
     </ul>
+  )
+}
+
+function Conversation({peer, sendMessage}) {
+  return (
+    <div className='conversation'>
+      <Messages className='conversation-messages' peer={peer} />
+      <Compose
+        className='conversation-compose'
+        peer={peer}
+        sendMessage={sendMessage}
+        />
+    </div>
   )
 }
 
@@ -89,8 +104,7 @@ function App({peers, addPeer, deletePeer, sendMessage}) {
         </div>
         {selectedPeer && (
           <div className='col-sm-8 app-conversation'>
-            <Compose peer={selectedPeer} sendMessage={sendMessage} />
-            <Messages peer={selectedPeer} />
+            <Conversation peer={selectedPeer} sendMessage={sendMessage} />
           </div>
         )}
       </div>
