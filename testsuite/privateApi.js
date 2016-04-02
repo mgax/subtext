@@ -37,6 +37,10 @@ class SocketClient {
     return res
   }
 
+  on(type, callback) {
+    this.socket.on(type, callback)
+  }
+
   disconnect() {
     this.socket.disconnect()
   }
@@ -99,6 +103,12 @@ describe('private api', function() {
   it('sends message', async function() {
     const aliceUrl = 'http://alice.example.com/profile'
     const bobUrl = 'http://bob.example.com/profile'
+
+    let notifications = []
+    this.socket.on('message', (peerId, message) => {
+      notifications.push({peerId, message})
+    })
+
     await this.socket.send('addPeer', bobUrl)
     let msg = {type: 'Message', text: "hi"}
     await this.socket.send('sendMessage', bobUrl, msg)
@@ -113,6 +123,10 @@ describe('private api', function() {
     let messages = await this.socket.send('getMessages', bobUrl)
     assert.deepEqual(messages[0].message, msg)
     assert.equal(messages[0].from, aliceUrl)
+
+    assert.equal(notifications[0].peerId, 1)
+    assert.deepEqual(notifications[0].message.message, msg)
+    assert.equal(notifications[0].message.from, aliceUrl)
   })
 
 })

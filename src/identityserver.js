@@ -1,4 +1,5 @@
 import fs from 'fs'
+import EventEmitter from 'events'
 import express from 'express'
 import bodyParser from 'body-parser'
 import SocketIO from 'socket.io'
@@ -23,6 +24,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
   let {keyPair, publicUrl} = config
   let myPublicUrl = publicUrl + '/profile'
+  let events = new EventEmitter()
 
   async function db(query, ...args) {
     let conn = await new Promise((resolve, reject) => {
@@ -30,11 +32,18 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
         if(err) reject(err); else resolve(db)
       })
     })
-    let rows = await new Promise((resolve, reject) => {
-      conn.all(query, ...args, (err, rows) => {
-        if(err) reject(err); else resolve(rows)
+    async function run(query, ...args) {
+      return await new Promise((resolve, reject) => {
+        conn.all(query, ...args, (err, rows) => {
+          if(err) reject(err); else resolve(rows)
+        })
       })
-    })
+    }
+    let rows = await run(query, ...args)
+    rows.lastInsertId = async function() {
+      let [{id}] = await run(`SELECT last_insert_rowid() as id`)
+      return id
+    }
     return rows
   }
 
@@ -160,14 +169,27 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
         return rows.map(loadMessage)
       })
 
+      function notifyMessage(peerId, message) {
+        socket.emit('message', peerId, message)
+      }
+
+      events.on('message', notifyMessage)
+
+      socket.on('disconnect', () => {
+        events.removeListener('message', notifyMessage)
+      })
+
     })
     return server
   }
 
-  async function saveMessage(peer, message, from) {
-    await db(`INSERT INTO message(peer_id, time, "from", message)
+  async function saveMessage(peerId, message, from) {
+    let res = await db(`INSERT INTO message(peer_id, time, "from", message)
       VALUES(?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), ?, ?)`,
-      peer, from, JSON.stringify(message))
+      peerId, from, JSON.stringify(message))
+    let id = await res.lastInsertId()
+    let [row] = await db(`SELECT * FROM message WHERE id = ?`, id)
+    events.emit('message', peerId, loadMessage(row))
   }
 
   function loadMessage({message, ... row}) {
