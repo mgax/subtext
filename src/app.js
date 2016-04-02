@@ -32,9 +32,15 @@ function App({peers, addPeer}) { return (
 
 ) }
 
-window.main = function() { (async function() {
+function waiter(promise, printRv=true) {
+  promise
+    .then((rv) => { if(printRv || rv !== undefined) console.log(rv) })
+    .catch((e) => { console.error(e.stack || e) })
+}
 
-  window.store = createStore()
+window.main = function() { waiter((async function() {
+
+  let store = createStore()
   const socket = io.connect('/')
 
   async function send(type, ... args) {
@@ -46,8 +52,8 @@ window.main = function() { (async function() {
   }
 
   const ConnectedApp = connect((state) => state, mapDispatchToProps)(App)
-  window.app = ReactDOM.render((
-    <Provider store={window.store}>
+  let app = ReactDOM.render((
+    <Provider store={store}>
       <ConnectedApp />
     </Provider>
   ), document.querySelector('#app'))
@@ -66,4 +72,11 @@ window.main = function() { (async function() {
     store.dispatch(newPeer(peer))
   }
 
-})().catch((e) => { console.error(e.stack) }) }
+  window.S = {
+    app: app,
+    store: store,
+    send: send,
+    waiter: waiter,
+  }
+
+})(), false) }
