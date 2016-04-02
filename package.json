@@ -1,7 +1,7 @@
 {
   "name": "subtext",
   "version": "0.0.1",
-  "devDependencies": {
+  "dependencies": {
     "babel-cli": "^6.4.5",
     "babel-loader": "^6.2.2",
     "babel-polyfill": "^6.5.0",
@@ -9,16 +9,18 @@
     "babel-preset-react": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
     "body-parser": "^1.15.0",
-    "chai": "^3.5.0",
     "express": "^4.13.4",
     "libsodium-wrappers": "^0.2.12",
-    "mocha": "^2.4.5",
     "request": "^2.69.0",
     "socket.io": "^1.4.5",
     "sqlite3": "^3.1.2",
-    "supertest": "^1.2.0",
-    "tmp": "0.0.28",
     "webpack": "^1.12.12",
     "webpack-dev-middleware": "^1.5.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5",
+    "supertest": "^1.2.0",
+    "tmp": "0.0.28"
   }
 }
