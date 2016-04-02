@@ -89,11 +89,26 @@ function Peer({peer, selectPeer, deletePeer, selected}) {
       deletePeer(peer.id)
   }
 
+  let menuId = `peer-menu-${peer.id}`
+  let menu = (
+    <div className='peer-menu dropdown'>
+      <button type='button'
+          className='peer-menubutton dropdown-toggle'
+          id={menuId}
+          data-toggle='dropdown'
+          ><Icon name='cog' /></button>
+      <div className='dropdown-menu dropdown-menu-right'
+          aria-labelledby={menuId}>
+        <a className='dropdown-item' onClick={h(onDelete)}>Delete</a>
+      </div>
+    </div>
+  )
+
   return (
     <div onClick={h(onClick)}
         className={classNames('peer', {'peer-selected': selected})}>
+      {menu}
       {peer.url}
-      <button onClick={h(onDelete)}>delete</button>
     </div>
   )
 }

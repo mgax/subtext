@@ -30,6 +30,19 @@ body,
   background: #eee;
 }
 
+.peer-menu {
+  float: right;
+}
+
+.peer-menubutton {
+  border: none;
+  background: none;
+  color: #ccc;
+  &::after {
+    display: none;
+  }
+}
+
 .conversation {
   height: 100%;
   position: relative;
