@@ -42,7 +42,7 @@ function App({peers, addPeer, sendMessage}) { return (
       })}
       >add peer</button>
     <ul>
-      {peers.map((peer) => (
+      {Object.values(peers).map((peer) => (
         <li key={peer.id}>
           {peer.url}
           <Compose peer={peer} sendMessage={sendMessage} />

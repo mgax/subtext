@@ -9,19 +9,20 @@ export function newPeer(peer) {
 }
 
 const INITIAL_STATE = {
-  peers: [],
+  peers: {},
 }
 
 function reduce(state=INITIAL_STATE, action) {
   switch(action.type) {
 
     case NEW_PEER:
-      if(state.peers.find((p) => p.id == action.peer.id)) {
-        return state
-      }
+      if(state.peers[action.peer.id]) return state
       return {
         ... state,
-        peers: [].concat(state.peers, [action.peer]),
+        peers: {
+          ... state.peers,
+          [action.peer.id]: action.peer,
+        },
       }
 
     default:
