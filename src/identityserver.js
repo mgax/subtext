@@ -127,7 +127,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
         return peers
       })
 
-      on('message', async (peerId, message) => {
+      on('sendMessage', async (peerId, message) => {
         let peer = await getPeerById(peerId)
         let envelope = {
           type: 'Envelope',

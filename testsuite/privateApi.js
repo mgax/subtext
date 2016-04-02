@@ -93,7 +93,7 @@ describe('private api', function() {
   it('sends message', async function() {
     await this.socket.send('addPeer', BOB.publicUrl + '/profile')
     let msg = {type: 'Message', text: "hi"}
-    await this.socket.send('message', 1, msg)
+    await this.socket.send('sendMessage', 1, msg)
 
     let {url, envelope} = this.sent[0]
     assert.equal(url, BOB.publicUrl + '/message')
