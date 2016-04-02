@@ -9,12 +9,14 @@ import nodeAsync from './nodeAsync.js'
 
 async function defaultFetchProfile(profileUrl) {
   let res = await nodeAsync(request.get)(profileUrl, {json: true})
-  return res.body
+  if(res.statusCode == 200) return res.body
+  throw new Error(`Request to ${url} failed with code ${res.statusCode}`)
 }
 
 async function defaultSend(url, envelope) {
   let res = await nodeAsync(request.post)(url, {json: true, body: envelope})
-  return res.body
+  if(res.statusCode == 200) return res.body
+  throw new Error(`Request to ${url} failed with code ${res.statusCode}`)
 }
 
 export default async function(identityPath, fetchProfile=defaultFetchProfile, send=defaultSend) {
