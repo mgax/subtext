@@ -67,3 +67,33 @@ body,
 .conversation-messages {
   overflow-y: auto;
 }
+
+.compose {
+  border-top: 1px solid #ccc;
+}
+
+.compose-text {
+  display: block;
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 70px;
+  bottom: 0;
+
+  input {
+    border: none;
+    width: 100%;
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.compose-submit {
+  position: absolute;
+  top: 8px;
+  right: 0;
+  &:focus {
+    outline: none;
+  }
+}

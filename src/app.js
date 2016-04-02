@@ -45,8 +45,12 @@ function Compose({className, peer, sendMessage}) {
   return (
     <form onSubmit={h(onSubmit)}
         className={classNames(className, 'compose')}>
-      <input name='text' placeholder='message ...' />
-      <button type='submit'>send</button>
+      <div className='compose-text'>
+        <input name='text' placeholder='message ...' />
+      </div>
+      <button type='submit'
+          className='compose-submit btn btn-default btn-sm'
+          >send</button>
     </form>
   )
 }
