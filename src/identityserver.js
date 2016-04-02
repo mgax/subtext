@@ -60,8 +60,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
     }
   }
 
-  async function receive({box, from, to }) {
-
+  async function receive({box, from, to}) {
     if(to != myPublicUrl) {
       return {error: "Message is not for me"}
     }
@@ -76,7 +75,6 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
 
     await saveMessage(peer.id, message)
     return {ok: true}
-
   }
 
   await db(`CREATE TABLE IF NOT EXISTS peer (
