@@ -28,6 +28,10 @@ function sorted(list, keyFunc=((i) => i)) {
   })
 }
 
+function Icon({name}) {
+  return <i className={`fa fa-${name}`} />
+}
+
 function Compose({className, peer, sendMessage}) {
   function onSubmit(e) {
     let input = e.target.querySelector('[name=text]')
