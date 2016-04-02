@@ -74,12 +74,21 @@ function Conversation({peer, sendMessage}) {
   )
 }
 
-function App({peers, addPeer, deletePeer, sendMessage}) {
-  function onDelete(e, peer) {
+function Peer({peer, deletePeer}) {
+  function onDelete() {
     if(! confirm(`delete ${peer.url}?`)) return
       deletePeer(peer.id)
   }
 
+  return (
+    <div className='peer'>
+      {peer.url}
+      <button onClick={h(onDelete)}>delete</button>
+    </div>
+  )
+}
+
+function App({peers, addPeer, deletePeer, sendMessage}) {
   let selectedPeerId = sorted(Object.keys(peers))[0]
   let selectedPeer = peers[selectedPeerId]
 
@@ -96,8 +105,7 @@ function App({peers, addPeer, deletePeer, sendMessage}) {
           <ul>
             {Object.values(peers).map((peer) => (
               <li key={peer.id}>
-                {peer.url}
-                <button onClick={h(onDelete, peer)}>delete</button>
+                <Peer peer={peer} deletePeer={deletePeer} />
               </li>
             ))}
           </ul>
