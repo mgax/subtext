@@ -138,6 +138,9 @@ window.main = function() { waiter((async function() {
   }
 
   async function loadState() {
+    socket.on('message', (peerId, message) => {
+      store.dispatch(newMessage(peerId, message))
+    })
     let peers = await send('getPeers')
     for(let peer of peers) {
       store.dispatch(newPeer(peer))
