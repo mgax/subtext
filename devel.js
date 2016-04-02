@@ -14,6 +14,7 @@ const WEBAPP_OPTIONS = {
   module: {
     loaders: [
       {test: /\.js$/, loader: 'babel', query: {presets: 'es2015,stage-0,react'}},
+      {test: /\.scss$/, loader: 'style!css!sass'},
     ],
     noParse: [
       /\/vendor\.js$/,

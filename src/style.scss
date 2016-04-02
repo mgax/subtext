@@ -1,0 +1,12 @@
+html,
+body,
+#app,
+#app > .container-fluid,
+#app > .container-fluid > .row {
+  height: 100%;
+}
+
+.app-peers, .app-conversation {
+  height: 100%;
+  overflow-y: auto;
+}

@@ -1,4 +1,5 @@
-require('babel-polyfill')
+import 'babel-polyfill'
+import './style.scss'
 import { React, ReactRedux, sodium } from './vendor.js'
 import { randomKeyPair, createBox, boxId } from './messages.js'
 import {
@@ -70,7 +71,7 @@ function App({peers, addPeer, deletePeer, sendMessage}) {
   return (
     <div className='container-fluid'>
       <div className='row'>
-        <div className='col-sm-4'>
+        <div className='col-sm-4 app-peers'>
           <button
             onClick={h(() => {
               let url = prompt('peer url')
@@ -87,7 +88,7 @@ function App({peers, addPeer, deletePeer, sendMessage}) {
           </ul>
         </div>
         {selectedPeer && (
-          <div className='col-sm-8'>
+          <div className='col-sm-8 app-conversation'>
             <Compose peer={selectedPeer} sendMessage={sendMessage} />
             <Messages peer={selectedPeer} />
           </div>
