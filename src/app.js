@@ -143,7 +143,7 @@ window.main = function() { waiter((async function() {
       store.dispatch(newPeer(peer))
       let messages = await send('getMessages', peer.url)
       for(let message of messages) {
-        store.dispatch(newMessage(peer, message))
+        store.dispatch(newMessage(peer.id, message))
       }
     }
   }

@@ -6,8 +6,8 @@ export function newPeer(peer) {
 }
 
 const NEW_MESSAGE = 'NEW_MESSAGE'
-export function newMessage(peer, message) {
-  return {type: NEW_MESSAGE, peer, message}
+export function newMessage(peerId, message) {
+  return {type: NEW_MESSAGE, peerId, message}
 }
 
 const INITIAL_STATE = {
@@ -31,7 +31,7 @@ function reduce(state=INITIAL_STATE, action) {
       }
 
     case NEW_MESSAGE:
-      let peer = state.peers[action.peer.id]
+      let peer = state.peers[action.peerId]
       if(peer.messages[action.message.id]) return state
       return {
         ... state,
