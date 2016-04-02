@@ -15,7 +15,7 @@ function h(callback, ... args) {
   }
 }
 
-function sorted(list, keyFunc) {
+function sorted(list, keyFunc=((i) => i)) {
   return list.slice().sort((a, b) => {
     let ka = keyFunc(a)
     let kb = keyFunc(b)
@@ -64,24 +64,35 @@ function App({peers, addPeer, deletePeer, sendMessage}) {
       deletePeer(peer.id)
   }
 
+  let selectedPeerId = sorted(Object.keys(peers))[0]
+  let selectedPeer = peers[selectedPeerId]
+
   return (
-    <div>
-      <button
-        onClick={h(() => {
-          let url = prompt('peer url')
-          addPeer(url)
-        })}
-        >add peer</button>
-      <ul>
-        {Object.values(peers).map((peer) => (
-          <li key={peer.id}>
-            {peer.url}
-            <button onClick={h(onDelete, peer)}>delete</button>
-            <Compose peer={peer} sendMessage={sendMessage} />
-            <Messages peer={peer} />
-          </li>
-        ))}
-      </ul>
+    <div className='container-fluid'>
+      <div className='row'>
+        <div className='col-sm-4'>
+          <button
+            onClick={h(() => {
+              let url = prompt('peer url')
+              addPeer(url)
+            })}
+            >add peer</button>
+          <ul>
+            {Object.values(peers).map((peer) => (
+              <li key={peer.id}>
+                {peer.url}
+                <button onClick={h(onDelete, peer)}>delete</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {selectedPeer && (
+          <div className='col-sm-8'>
+            <Compose peer={selectedPeer} sendMessage={sendMessage} />
+            <Messages peer={selectedPeer} />
+          </div>
+        )}
+      </div>
     </div>
   )
 }
