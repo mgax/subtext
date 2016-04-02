@@ -17,6 +17,7 @@ export function selectPeer(peerId) {
 
 const INITIAL_STATE = {
   peers: {},
+  selectedPeerId: +localStorage.subtext_selectedPeerId,
 }
 
 function reduce(state=INITIAL_STATE, action) {
@@ -57,6 +58,7 @@ function reduce(state=INITIAL_STATE, action) {
       }
 
     case SELECT_PEER:
+      localStorage.subtext_selectedPeerId = action.peerId
       return {
         ... state,
         selectedPeerId: action.peerId,
