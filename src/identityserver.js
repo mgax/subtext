@@ -73,7 +73,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
     }
     catch(e) { return {error: "Could not decrypt message"} }
 
-    await saveMessage(peer.id, message)
+    await saveMessage(peer.id, message, from)
     return {ok: true}
   }
 
@@ -86,6 +86,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       peer_id INTEGER,
       time TEXT,
+      "from" TEXT,
       message TEXT,
       FOREIGN KEY(peer_id) REFERENCES peer(id)
     )`)
@@ -148,7 +149,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
           from: myPublicUrl,
           to: peer.url,
         }
-        await saveMessage(peer.id, message)
+        await saveMessage(peer.id, message, myPublicUrl)
         await send(peer.profile.inboxUrl, envelope)
       })
 
@@ -156,9 +157,8 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
         let peer = await getPeerByUrl(peerUrl)
         let rows = await db(`SELECT * FROM message WHERE peer_id = ?
           ORDER BY id DESC LIMIT 10`, peer.id)
-        let messages = rows.map(({id, message, time}) => ({
-          id: id,
-          time: time,
+        let messages = rows.map(({message, ... row}) => ({
+          ... row,
           message: JSON.parse(message),
         }))
         return messages
@@ -168,10 +168,10 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
     return server
   }
 
-  async function saveMessage(peer, message) {
-    await db(`INSERT INTO message(peer_id, message, time)
-      VALUES(?, ?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))`,
-      peer, JSON.stringify(message))
+  async function saveMessage(peer, message, from) {
+    await db(`INSERT INTO message(peer_id, time, "from", message)
+      VALUES(?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), ?, ?)`,
+      peer, from, JSON.stringify(message))
   }
 
   return {publicApp, websocket}

@@ -97,6 +97,7 @@ describe('private api', function() {
   })
 
   it('sends message', async function() {
+    const aliceUrl = 'http://alice.example.com/profile'
     const bobUrl = 'http://bob.example.com/profile'
     await this.socket.send('addPeer', bobUrl)
     let msg = {type: 'Message', text: "hi"}
@@ -111,6 +112,7 @@ describe('private api', function() {
 
     let messages = await this.socket.send('getMessages', bobUrl)
     assert.deepEqual(messages[0].message, msg)
+    assert.equal(messages[0].from, aliceUrl)
   })
 
 })
