@@ -57,27 +57,27 @@ function Messages({peer}) {
   )
 }
 
-function App({peers, addPeer, sendMessage}) { return (
-
-  <div>
-    <button
-      onClick={h(() => {
-        let url = prompt('peer url')
-        addPeer(url)
-      })}
-      >add peer</button>
-    <ul>
-      {Object.values(peers).map((peer) => (
-        <li key={peer.id}>
-          {peer.url}
-          <Compose peer={peer} sendMessage={sendMessage} />
-          <Messages peer={peer} />
-        </li>
-      ))}
-    </ul>
-  </div>
-
-) }
+function App({peers, addPeer, sendMessage}) {
+  return (
+    <div>
+      <button
+        onClick={h(() => {
+          let url = prompt('peer url')
+          addPeer(url)
+        })}
+        >add peer</button>
+      <ul>
+        {Object.values(peers).map((peer) => (
+          <li key={peer.id}>
+            {peer.url}
+            <Compose peer={peer} sendMessage={sendMessage} />
+            <Messages peer={peer} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 function waiter(promise, printRv=true) {
   promise
