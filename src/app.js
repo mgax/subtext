@@ -31,7 +31,7 @@ function Compose({peer, sendMessage}) {
     waiter(sendMessage(peer.id, {
       type: 'Message',
       text: input.value,
-    }))
+    }), false)
     input.value = ''
   }
 
