@@ -92,16 +92,20 @@ window.main = function() { waiter((async function() {
 
   }}
 
-  let peers = await send('getPeers')
-  for(let peer of peers) {
-    store.dispatch(newPeer(peer))
-  }
-
   window.S = {
     app: app,
     store: store,
     send: send,
     waiter: waiter,
   }
+
+  async function loadState() {
+    let peers = await send('getPeers')
+    for(let peer of peers) {
+      store.dispatch(newPeer(peer))
+    }
+  }
+
+  await loadState()
 
 })(), false) }
