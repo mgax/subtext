@@ -140,8 +140,8 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
         return peers
       })
 
-      on('sendMessage', async (peerId, message) => {
-        let peer = await getPeerById(peerId)
+      on('sendMessage', async (peerUrl, message) => {
+        let peer = await getPeerByUrl(peerUrl)
         let envelope = {
           type: 'Envelope',
           box: createBox(message, keyPair.privateKey, peer.profile.publicKey),
@@ -152,8 +152,8 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
         await send(peer.profile.inboxUrl, envelope)
       })
 
-      on('getMessages', async (peerId) => {
-        let peer = await getPeerById(peerId)
+      on('getMessages', async (peerUrl) => {
+        let peer = await getPeerByUrl(peerUrl)
         let rows = await db(`SELECT * FROM message WHERE peer_id = ?
           ORDER BY id DESC LIMIT 10`, peer.id)
         let messages = rows.map(({id, message, time}) => ({
@@ -166,12 +166,6 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
 
     })
     return server
-  }
-
-  async function getPeerById(id) {
-    let [{url, profile}] = await db('SELECT * FROM peer WHERE id = ?', id)
-    profile = JSON.parse(profile)
-    return {id, url, profile}
   }
 
   async function saveMessage(peer, message) {

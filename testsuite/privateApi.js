@@ -97,18 +97,19 @@ describe('private api', function() {
   })
 
   it('sends message', async function() {
-    await this.socket.send('addPeer', BOB.publicUrl + '/profile')
+    const bobUrl = 'http://bob.example.com/profile'
+    await this.socket.send('addPeer', bobUrl)
     let msg = {type: 'Message', text: "hi"}
-    await this.socket.send('sendMessage', 1, msg)
+    await this.socket.send('sendMessage', bobUrl, msg)
 
     let {url, envelope} = this.sent[0]
     assert.equal(url, BOB.publicUrl + '/message')
-    assert.equal(envelope.to, BOB.publicUrl + '/profile')
+    assert.equal(envelope.to, bobUrl)
     let boxedMessage = openBox(envelope.box,
       BOB.keyPair.privateKey, ALICE.keyPair.publicKey)
     assert.deepEqual(boxedMessage, msg)
 
-    let messages = await this.socket.send('getMessages', 1)
+    let messages = await this.socket.send('getMessages', bobUrl)
     assert.deepEqual(messages[0].message, msg)
   })
 
