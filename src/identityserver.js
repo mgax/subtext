@@ -170,7 +170,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
 
   async function saveMessage(peer, message) {
     await db(`INSERT INTO message(peer_id, message, time)
-      VALUES(?, ?, datetime())`,
+      VALUES(?, ?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))`,
       peer, JSON.stringify(message))
   }
 
