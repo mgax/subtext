@@ -8,8 +8,8 @@ import request from 'request'
 import sqlite3 from 'sqlite3'
 import nodeAsync from './nodeAsync.js'
 
-async function defaultFetchProfile(profileUrl) {
-  let res = await nodeAsync(request.get)(profileUrl, {json: true})
+async function defaultFetchProfile(url) {
+  let res = await nodeAsync(request.get)(url, {json: true})
   if(res.statusCode == 200) return res.body
   throw new Error(`Request to ${url} failed with code ${res.statusCode}`)
 }
