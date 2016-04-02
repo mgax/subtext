@@ -8,10 +8,10 @@ import {
 } from './store.js'
 const { Provider, connect } = ReactRedux
 
-function h(callback) {
+function h(callback, ... args) {
   return function(e) {
     e.preventDefault()
-    callback(e)
+    callback(e, ... args)
   }
 }
 
@@ -57,7 +57,12 @@ function Messages({peer}) {
   )
 }
 
-function App({peers, addPeer, sendMessage}) {
+function App({peers, addPeer, deletePeer, sendMessage}) {
+  function onDelete(e, peer) {
+    if(! confirm(`delete ${peer.url}?`)) return
+      deletePeer(peer.url)
+  }
+
   return (
     <div>
       <button
@@ -70,6 +75,7 @@ function App({peers, addPeer, sendMessage}) {
         {Object.values(peers).map((peer) => (
           <li key={peer.id}>
             {peer.url}
+            <button onClick={h(onDelete, peer)}>delete</button>
             <Compose peer={peer} sendMessage={sendMessage} />
             <Messages peer={peer} />
           </li>
@@ -110,6 +116,11 @@ window.main = function() { waiter((async function() {
     addPeer: async function(url) {
       let peer = await send('addPeer', url)
       dispatch(newPeer(peer))
+    },
+
+    deletePeer: async function(url) {
+      await send('deletePeer', url)
+      window.location.reload()
     },
 
     sendMessage: async function(peerUrl, message) {
