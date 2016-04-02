@@ -2,10 +2,12 @@ import { Redux } from './vendor.js'
 
 const NEW_PEER = 'NEW_PEER'
 export function newPeer(peer) {
-  return {
-    type: NEW_PEER,
-    peer: peer,
-  }
+  return {type: NEW_PEER, peer}
+}
+
+const NEW_MESSAGE = 'NEW_MESSAGE'
+export function newMessage(peer, message) {
+  return {type: NEW_MESSAGE, peer, message}
 }
 
 const INITIAL_STATE = {
@@ -21,7 +23,30 @@ function reduce(state=INITIAL_STATE, action) {
         ... state,
         peers: {
           ... state.peers,
-          [action.peer.id]: action.peer,
+          [action.peer.id]: {
+            ... action.peer,
+            messages: [],
+          },
+        },
+      }
+
+    case NEW_MESSAGE:
+      let peer = state.peers[action.peer.id]
+      if(peer.messages[action.message.id]) return state
+      return {
+        ... state,
+        peers: {
+          ... state.peers,
+          [peer.id]: {
+            ... peer,
+            messages: {
+              ... peer.messages,
+              [action.message.id]: {
+                ... action.message,
+                time: new Date(action.message.time),
+              }
+            },
+          },
         },
       }
 

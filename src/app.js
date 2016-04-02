@@ -4,6 +4,7 @@ import { randomKeyPair, createBox, boxId } from './messages.js'
 import {
   createStore,
   newPeer,
+  newMessage,
 } from './store.js'
 const { Provider, connect } = ReactRedux
 
@@ -12,6 +13,16 @@ function h(callback) {
     e.preventDefault()
     callback(e)
   }
+}
+
+function sorted(list, keyFunc) {
+  return list.slice().sort((a, b) => {
+    let ka = keyFunc(a)
+    let kb = keyFunc(b)
+    if(ka < kb) return -1
+    if(ka > kb) return 1
+    return 0
+  })
 }
 
 function Compose({peer, sendMessage}) {
@@ -32,6 +43,20 @@ function Compose({peer, sendMessage}) {
   )
 }
 
+function Messages({peer}) {
+  let messages = sorted(Object.values(peer.messages), (m) => m.time)
+  return (
+    <ul>
+      {messages.map((message) => (
+        <li key={message.id}>
+          <p className='message-time'>{''+message.time}</p>
+          <p className='message-text'>{message.message.text}</p>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 function App({peers, addPeer, sendMessage}) { return (
 
   <div>
@@ -46,6 +71,7 @@ function App({peers, addPeer, sendMessage}) { return (
         <li key={peer.id}>
           {peer.url}
           <Compose peer={peer} sendMessage={sendMessage} />
+          <Messages peer={peer} />
         </li>
       ))}
     </ul>
@@ -103,6 +129,10 @@ window.main = function() { waiter((async function() {
     let peers = await send('getPeers')
     for(let peer of peers) {
       store.dispatch(newPeer(peer))
+      let messages = await send('getMessages', peer.url)
+      for(let message of messages) {
+        store.dispatch(newMessage(peer, message))
+      }
     }
   }
 
