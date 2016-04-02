@@ -10,6 +10,11 @@ export function newMessage(peerId, message) {
   return {type: NEW_MESSAGE, peerId, message}
 }
 
+const SELECT_PEER = 'SELECT_PEER'
+export function selectPeer(peerId) {
+  return {type: SELECT_PEER, peerId}
+}
+
 const INITIAL_STATE = {
   peers: {},
 }
@@ -49,6 +54,12 @@ function reduce(state=INITIAL_STATE, action) {
             },
           },
         },
+      }
+
+    case SELECT_PEER:
+      return {
+        ... state,
+        selectedPeerId: action.peerId,
       }
 
     default:

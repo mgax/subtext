@@ -7,6 +7,7 @@ import {
   createStore,
   newPeer,
   newMessage,
+  selectPeer,
 } from './store.js'
 const { Provider, connect } = ReactRedux
 
@@ -74,22 +75,25 @@ function Conversation({peer, sendMessage}) {
   )
 }
 
-function Peer({peer, deletePeer}) {
+function Peer({peer, selectPeer, deletePeer}) {
+  function onClick() {
+    selectPeer(peer.id)
+  }
+
   function onDelete() {
     if(! confirm(`delete ${peer.url}?`)) return
       deletePeer(peer.id)
   }
 
   return (
-    <div className='peer'>
+    <div className='peer' onClick={h(onClick)}>
       {peer.url}
       <button onClick={h(onDelete)}>delete</button>
     </div>
   )
 }
 
-function App({peers, addPeer, deletePeer, sendMessage}) {
-  let selectedPeerId = sorted(Object.keys(peers))[0]
+function App({peers, selectedPeerId, selectPeer, addPeer, deletePeer, sendMessage}) {
   let selectedPeer = peers[selectedPeerId]
 
   return (
@@ -105,7 +109,11 @@ function App({peers, addPeer, deletePeer, sendMessage}) {
           <ul>
             {Object.values(peers).map((peer) => (
               <li key={peer.id}>
-                <Peer peer={peer} deletePeer={deletePeer} />
+                <Peer
+                  peer={peer}
+                  selectPeer={selectPeer}
+                  deletePeer={deletePeer}
+                  />
               </li>
             ))}
           </ul>
@@ -160,6 +168,10 @@ window.main = function() { waiter((async function() {
 
     sendMessage: async function(peerId, message) {
       await send('sendMessage', peerId, message)
+    },
+
+    selectPeer: function(peerId) {
+      dispatch(selectPeer(peerId))
     },
 
   }}
