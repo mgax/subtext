@@ -11,6 +11,7 @@ body,
 .app-peers {
   height: 100%;
   overflow-y: auto;
+  border-right: 1px solid #aaa;
 
   > ul {
     list-style: none;
@@ -24,6 +25,7 @@ body,
 
 .peer {
   height: 60px;
+  border-bottom: 1px solid #ccc;
 }
 
 .peer-selected {
