@@ -61,30 +61,6 @@ function createidentity(path) {
   }, null, 2), {mode: 0o600})
 }
 
-async function send(identityPath, profile, text) {
-
-  async function get(url) {
-    let res = await nodeAsync(request.get)(url, {json: true})
-    return res.body
-  }
-
-  async function post(url, body) {
-    let res = await nodeAsync(request.post)(url, {json: true, body: body})
-    return res.body
-  }
-
-  let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
-  let peer = await get(profile)
-  let message = {type: 'text', text: text}
-  let result = await post(peer.inboxUrl, {
-    box: createBox(message, config.keyPair.privateKey, peer.publicKey),
-    from: config.keyPair.publicKey,
-    to: peer.publicKey,
-  })
-  console.assert(result.ok, 'error sending message: ' + JSON.stringify(result))
-
-}
-
 (async function() {
   let cmd = process.argv[2]
 
@@ -98,9 +74,6 @@ async function send(identityPath, profile, text) {
 
     case 'createidentity':
       return createidentity(process.argv[3])
-
-    case 'send':
-      return send(process.argv[3], process.argv[4], process.argv[5])
 
     default:
       throw new Error("Unknown command " + cmd)

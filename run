@@ -34,11 +34,6 @@ case $COMMAND in
     exec ./run babel-node devel.js createidentity "$@"
     ;;
 
-  send)
-    set -x
-    exec ./run babel-node devel.js send "$@"
-    ;;
-
   *)
     echo "Unknown command $COMMAND"
     ;;
