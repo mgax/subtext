@@ -32,8 +32,26 @@ function Icon({name}) {
   return <i className={`fa fa-${name}`} />
 }
 
-function Compose({className, peer, sendMessage}) {
-  function onSubmit(e) {
+class Compose extends React.Component {
+
+  render() {
+    let {className} = this.props
+
+    return (
+      <form onSubmit={h((e) => { this.handleSubmit(e) })}
+          className={classNames(className, 'compose')}>
+        <div className='compose-text'>
+          <input name='text' placeholder='message ...' autoComplete='off' />
+        </div>
+        <button type='submit'
+            className='compose-submit btn btn-default btn-sm'
+            >send</button>
+      </form>
+    )
+  }
+
+  handleSubmit(e) {
+    let {peer, sendMessage} = this.props
     let input = e.target.querySelector('[name=text]')
     waiter(sendMessage(peer.id, {
       type: 'Message',
@@ -42,17 +60,6 @@ function Compose({className, peer, sendMessage}) {
     input.value = ''
   }
 
-  return (
-    <form onSubmit={h(onSubmit)}
-        className={classNames(className, 'compose')}>
-      <div className='compose-text'>
-        <input name='text' placeholder='message ...' autoComplete='off' />
-      </div>
-      <button type='submit'
-          className='compose-submit btn btn-default btn-sm'
-          >send</button>
-    </form>
-  )
 }
 
 function Message({message: {me, time, message: {text}}}) {
