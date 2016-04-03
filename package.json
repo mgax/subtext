@@ -17,6 +17,7 @@
     "request": "^2.69.0",
     "sass-loader": "^3.2.0",
     "socket.io": "^1.4.5",
+    "socketio-auth": "0.0.5",
     "sqlite3": "^3.1.2",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.12",

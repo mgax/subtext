@@ -211,6 +211,18 @@ window.main = function() { waiter((async function() {
   let store = createStore()
   const socket = io.connect('/')
 
+  socket.on('unauthorized', (err) => {
+    console.error('socket.io unauthorized:', err)
+  })
+
+  socket.on('connect', () => {
+    socket.emit('authentication', localStorage.subtext_authToken)
+  })
+
+  socket.on('authenticated', () => {
+    waiter(loadState(), false)
+  })
+
   async function send(type, ... args) {
     let [err, res] = await new Promise((resolve) => {
       socket.emit(type, args, resolve)
@@ -268,7 +280,5 @@ window.main = function() { waiter((async function() {
       }
     }
   }
-
-  await loadState()
 
 })(), false) }

@@ -3,6 +3,7 @@ import EventEmitter from 'events'
 import express from 'express'
 import bodyParser from 'body-parser'
 import SocketIO from 'socket.io'
+import socketioAuth from 'socketio-auth'
 import {createBox, openBox, boxId} from './messages.js'
 import request from 'request'
 import sqlite3 from 'sqlite3'
@@ -22,7 +23,7 @@ async function defaultSend(url, envelope) {
 
 export default async function(identityPath, fetchProfile=defaultFetchProfile, send=defaultSend) {
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
-  let {keyPair, publicUrl} = config
+  let {keyPair, publicUrl, authToken} = config
   let myPublicUrl = publicUrl + '/profile'
   let events = new EventEmitter()
 
@@ -157,7 +158,12 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
   }))
 
   function websocket(server) {
-    SocketIO(server).on('connection', function(socket) {
+    socketioAuth(SocketIO(server), {
+      authenticate: (socket, token, cb) => { cb(null, token == authToken) },
+      postAuthenticate: connection,
+    })
+
+    function connection(socket) {
 
       function on(type, callback) {
         socket.on(type, async function(args, respond) {
@@ -219,7 +225,8 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
         events.removeListener('message', notifyMessage)
       })
 
-    })
+    }
+
     return server
   }
 
