@@ -16,6 +16,7 @@ export const ALICE = {
     },
   },
   name: "Alice",
+  authToken: '--alice-token--',
   publicUrl: "http://alice.example.com",
 }
 
@@ -32,6 +33,7 @@ export const BOB = {
     },
   },
   name: "Bob",
+  authToken: '--bob-token--',
   publicUrl: "http://bob.example.com",
 }
 
@@ -48,6 +50,7 @@ export const EVE = {
     },
   },
   name: "Eve",
+  authToken: '--eve-token--',
   publicUrl: "http://eve.example.com",
 }
 

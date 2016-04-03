@@ -29,6 +29,11 @@ class SocketClient {
     this.socket = io.connect(`http://localhost:${PORT}`)
   }
 
+  auth(token) {
+    this.socket.emit('authentication', token)
+    return new Promise((r) => { this.socket.on('authenticated', r) })
+  }
+
   async send(type, ... args) {
     let [err, res] = await new Promise((resolve) => {
       this.socket.emit(type, args, resolve)
@@ -64,6 +69,7 @@ describe('private api', function() {
     this.http = new TestServer(server.websocket)
     await this.http.start()
     this.socket = new SocketClient()
+    let rv = await this.socket.auth('--alice-token--')
   })
 
   afterEach(async function() {
