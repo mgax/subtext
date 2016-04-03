@@ -55,7 +55,16 @@ function Compose({className, peer, sendMessage}) {
   )
 }
 
-class Messages extends React.Component {
+function Message({message: {me, time, message: {text}}}) {
+  let cls = classNames('message', {'message-me': me})
+  return (
+    <li className={cls} title={time}>
+      {text}
+    </li>
+  )
+}
+
+class MessageList extends React.Component {
 
   render() {
     let {className, peer} = this.props
@@ -64,11 +73,7 @@ class Messages extends React.Component {
       <ul className={classNames(className, 'messageList')}
           onScroll={h(() => { this.onScroll() })}>
         {messages.map((message) => (
-          <li key={message.id}>
-            <p className='message-sender'>{message.from}</p>
-            <p className='message-time'>{''+message.time}</p>
-            <p className='message-text'>{message.message.text}</p>
-          </li>
+          <Message key={message.id} message={message} />
         ))}
       </ul>
     )
@@ -103,7 +108,7 @@ class Messages extends React.Component {
 function Conversation({peer, sendMessage}) {
   return (
     <div className='conversation'>
-      <Messages className='conversation-messages' peer={peer} />
+      <MessageList className='conversation-messages' peer={peer} />
       <Compose
         className='conversation-compose'
         peer={peer}
