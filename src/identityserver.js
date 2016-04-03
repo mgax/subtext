@@ -121,13 +121,9 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
             time TEXT,
             me BOOL,
             message TEXT,
+            unread BOOL,
             FOREIGN KEY(peer_id) REFERENCES peer(id)
           )`)
-        await prop('dbVersion', 1)
-
-      case 1:
-        console.log('DB upgrade 1 -> 2')
-        await db(`ALTER TABLE message ADD COLUMN unread BOOL`)
         await prop('dbVersion', 2)
 
       case 2:
