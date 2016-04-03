@@ -97,3 +97,22 @@ body,
     outline: none;
   }
 }
+
+.messageList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.message {
+  clear: both;
+  float: left;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.message-me {
+  float: right;
+  background: forestgreen;
+  color: white;
+}
