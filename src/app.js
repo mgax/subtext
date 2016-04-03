@@ -55,19 +55,49 @@ function Compose({className, peer, sendMessage}) {
   )
 }
 
-function Messages({className, peer}) {
-  let messages = sorted(Object.values(peer.messages), (m) => m.time)
-  return (
-    <ul className={classNames(className, 'messageList')}>
-      {messages.map((message) => (
-        <li key={message.id}>
-          <p className='message-sender'>{message.from}</p>
-          <p className='message-time'>{''+message.time}</p>
-          <p className='message-text'>{message.message.text}</p>
-        </li>
-      ))}
-    </ul>
-  )
+class Messages extends React.Component {
+
+  render() {
+    let {className, peer} = this.props
+    let messages = sorted(Object.values(peer.messages), (m) => m.time)
+    return (
+      <ul className={classNames(className, 'messageList')}
+          onScroll={h(() => { this.onScroll() })}>
+        {messages.map((message) => (
+          <li key={message.id}>
+            <p className='message-sender'>{message.from}</p>
+            <p className='message-time'>{''+message.time}</p>
+            <p className='message-text'>{message.message.text}</p>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  componentDidMount() {
+    this.bottom = true
+    this.updateScroll = () => {
+      if(this.bottom) {
+        let node = ReactDOM.findDOMNode(this)
+        node.scrollTop = node.scrollHeight - node.offsetHeight
+      }
+    }
+    window.addEventListener('resize', this.updateScroll)
+  }
+
+  onScroll() {
+    let node = ReactDOM.findDOMNode(this)
+    this.bottom = node.scrollTop >= node.scrollHeight - node.offsetHeight
+  }
+
+  componentDidUpdate() {
+    this.updateScroll()
+  }
+
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateScroll)
+  }
 }
 
 function Conversation({peer, sendMessage}) {
