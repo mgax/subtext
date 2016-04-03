@@ -5,12 +5,12 @@ import identityserver from '../src/identityserver.js'
 describe('public api', function() {
 
   before(async function() {
-    let profiles = {
-      [BOB.publicUrl + '/profile']: {publicKey: BOB.keyPair.publicKey},
+    let cards = {
+      [BOB.publicUrl + '/card']: {publicKey: BOB.keyPair.publicKey},
     }
-    let fetchProfile = (url) => profiles[url]
+    let fetchCard = (url) => cards[url]
     this.tmp = temporaryIdentity(ALICE)
-    let server = await identityserver(this.tmp.path, fetchProfile)
+    let server = await identityserver(this.tmp.path, fetchCard)
     this.pub = client(server.publicApp)
   })
 
@@ -18,8 +18,8 @@ describe('public api', function() {
     this.tmp.cleanup()
   })
 
-  it('responds to profile', async function() {
-    let {body} = await this.pub.get('/profile')
+  it('responds to card', async function() {
+    let {body} = await this.pub.get('/card')
     assert.equal(body.publicKey.key,
       'YRgaMPzdZPAQiWFiiCggx5qppkN5LNsFTvuoXFF5kDA=')
     assert.equal(body.inboxUrl, 'http://alice.example.com/message')
@@ -39,7 +39,7 @@ describe('public api', function() {
 
   it('rejects message that does not decrypt', async function() {
     let msg = message(BOB, EVE, "hi")
-    msg.to = ALICE.publicUrl + '/profile'
+    msg.to = ALICE.publicUrl + '/card'
     let {body} = await this.pub.post('/message', msg)
     assert.equal(body.error, 'Could not decrypt message')
   })

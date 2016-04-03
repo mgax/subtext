@@ -55,17 +55,17 @@ class SocketClient {
 describe('private api', function() {
 
   beforeEach(async function() {
-    let profiles = {
-      [BOB.publicUrl + '/profile']: {
+    let cards = {
+      [BOB.publicUrl + '/card']: {
         inboxUrl: BOB.publicUrl + '/message',
         publicKey: BOB.keyPair.publicKey,
       },
     }
     let sent = this.sent = []
-    let fetchProfile = (url) => profiles[url]
+    let fetchCard = (url) => cards[url]
     let send = (url, envelope) => { sent.push({url, envelope}) }
     this.tmp = temporaryIdentity(ALICE)
-    let server = await identityserver(this.tmp.path, fetchProfile, send)
+    let server = await identityserver(this.tmp.path, fetchCard, send)
     this.http = new TestServer(server.websocket)
     await this.http.start()
     this.socket = new SocketClient()
@@ -79,8 +79,8 @@ describe('private api', function() {
   })
 
   it('saves new peer', async function() {
-    const bobUrl = 'http://bob.example.com/profile'
-    const eveUrl = 'http://eve.example.com/profile'
+    const bobUrl = 'http://bob.example.com/card'
+    const eveUrl = 'http://eve.example.com/card'
 
     // add peer
     let peer = await this.socket.send('addPeer', bobUrl)
@@ -97,7 +97,7 @@ describe('private api', function() {
     let peers = await this.socket.send('getPeers')
     let summary = peers.map(p => ({id: p.id, url: p.url}))
     assert.deepEqual(summary, [{id: 1, url: bobUrl}, {id: 2, url: eveUrl}])
-    assert.equal(peers[0].profile.publicKey.key, BOB.keyPair.publicKey.key)
+    assert.equal(peers[0].card.publicKey.key, BOB.keyPair.publicKey.key)
 
     // delete a peer
     await this.socket.send('deletePeer', bobId)
@@ -107,7 +107,7 @@ describe('private api', function() {
   })
 
   it('sends message', async function() {
-    const bobUrl = 'http://bob.example.com/profile'
+    const bobUrl = 'http://bob.example.com/card'
 
     let notifications = []
     this.socket.on('message', (peerId, message) => {

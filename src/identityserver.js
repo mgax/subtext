@@ -9,7 +9,7 @@ import request from 'request'
 import sqlite3 from 'sqlite3'
 import nodeAsync from './nodeAsync.js'
 
-async function defaultFetchProfile(url) {
+async function defaultFetchCard(url) {
   let res = await nodeAsync(request.get)(url, {json: true})
   if(res.statusCode == 200) return res.body
   throw new Error(`Request to ${url} failed with code ${res.statusCode}`)
@@ -21,10 +21,10 @@ async function defaultSend(url, envelope) {
   throw new Error(`Request to ${url} failed with code ${res.statusCode}`)
 }
 
-export default async function(identityPath, fetchProfile=defaultFetchProfile, send=defaultSend) {
+export default async function(identityPath, fetchCard=defaultFetchCard, send=defaultSend) {
   let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
   let {keyPair, publicUrl, authToken} = config
-  let myPublicUrl = publicUrl + '/profile'
+  let myPublicUrl = publicUrl + '/card'
   let events = new EventEmitter()
 
   async function db(query, ...args) {
@@ -51,20 +51,20 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
   async function getPeerByUrl(url) {
     let [row] = await db('SELECT * FROM peer WHERE url = ?', url)
     if(row) {
-      let {id, profile} = row
-      profile = JSON.parse(profile)
-      return {id, url, profile}
+      let {id, card} = row
+      card = JSON.parse(card)
+      return {id, url, card}
     }
 
-    let profile = await fetchProfile(url)
-    await db('INSERT INTO peer(url, profile) VALUES (?, ?)',
-      url, JSON.stringify(profile))
+    let card = await fetchCard(url)
+    await db('INSERT INTO peer(url, card) VALUES (?, ?)',
+      url, JSON.stringify(card))
     return getPeerByUrl(url)
   }
 
   async function getPeer(id) {
-    let [{url, profile}] = await db('SELECT * FROM peer WHERE id = ?', id)
-    return {id, url, profile: JSON.parse(profile)}
+    let [{url, card}] = await db('SELECT * FROM peer WHERE id = ?', id)
+    return {id, url, card: JSON.parse(card)}
   }
 
   async function deletePeerById(id) {
@@ -81,7 +81,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
 
     let message
     try {
-      message = openBox(box, keyPair.privateKey, peer.profile.publicKey)
+      message = openBox(box, keyPair.privateKey, peer.card.publicKey)
     }
     catch(e) { return {error: "Could not decrypt message"} }
 
@@ -113,7 +113,8 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
       case undefined:
         await db(`CREATE TABLE peer (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            url TEXT UNIQUE, profile TEXT
+            url TEXT UNIQUE,
+            card TEXT
           )`)
         await db(`CREATE TABLE message (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -124,9 +125,9 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
             unread BOOL,
             FOREIGN KEY(peer_id) REFERENCES peer(id)
           )`)
-        await prop('dbVersion', 2)
+        await prop('dbVersion', 3)
 
-      case 2:
+      case 3:
         return
 
       default:
@@ -141,7 +142,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
   publicApp.use(bodyParser.json())
 
   let _wrap = (fn) => (...args) => fn(...args).catch(args[2])
-  publicApp.get('/profile', (req, res) => {
+  publicApp.get('/card', (req, res) => {
     res.send({
       publicKey: keyPair.publicKey,
       inboxUrl: publicUrl + '/message',
@@ -184,10 +185,10 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
 
       on('getPeers', async () => {
         let rows = await db('SELECT * FROM peer')
-        let peers = rows.map(({id, url, profile}) => ({
+        let peers = rows.map(({id, url, card}) => ({
           id: id,
           url: url,
-          profile: JSON.parse(profile),
+          card: JSON.parse(card),
         }))
         return peers
       })
@@ -196,12 +197,12 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
         let peer = await getPeer(peerId)
         let envelope = {
           type: 'Envelope',
-          box: createBox(message, keyPair.privateKey, peer.profile.publicKey),
+          box: createBox(message, keyPair.privateKey, peer.card.publicKey),
           from: myPublicUrl,
           to: peer.url,
         }
         await saveMessage(peer.id, message, true)
-        await send(peer.profile.inboxUrl, envelope)
+        await send(peer.card.inboxUrl, envelope)
       })
 
       on('getMessages', async (peerId) => {
