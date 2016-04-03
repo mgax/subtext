@@ -84,7 +84,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
     }
     catch(e) { return {error: "Could not decrypt message"} }
 
-    await saveMessage(peer.id, message, from)
+    await saveMessage(peer.id, message, false)
     return {ok: true}
   }
 
@@ -97,7 +97,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       peer_id INTEGER,
       time TEXT,
-      "from" TEXT,
+      me BOOL,
       message TEXT,
       FOREIGN KEY(peer_id) REFERENCES peer(id)
     )`)
@@ -160,7 +160,7 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
           from: myPublicUrl,
           to: peer.url,
         }
-        await saveMessage(peer.id, message, myPublicUrl)
+        await saveMessage(peer.id, message, true)
         await send(peer.profile.inboxUrl, envelope)
       })
 
@@ -185,18 +185,19 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
     return server
   }
 
-  async function saveMessage(peerId, message, from) {
-    let res = await db(`INSERT INTO message(peer_id, time, "from", message)
+  async function saveMessage(peerId, message, me) {
+    let res = await db(`INSERT INTO message(peer_id, time, me, message)
       VALUES(?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), ?, ?)`,
-      peerId, from, JSON.stringify(message))
+      peerId, me, JSON.stringify(message))
     let id = await res.lastInsertId()
     let [row] = await db(`SELECT * FROM message WHERE id = ?`, id)
     events.emit('message', peerId, loadMessage(row))
   }
 
-  function loadMessage({message, ... row}) {
+  function loadMessage({message, me, ... row}) {
     return {
       ... row,
+      me: !! me,
       message: JSON.parse(message),
     }
   }
