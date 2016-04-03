@@ -93,20 +93,6 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
       value TEXT
     )`)
 
-  await db(`CREATE TABLE IF NOT EXISTS peer (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      url TEXT UNIQUE, profile TEXT
-    )`)
-
-  await db(`CREATE TABLE IF NOT EXISTS message (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      peer_id INTEGER,
-      time TEXT,
-      me BOOL,
-      message TEXT,
-      FOREIGN KEY(peer_id) REFERENCES peer(id)
-    )`)
-
   async function prop(key, value) {
     if(value === undefined) {
       let res = await db(`SELECT value FROM prop WHERE key = ?`, key)
@@ -121,9 +107,22 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
 
   async function dbUpgrade() {
     let dbVersion = await prop('dbVersion')
-    if(! dbVersion) dbVersion = await prop('dbVersion', 1)
-
     switch(dbVersion) {
+
+      case undefined:
+        await db(`CREATE TABLE peer (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            url TEXT UNIQUE, profile TEXT
+          )`)
+        await db(`CREATE TABLE message (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            peer_id INTEGER,
+            time TEXT,
+            me BOOL,
+            message TEXT,
+            FOREIGN KEY(peer_id) REFERENCES peer(id)
+          )`)
+        await prop('dbVersion', 1)
 
       case 1:
         console.log('DB upgrade 1 -> 2')
