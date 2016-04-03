@@ -119,6 +119,28 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
     return value
   }
 
+  async function dbUpgrade() {
+    let dbVersion = await prop('dbVersion')
+    if(! dbVersion) dbVersion = await prop('dbVersion', 1)
+
+    switch(dbVersion) {
+
+      case 1:
+        console.log('DB upgrade 1 -> 2')
+        await db(`ALTER TABLE message ADD COLUMN unread BOOL`)
+        await prop('dbVersion', 2)
+
+      case 2:
+        return
+
+      default:
+        throw Error(`Unknown DB version ${dbVersion}`)
+
+    }
+  }
+
+  await dbUpgrade()
+
   let publicApp = express()
   publicApp.use(bodyParser.json())
 
