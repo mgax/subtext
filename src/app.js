@@ -50,6 +50,10 @@ class Compose extends React.Component {
     )
   }
 
+  componentDidMount() {
+    ReactDOM.findDOMNode(this).querySelector('[name=text]').focus()
+  }
+
   handleSubmit(e) {
     let {peer, sendMessage} = this.props
     let input = e.target.querySelector('[name=text]')
@@ -187,7 +191,8 @@ function App({peers, selectedPeerId, selectPeer, addPeer, deletePeer, sendMessag
         </div>
         {selectedPeer && (
           <div className='col-sm-8 app-conversation'>
-            <Conversation peer={selectedPeer} sendMessage={sendMessage} />
+            <Conversation key={selectedPeer.id}
+              peer={selectedPeer} sendMessage={sendMessage} />
           </div>
         )}
       </div>
