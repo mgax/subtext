@@ -88,6 +88,11 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
     return {ok: true}
   }
 
+  await db(`CREATE TABLE IF NOT EXISTS prop (
+      key TEXT UNIQUE,
+      value TEXT
+    )`)
+
   await db(`CREATE TABLE IF NOT EXISTS peer (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       url TEXT UNIQUE, profile TEXT
@@ -101,6 +106,18 @@ export default async function(identityPath, fetchProfile=defaultFetchProfile, se
       message TEXT,
       FOREIGN KEY(peer_id) REFERENCES peer(id)
     )`)
+
+  async function prop(key, value) {
+    if(value === undefined) {
+      let res = await db(`SELECT value FROM prop WHERE key = ?`, key)
+      if(res.length > 0) value = JSON.parse(res[0].value)
+    }
+    else {
+      await db(`INSERT OR REPLACE INTO prop (key, value) VALUES (?, ?)`,
+          key, JSON.stringify(value))
+    }
+    return value
+  }
 
   let publicApp = express()
   publicApp.use(bodyParser.json())
