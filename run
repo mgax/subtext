@@ -26,7 +26,7 @@ case $COMMAND in
 
   server)
     set -x
-    exec ./run babel-node server.js
+    exec ./run babel-node server.js "$@"
     ;;
 
   createidentity)
