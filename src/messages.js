@@ -54,6 +54,14 @@ export function randomKeyPair() {
   }
 }
 
+export function randomToken(size) {
+  let rv = ''
+  while(rv.length < size) {
+    rv += sodium.to_base64(sodium.randombytes_buf(3)).replace(/[+/]/g, '')
+  }
+  return rv.slice(0, size)
+}
+
 export function boxId(cryptoBox) {
   let [ciphertext] = from_cryptobox(cryptoBox)
   return sodium.to_base64(sodium.crypto_hash(ciphertext).slice(0, 32))
