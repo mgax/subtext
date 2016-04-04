@@ -49,3 +49,5 @@ You will need a recent version of node.js (5.x).
    ```javascript
    localStorage.subtext_authToken = 'MY_AUTH_TOKEN'
    ```
+
+   Then, add a peer (like `https://mgax.grep.ro/card`), and chat away!
