@@ -4,7 +4,7 @@ import webpack from 'webpack'
 import fs from 'fs'
 import readlineLib from 'readline'
 import request from 'request'
-import { randomKeyPair, createBox } from './src/messages.js'
+import { randomKeyPair, createBox, randomToken } from './src/messages.js'
 import identityServer from './src/identityserver.js'
 import nodeAsync from './src/nodeAsync.js'
 
@@ -80,11 +80,25 @@ function prompt({question, defaultValue = '', valid = (() => true)}) {
   })
 }
 
-function createidentity(path) {
+async function createidentity(path) {
+  let name = await prompt({
+    question: 'Name',
+    defaultValue: process.env.USER,
+  })
+  let publicUrl = await prompt({
+    question: 'URL where the subtext server will respond, no trailing\n' +
+        'slash, e.g. "http://subtext.example.com"',
+    valid: (url) => url.match(/^http[s]?:\/\/.+[^/]$/),
+  })
+  let authToken = randomToken(20)
   fs.mkdirSync(path)
   fs.writeFileSync(path + '/config.json', JSON.stringify({
     keyPair: randomKeyPair(),
+    name: name,
+    publicUrl: publicUrl,
+    authToken: authToken,
   }, null, 2), {mode: 0o600})
+  console.log('Your authentication token:', authToken)
 }
 
 (async function() {
@@ -99,7 +113,7 @@ function createidentity(path) {
       return await devserver(process.argv[3])
 
     case 'createidentity':
-      return createidentity(process.argv[3])
+      return await createidentity(process.argv[3])
 
     default:
       throw new Error("Unknown command " + cmd)
