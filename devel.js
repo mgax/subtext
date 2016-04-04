@@ -2,6 +2,7 @@ import express from 'express'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpack from 'webpack'
 import fs from 'fs'
+import readlineLib from 'readline'
 import request from 'request'
 import { randomKeyPair, createBox } from './src/messages.js'
 import identityServer from './src/identityserver.js'
@@ -52,6 +53,31 @@ async function devserver(path) {
   app.get('/', function(req, res) { res.send(index_html()) })
   let server = app.listen(+(process.env.PORT || 8000))
   identity.websocket(server)
+}
+
+function prompt({question, defaultValue = '', valid = (() => true)}) {
+  let rl = readlineLib.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  })
+  let defaultText = defaultValue ? ` [${defaultValue}]` : ''
+  let text = `${question}${defaultText}: `
+  return new Promise((resolve) => {
+    function ask() {
+      rl.question(text, (resp) => {
+        let value = resp || defaultValue
+        if(valid(resp)) {
+          resolve(value)
+          rl.close()
+        }
+        else {
+          console.log('Not a valid answer:', value)
+          ask()
+        }
+      })
+    }
+    ask()
+  })
 }
 
 function createidentity(path) {
