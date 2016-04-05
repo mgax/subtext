@@ -93,10 +93,16 @@ describe('private api', function() {
     // add bob again; operation should be idempotent
     let {id: bobId} = await this.socket.send('addPeer', bobUrl)
 
+    // edit peer props
+    await this.socket.send('setPeerProps', 2, {foo: 'bar'})
+
     // see what we have
     let peers = await this.socket.send('getPeers')
-    let summary = peers.map(p => ({id: p.id, url: p.url}))
-    assert.deepEqual(summary, [{id: 1, url: bobUrl}, {id: 2, url: eveUrl}])
+    let summary = peers.map(p => ({id: p.id, url: p.url, props: p.props}))
+    assert.deepEqual(summary, [
+      {id: 1, url: bobUrl, props: {}},
+      {id: 2, url: eveUrl, props: {foo: 'bar'}},
+    ])
     assert.equal(peers[0].card.publicKey.key, BOB.keyPair.publicKey.key)
 
     // delete a peer
