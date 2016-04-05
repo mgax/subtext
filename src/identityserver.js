@@ -62,6 +62,13 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
     return getPeerByUrl(url)
   }
 
+  async function updatePeerCard(peerId) {
+    let peer = await getPeer(peerId)
+    let card = await fetchCard(peer.url)
+    await db('UPDATE peer SET card = ? WHERE id = ?',
+      JSON.stringify(card), peerId)
+  }
+
   async function getPeer(id) {
     let [{url, card}] = await db('SELECT * FROM peer WHERE id = ?', id)
     return {id, url, card: JSON.parse(card)}
@@ -181,6 +188,11 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
 
       on('deletePeer', async (peerId) => {
         await deletePeerById(peerId)
+      })
+
+      on('updatePeerCard', async (peerId) => {
+        await updatePeerCard(peerId)
+        return await getPeer(peerId)
       })
 
       on('getPeers', async () => {
