@@ -168,7 +168,7 @@ function Conversation({peer, sendMessage}) {
   )
 }
 
-function Peer({peer, selectPeer, modal, deletePeer, selected}) {
+function Peer({peer, updatePeerCard, selectPeer, modal, deletePeer, selected}) {
   let name = peer.url
 
   function onInfo() {
@@ -182,7 +182,14 @@ function Peer({peer, selectPeer, modal, deletePeer, selected}) {
     ]
     modal(
       <Modal title={name} buttons={buttons}>
-        <h5>card</h5>
+        <h5>
+          card
+          <a className='btn btn-default btn-sm' onClick={h(() => {
+                updatePeerCard(peer.id)
+              })}>
+            update
+          </a>
+        </h5>
         <pre>{JSON.stringify(peer.card, null, 2)}</pre>
       </Modal>
     )
@@ -199,7 +206,7 @@ function Peer({peer, selectPeer, modal, deletePeer, selected}) {
   )
 }
 
-function App({peers, modal, selectedPeerId, selectPeer, addPeer, deletePeer, sendMessage}) {
+function App({peers, modal, selectedPeerId, updatePeerCard, selectPeer, addPeer, deletePeer, sendMessage}) {
   let selectedPeer = peers[selectedPeerId]
 
   return (
@@ -217,6 +224,7 @@ function App({peers, modal, selectedPeerId, selectPeer, addPeer, deletePeer, sen
               <li key={peer.id}>
                 <Peer
                   peer={peer}
+                  updatePeerCard={updatePeerCard}
                   selectPeer={selectPeer}
                   deletePeer={deletePeer}
                   modal={modal}
@@ -295,6 +303,11 @@ window.main = function() { waiter((async function() {
 
     sendMessage: async function(peerId, message) {
       await send('sendMessage', peerId, message)
+    },
+
+    updatePeerCard: async function(peerId) {
+      let peer = await send('updatePeerCard', peerId)
+      dispatch(newPeer(peer))
     },
 
     selectPeer: function(peerId) {

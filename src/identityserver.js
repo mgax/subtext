@@ -153,6 +153,7 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
     res.send({
       publicKey: keyPair.publicKey,
       inboxUrl: publicUrl + '/message',
+      name: config.name,
     })
   })
 

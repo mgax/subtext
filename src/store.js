@@ -24,14 +24,14 @@ function reduce(state=INITIAL_STATE, action) {
   switch(action.type) {
 
     case NEW_PEER:
-      if(state.peers[action.peer.id]) return state
       return {
         ... state,
         peers: {
           ... state.peers,
           [action.peer.id]: {
-            ... action.peer,
             messages: [],
+            ... state.peers[action.peer.id],
+            ... action.peer,
           },
         },
       }
