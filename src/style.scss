@@ -109,13 +109,35 @@ body,
 .message {
   clear: both;
   float: left;
+  position: relative;
   padding: 3px 15px;
   border-radius: 18px;
   background: #eee;
+
+  .time {
+    display: none;
+  }
+
+  &:hover .time {
+    display: block;
+    position: absolute;
+    top: -16px;
+    white-space: nowrap;
+    background: white;
+    color: #888;
+    font-size: 11px;
+    left: 0;
+  }
 }
 
 .message-me {
   float: right;
   background: forestgreen;
   color: white;
+
+  &:hover .time {
+    left: auto;
+    right: 0;
+    text-align: right;
+  }
 }
