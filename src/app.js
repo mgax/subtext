@@ -188,7 +188,7 @@ function App({peers, selectedPeerId, selectPeer, addPeer, deletePeer, sendMessag
           <button
             onClick={h(() => {
               let url = prompt('peer url')
-              addPeer(url)
+              if(url) addPeer(url)
             })}
             >add peer</button>
           <ul>
