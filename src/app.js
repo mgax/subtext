@@ -196,6 +196,7 @@ function Peer({store, peer, updatePeerCard, selectPeer, modal, deletePeer, selec
               update
             </a>
           </h5>
+          <p><code>{peer.url}</code></p>
           <pre>{JSON.stringify(peer.card, null, 2)}</pre>
         </Modal>
       )
