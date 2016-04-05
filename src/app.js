@@ -32,6 +32,34 @@ function Icon({name}) {
   return <i className={`fa fa-${name}`} />
 }
 
+function Modal() {
+  return (
+    <div className='modal fade'>
+      <div className='modal-dialog' role='document'>
+        <div className='modal-content'>
+          <div className='modal-header'>
+            <button type='button' className='close'
+              data-dismiss='modal' aria-label='Close'>
+              <span aria-hidden='true'>&times;</span>
+            </button>
+            <h4 className='modal-title'>Modal title</h4>
+          </div>
+          <div className='modal-body'>
+            <p>One fine body&hellip;</p>
+          </div>
+          <div className='modal-footer'>
+            <button type='button' className='btn btn-secondary'
+                data-dismiss='modal'>Close</button>
+            <button type='button' className='btn btn-primary'>
+              Save changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 class Compose extends React.Component {
 
   render() {
@@ -144,9 +172,13 @@ function Conversation({peer, sendMessage}) {
   )
 }
 
-function Peer({peer, selectPeer, deletePeer, selected}) {
+function Peer({peer, selectPeer, modal, deletePeer, selected}) {
   function onClick() {
     selectPeer(peer.id)
+  }
+
+  function onInfo() {
+    modal(<Modal />)
   }
 
   function onDelete() {
@@ -164,6 +196,7 @@ function Peer({peer, selectPeer, deletePeer, selected}) {
           ><Icon name='cog' /></button>
       <div className='dropdown-menu dropdown-menu-right'
           aria-labelledby={menuId}>
+        <a className='dropdown-item' onClick={h(onInfo)}>Info</a>
         <a className='dropdown-item' onClick={h(onDelete)}>Delete</a>
       </div>
     </div>
@@ -178,7 +211,7 @@ function Peer({peer, selectPeer, deletePeer, selected}) {
   )
 }
 
-function App({peers, selectedPeerId, selectPeer, addPeer, deletePeer, sendMessage}) {
+function App({peers, modal, selectedPeerId, selectPeer, addPeer, deletePeer, sendMessage}) {
   let selectedPeer = peers[selectedPeerId]
 
   return (
@@ -198,6 +231,7 @@ function App({peers, selectedPeerId, selectPeer, addPeer, deletePeer, sendMessag
                   peer={peer}
                   selectPeer={selectPeer}
                   deletePeer={deletePeer}
+                  modal={modal}
                   selected={selectedPeerId == peer.id}
                   />
               </li>
@@ -249,9 +283,15 @@ window.main = function() { waiter((async function() {
   const ConnectedApp = connect((state) => state, mapDispatchToProps)(App)
   let app = ReactDOM.render((
     <Provider store={store}>
-      <ConnectedApp />
+      <ConnectedApp modal={modal} />
     </Provider>
   ), document.querySelector('#app'))
+
+  function modal(content) {
+    let container = document.querySelector('#modal')
+    ReactDOM.render(content, container)
+    $('.modal', container).modal()
+  }
 
   function mapDispatchToProps(dispatch) { return {
 
