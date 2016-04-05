@@ -169,7 +169,7 @@ function Conversation({peer, sendMessage}) {
 }
 
 function Peer({store, peer, updatePeerCard, selectPeer, modal, deletePeer, selected}) {
-  let name = peer.url
+  let name = peer.card.name || peer.url
 
   function onInfo() {
 
