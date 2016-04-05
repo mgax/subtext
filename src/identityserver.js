@@ -50,11 +50,7 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
 
   async function getPeerByUrl(url) {
     let [row] = await db('SELECT * FROM peer WHERE url = ?', url)
-    if(row) {
-      let {id, card} = row
-      card = JSON.parse(card)
-      return {id, url, card}
-    }
+    if(row) return loadPeer(row)
 
     let card = await fetchCard(url)
     await db('INSERT INTO peer(url, card) VALUES (?, ?)',
@@ -70,8 +66,8 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
   }
 
   async function getPeer(id) {
-    let [{url, card}] = await db('SELECT * FROM peer WHERE id = ?', id)
-    return {id, url, card: JSON.parse(card)}
+    let [row] = await db('SELECT * FROM peer WHERE id = ?', id)
+    return loadPeer(row)
   }
 
   async function deletePeerById(id) {
@@ -198,11 +194,7 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
 
       on('getPeers', async () => {
         let rows = await db('SELECT * FROM peer')
-        let peers = rows.map(({id, url, card}) => ({
-          id: id,
-          url: url,
-          card: JSON.parse(card),
-        }))
+        let peers = rows.map(loadPeer)
         return peers
       })
 
@@ -247,6 +239,13 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
     let id = await res.lastInsertId()
     let [row] = await db(`SELECT * FROM message WHERE id = ?`, id)
     events.emit('message', peerId, loadMessage(row))
+  }
+
+  function loadPeer({card, props, ... row}) {
+    return {
+      ... row,
+      card: JSON.parse(card),
+    }
   }
 
   function loadMessage({message, me, ... row}) {
