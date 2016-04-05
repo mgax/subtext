@@ -188,6 +188,8 @@ function Peer({store, peer, updatePeerCard, selectPeer, modal, deletePeer, selec
       ]
       return (
         <Modal title={name} buttons={buttons}>
+          <h5>props</h5>
+          <pre>{JSON.stringify(peer.props, null, 2)}</pre>
           <h5>
             card
             <a className='btn btn-secondary btn-sm pull-right' onClick={h(() => {
