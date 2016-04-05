@@ -34,14 +34,11 @@ body,
 
 .peer-menu {
   float: right;
-}
-
-.peer-menubutton {
   border: none;
   background: none;
   color: #ccc;
-  &::after {
-    display: none;
+  &:focus {
+    outline: none;
   }
 }
 

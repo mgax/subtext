@@ -32,7 +32,7 @@ function Icon({name}) {
   return <i className={`fa fa-${name}`} />
 }
 
-function Modal() {
+function Modal({title, children, buttons = []}) {
   return (
     <div className='modal fade'>
       <div className='modal-dialog' role='document'>
@@ -42,17 +42,13 @@ function Modal() {
               data-dismiss='modal' aria-label='Close'>
               <span aria-hidden='true'>&times;</span>
             </button>
-            <h4 className='modal-title'>Modal title</h4>
+            <h4 className='modal-title'>{title}</h4>
           </div>
           <div className='modal-body'>
-            <p>One fine body&hellip;</p>
+            {children}
           </div>
           <div className='modal-footer'>
-            <button type='button' className='btn btn-secondary'
-                data-dismiss='modal'>Close</button>
-            <button type='button' className='btn btn-primary'>
-              Save changes
-            </button>
+            {buttons}
           </div>
         </div>
       </div>
@@ -173,40 +169,36 @@ function Conversation({peer, sendMessage}) {
 }
 
 function Peer({peer, selectPeer, modal, deletePeer, selected}) {
+  let name = peer.url
+
   function onClick() {
     selectPeer(peer.id)
   }
 
   function onInfo() {
-    modal(<Modal />)
+    let buttons = [
+      <button key='1' type='button' className='btn btn-danger'
+          onClick={h(() => {
+            if(confirm(`delete ${peer.url}?`)) deletePeer(peer.id)
+          })}>
+        delete
+      </button>
+    ]
+    modal(
+      <Modal title={name} buttons={buttons}>
+        <h5>card</h5>
+        <pre>{JSON.stringify(peer.card, null, 2)}</pre>
+      </Modal>
+    )
   }
-
-  function onDelete() {
-    if(! confirm(`delete ${peer.url}?`)) return
-      deletePeer(peer.id)
-  }
-
-  let menuId = `peer-menu-${peer.id}`
-  let menu = (
-    <div className='peer-menu dropdown'>
-      <button type='button'
-          className='peer-menubutton dropdown-toggle'
-          id={menuId}
-          data-toggle='dropdown'
-          ><Icon name='cog' /></button>
-      <div className='dropdown-menu dropdown-menu-right'
-          aria-labelledby={menuId}>
-        <a className='dropdown-item' onClick={h(onInfo)}>Info</a>
-        <a className='dropdown-item' onClick={h(onDelete)}>Delete</a>
-      </div>
-    </div>
-  )
 
   return (
     <div onClick={h(onClick)}
         className={classNames('peer', {'peer-selected': selected})}>
-      {menu}
-      {peer.url}
+      <button type='button' className='peer-menu' onClick={h(onInfo)}>
+        <Icon name='cog' />
+      </button>
+      {name}
     </div>
   )
 }
