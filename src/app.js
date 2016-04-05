@@ -171,10 +171,6 @@ function Conversation({peer, sendMessage}) {
 function Peer({peer, selectPeer, modal, deletePeer, selected}) {
   let name = peer.url
 
-  function onClick() {
-    selectPeer(peer.id)
-  }
-
   function onInfo() {
     let buttons = [
       <button key='1' type='button' className='btn btn-danger'
@@ -193,7 +189,7 @@ function Peer({peer, selectPeer, modal, deletePeer, selected}) {
   }
 
   return (
-    <div onClick={h(onClick)}
+    <div onClick={h(() => { selectPeer(peer.id) })}
         className={classNames('peer', {'peer-selected': selected})}>
       <button type='button' className='peer-menu' onClick={h(onInfo)}>
         <Icon name='cog' />
