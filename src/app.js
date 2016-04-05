@@ -168,30 +168,44 @@ function Conversation({peer, sendMessage}) {
   )
 }
 
-function Peer({peer, updatePeerCard, selectPeer, modal, deletePeer, selected}) {
+function Peer({store, peer, updatePeerCard, selectPeer, modal, deletePeer, selected}) {
   let name = peer.url
 
   function onInfo() {
-    let buttons = [
-      <button key='1' type='button' className='btn btn-danger'
-          onClick={h(() => {
-            if(confirm(`delete ${peer.url}?`)) deletePeer(peer.id)
-          })}>
-        delete
-      </button>
-    ]
+
+    let mapModalState = (state) => ({
+      peer: state.peers[peer.id]
+    })
+
+    function PeerModal({peer}) {
+      let buttons = [
+        <button key='1' type='button' className='btn btn-danger'
+            onClick={h(() => {
+              if(confirm(`delete ${peer.url}?`)) deletePeer(peer.id)
+            })}>
+          delete
+        </button>
+      ]
+      return (
+        <Modal title={name} buttons={buttons}>
+          <h5>
+            card
+            <a className='btn btn-default btn-sm' onClick={h(() => {
+                  updatePeerCard(peer.id)
+                })}>
+              update
+            </a>
+          </h5>
+          <pre>{JSON.stringify(peer.card, null, 2)}</pre>
+        </Modal>
+      )
+    }
+
+    const ConnectedPeerModal = connect(mapModalState)(PeerModal)
     modal(
-      <Modal title={name} buttons={buttons}>
-        <h5>
-          card
-          <a className='btn btn-default btn-sm' onClick={h(() => {
-                updatePeerCard(peer.id)
-              })}>
-            update
-          </a>
-        </h5>
-        <pre>{JSON.stringify(peer.card, null, 2)}</pre>
-      </Modal>
+      <Provider store={store}>
+        <ConnectedPeerModal />
+      </Provider>
     )
   }
 
@@ -206,7 +220,7 @@ function Peer({peer, updatePeerCard, selectPeer, modal, deletePeer, selected}) {
   )
 }
 
-function App({peers, modal, selectedPeerId, updatePeerCard, selectPeer, addPeer, deletePeer, sendMessage}) {
+function App({store, peers, modal, selectedPeerId, updatePeerCard, selectPeer, addPeer, deletePeer, sendMessage}) {
   let selectedPeer = peers[selectedPeerId]
 
   return (
@@ -223,6 +237,7 @@ function App({peers, modal, selectedPeerId, updatePeerCard, selectPeer, addPeer,
             {Object.values(peers).map((peer) => (
               <li key={peer.id}>
                 <Peer
+                  store={store}
                   peer={peer}
                   updatePeerCard={updatePeerCard}
                   selectPeer={selectPeer}
@@ -279,7 +294,7 @@ window.main = function() { waiter((async function() {
   const ConnectedApp = connect((state) => state, mapDispatchToProps)(App)
   let app = ReactDOM.render((
     <Provider store={store}>
-      <ConnectedApp modal={modal} />
+      <ConnectedApp store={store} modal={modal} />
     </Provider>
   ), document.querySelector('#app'))
 
