@@ -53,7 +53,7 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
     if(row) return loadPeer(row)
 
     let card = await fetchCard(url)
-    await db('INSERT INTO peer(url, card) VALUES (?, ?)',
+    await db(`INSERT INTO peer(url, card, props) VALUES (?, ?, '{}')`,
       url, JSON.stringify(card))
     return getPeerByUrl(url)
   }
@@ -131,6 +131,11 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
         await prop('dbVersion', 3)
 
       case 3:
+        await db(`ALTER TABLE peer ADD COLUMN props TEXT`)
+        await db(`UPDATE peer SET props = '{}'`)
+        await prop('dbVersion', 4)
+
+      case 4:
         return
 
       default:
@@ -245,6 +250,7 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
     return {
       ... row,
       card: JSON.parse(card),
+      props: JSON.parse(props),
     }
   }
 
