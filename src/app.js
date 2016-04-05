@@ -190,7 +190,7 @@ function Peer({store, peer, updatePeerCard, selectPeer, modal, deletePeer, selec
         <Modal title={name} buttons={buttons}>
           <h5>
             card
-            <a className='btn btn-default btn-sm' onClick={h(() => {
+            <a className='btn btn-secondary btn-sm pull-right' onClick={h(() => {
                   updatePeerCard(peer.id)
                 })}>
               update
