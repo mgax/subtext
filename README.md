@@ -23,10 +23,11 @@ You will need a recent version of node.js (5.x).
    ./run createidentity ../foo
    ```
 
-3. Start the server
+3. Build the front-end app and start the server
 
    ```shell
-   ./run devserver ../foo
+   ./run build
+   ./run server ../foo
    ```
 
 4. Optionally set up a reverse proxy. This is what you'd write in the nginx
