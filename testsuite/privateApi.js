@@ -1,7 +1,7 @@
 import http from 'http'
 import io from 'socket.io-client'
 import {assert} from 'chai'
-import {ALICE, BOB, temporaryIdentity} from './common.js'
+import {ALICE, BOB, temporaryIdentity, client, message} from './common.js'
 import identityserver from '../src/identityserver.js'
 import {openBox} from '../src/messages.js'
 
@@ -69,6 +69,7 @@ describe('private api', function() {
     this.http = new TestServer(server.websocket)
     await this.http.start()
     this.socket = new SocketClient()
+    this.pub = client(server.publicApp)
     let rv = await this.socket.auth('--alice-token--')
   })
 
@@ -138,6 +139,18 @@ describe('private api', function() {
     assert.equal(notifications[0].peerId, 1)
     assert.deepEqual(notifications[0].message.message, msg)
     assert.isTrue(notifications[0].message.me)
+  })
+
+  it('keeps track of unread messages', async function() {
+    await this.pub.post('/message', message(BOB, ALICE, "hi"))
+
+    let peerIds = await this.socket.send('getPeersWithUnread')
+    assert.deepEqual(peerIds, [1])
+
+    await this.socket.send('markAsRead', 1)
+
+    let peerIds2 = await this.socket.send('getPeersWithUnread')
+    assert.deepEqual(peerIds2, [])
   })
 
 })

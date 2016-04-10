@@ -80,6 +80,17 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
     await db('DELETE FROM peer WHERE id = ?', id)
   }
 
+  async function getPeersWithUnread() {
+    let rows = await db(`SELECT peer_id FROM message
+      WHERE unread = 1 GROUP BY peer_id`)
+    return rows.map((row) => row.peer_id)
+  }
+
+  async function markAsRead(peerId) {
+    await db(`UPDATE message SET unread = 0 WHERE peer_id = ? AND unread = 1`,
+      peerId)
+  }
+
   async function receive({box, from, to}) {
     if(to != myPublicUrl) {
       return {error: "Message is not for me"}
@@ -229,6 +240,14 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
         let rows = await db(`SELECT * FROM message WHERE peer_id = ?
           ORDER BY id DESC LIMIT 10`, peer.id)
         return rows.map(loadMessage)
+      })
+
+      on('getPeersWithUnread', async () => {
+        return await getPeersWithUnread()
+      })
+
+      on('markAsRead', async (peerId) => {
+        await markAsRead(peerId)
       })
 
       function notifyMessage(peerId, message) {
