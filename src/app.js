@@ -335,8 +335,9 @@ window.main = function() { waiter((async function() {
       dispatch(newPeer(peer))
     },
 
-    selectPeer: function(peerId) {
+    selectPeer: async function(peerId) {
       dispatch(selectPeer(peerId))
+      await send('markAsRead', peerId)
     },
 
   }}
@@ -352,6 +353,9 @@ window.main = function() { waiter((async function() {
     socket.on('message', (peerId, message) => {
       store.dispatch(newMessage(peerId, message))
       store.dispatch(markUnread(peerId, true))
+    })
+    socket.on('markAsRead', (peerId) => {
+      store.dispatch(markUnread(peerId, false))
     })
     let peers = await send('getPeers')
     for(let peer of peers) {
