@@ -200,6 +200,18 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
         })
       }
 
+      function subscribe(type) {
+        function handler() {
+          socket.emit(type, ... arguments)
+        }
+
+        events.on(type, handler)
+
+        socket.on('disconnect', () => {
+          events.removeListener(type, handler)
+        })
+      }
+
       on('addPeer', async (url) => {
         return await getPeerByUrl(url)
       })
@@ -250,15 +262,7 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
         await markAsRead(peerId)
       })
 
-      function notifyMessage(peerId, message) {
-        socket.emit('message', peerId, message)
-      }
-
-      events.on('message', notifyMessage)
-
-      socket.on('disconnect', () => {
-        events.removeListener('message', notifyMessage)
-      })
+      subscribe('message')
 
     }
 
