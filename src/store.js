@@ -23,7 +23,7 @@ const INITIAL_STATE = {
 function reduce(state=INITIAL_STATE, action) {
   switch(action.type) {
 
-    case NEW_PEER:
+    case NEW_PEER: {
       return {
         ... state,
         peers: {
@@ -35,8 +35,9 @@ function reduce(state=INITIAL_STATE, action) {
           },
         },
       }
+    }
 
-    case NEW_MESSAGE:
+    case NEW_MESSAGE: {
       let peer = state.peers[action.peerId]
       if(! peer) return state
       if(peer.messages[action.message.id]) return state
@@ -56,16 +57,19 @@ function reduce(state=INITIAL_STATE, action) {
           },
         },
       }
+    }
 
-    case SELECT_PEER:
+    case SELECT_PEER: {
       localStorage.subtext_selectedPeerId = action.peerId
       return {
         ... state,
         selectedPeerId: action.peerId,
       }
+    }
 
-    default:
+    default: {
       return state
+    }
 
   }
 }
