@@ -42,6 +42,12 @@ body,
   }
 }
 
+.peer-unread {
+  .peer-name {
+    font-weight: bold;
+  }
+}
+
 .conversation {
   height: 100%;
   position: relative;

@@ -8,6 +8,7 @@ import {
   newPeer,
   newMessage,
   selectPeer,
+  markUnread,
 } from './store.js'
 const { Provider, connect } = ReactRedux
 
@@ -212,13 +213,17 @@ function Peer({store, peer, updatePeerCard, selectPeer, modal, deletePeer, selec
     )
   }
 
+  let className = classNames('peer', {
+    'peer-selected': selected,
+    'peer-unread': peer.unread,
+  })
+
   return (
-    <div onClick={h(() => { selectPeer(peer.id) })}
-        className={classNames('peer', {'peer-selected': selected})}>
+    <div onClick={h(() => { selectPeer(peer.id) })} className={className}>
       <button type='button' className='peer-menu' onClick={h(onInfo)}>
         <Icon name='cog' />
       </button>
-      {name}
+      <span className='peer-name'>{name}</span>
     </div>
   )
 }
@@ -346,6 +351,7 @@ window.main = function() { waiter((async function() {
   async function loadState() {
     socket.on('message', (peerId, message) => {
       store.dispatch(newMessage(peerId, message))
+      store.dispatch(markUnread(peerId, true))
     })
     let peers = await send('getPeers')
     for(let peer of peers) {
@@ -354,6 +360,10 @@ window.main = function() { waiter((async function() {
       for(let message of messages) {
         store.dispatch(newMessage(peer.id, message))
       }
+    }
+    let unreadPeers = await send('getPeersWithUnread')
+    for(let peerId of unreadPeers) {
+      store.dispatch(markUnread(peerId, true))
     }
   }
 

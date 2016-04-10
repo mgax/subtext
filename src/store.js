@@ -15,6 +15,11 @@ export function selectPeer(peerId) {
   return {type: SELECT_PEER, peerId}
 }
 
+const MARK_UNREAD = 'MARK_UNREAD'
+export function markUnread(peerId, unread) {
+  return {type: MARK_UNREAD, peerId, unread}
+}
+
 const INITIAL_STATE = {
   peers: {},
   selectedPeerId: +localStorage.subtext_selectedPeerId,
@@ -64,6 +69,21 @@ function reduce(state=INITIAL_STATE, action) {
       return {
         ... state,
         selectedPeerId: action.peerId,
+      }
+    }
+
+    case MARK_UNREAD: {
+      let peer = state.peers[action.peerId]
+      if(! peer) return state
+      return {
+        ... state,
+        peers: {
+          ... state.peers,
+          [peer.id]: {
+            ... peer,
+            unread: action.unread,
+          }
+        }
       }
     }
 
