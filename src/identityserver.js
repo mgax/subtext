@@ -260,9 +260,12 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
 
       on('markAsRead', async (peerId) => {
         await markAsRead(peerId)
+        events.emit('markAsRead', peerId)
       })
 
       subscribe('message')
+
+      subscribe('markAsRead')
 
     }
 

@@ -142,6 +142,11 @@ describe('private api', function() {
   })
 
   it('keeps track of unread messages', async function() {
+    let notifications = []
+    this.socket.on('markAsRead', (peerId) => {
+      notifications.push(peerId)
+    })
+
     await this.pub.post('/message', message(BOB, ALICE, "hi"))
 
     let peerIds = await this.socket.send('getPeersWithUnread')
@@ -151,6 +156,7 @@ describe('private api', function() {
 
     let peerIds2 = await this.socket.send('getPeersWithUnread')
     assert.deepEqual(peerIds2, [])
+    assert.deepEqual(notifications, [1])
   })
 
 })
