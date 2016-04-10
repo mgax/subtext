@@ -247,9 +247,9 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
   }
 
   async function saveMessage(peerId, message, me) {
-    let res = await db(`INSERT INTO message(peer_id, time, me, message)
-      VALUES(?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), ?, ?)`,
-      peerId, me, JSON.stringify(message))
+    let res = await db(`INSERT INTO message(peer_id, time, me, message, unread)
+      VALUES(?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), ?, ?, ?)`,
+      peerId, me, JSON.stringify(message), ! me)
     let id = await res.lastInsertId()
     let [row] = await db(`SELECT * FROM message WHERE id = ?`, id)
     events.emit('message', peerId, loadMessage(row))
@@ -263,10 +263,11 @@ export default async function(identityPath, fetchCard=defaultFetchCard, send=def
     }
   }
 
-  function loadMessage({message, me, ... row}) {
+  function loadMessage({message, me, unread, ... row}) {
     return {
       ... row,
       me: !! me,
+      unread: !! unread,
       message: JSON.parse(message),
     }
   }
