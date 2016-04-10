@@ -336,6 +336,7 @@ window.main = function() { waiter((async function() {
     },
 
     selectPeer: async function(peerId) {
+      localStorage.subtext_selectedPeerId = peerId
       dispatch(selectPeer(peerId))
       await send('markAsRead', peerId)
     },
@@ -369,6 +370,9 @@ window.main = function() { waiter((async function() {
     for(let peerId of unreadPeers) {
       store.dispatch(markUnread(peerId, true))
     }
+
+    let selectedPeerId = +localStorage.subtext_selectedPeerId
+    store.dispatch(selectPeer(selectedPeerId))
   }
 
 })(), false) }
