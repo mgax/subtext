@@ -372,7 +372,10 @@ window.main = function() { waiter((async function() {
     }
 
     let selectedPeerId = +localStorage.subtext_selectedPeerId
-    store.dispatch(selectPeer(selectedPeerId))
+    if(selectedPeerId) {
+      store.dispatch(selectPeer(selectedPeerId))
+      await send('markAsRead', peerId)
+    }
   }
 
 })(), false) }
