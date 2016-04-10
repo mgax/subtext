@@ -276,6 +276,8 @@ window.main = function() { waiter((async function() {
 
   socket.on('unauthorized', (err) => {
     console.error('socket.io unauthorized:', err)
+    localStorage.subtext_authToken = prompt("Please enter authToken")
+    window.location.reload()
   })
 
   socket.on('connect', () => {
