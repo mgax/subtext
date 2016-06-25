@@ -1,7 +1,8 @@
 import http from 'http'
 import io from 'socket.io-client'
+import tmp from 'tmp'
 import {assert} from 'chai'
-import {ALICE, BOB, temporaryIdentity, client, message} from './common.js'
+import {ALICE, BOB, client, message} from './common.js'
 import identityserver from '../src/identityserver.js'
 import {openBox} from '../src/messages.js'
 
@@ -64,8 +65,8 @@ describe('private api', function() {
     let sent = this.sent = []
     let fetchCard = (url) => cards[url]
     let send = (url, envelope) => { sent.push({url, envelope}) }
-    this.tmp = temporaryIdentity()
-    let server = await identityserver(this.tmp.path, ALICE.publicUrl,
+    this.tmp = tmp.dirSync({unsafeCleanup: true})
+    let server = await identityserver(this.tmp.name, ALICE.publicUrl,
       ALICE.authToken, fetchCard, send)
     await server.setKeyPair(ALICE.keyPair)
     await server.setName(ALICE.name)
@@ -79,7 +80,7 @@ describe('private api', function() {
   afterEach(async function() {
     this.socket.disconnect()
     await this.http.stop()
-    this.tmp.cleanup()
+    this.tmp.removeCallback()
   })
 
   it('saves new peer', async function() {

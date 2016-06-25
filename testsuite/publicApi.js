@@ -1,5 +1,6 @@
+import tmp from 'tmp'
 import {assert} from 'chai'
-import {ALICE, BOB, EVE, temporaryIdentity, client, message} from './common.js'
+import {ALICE, BOB, EVE, client, message} from './common.js'
 import identityserver from '../src/identityserver.js'
 
 describe('public api', function() {
@@ -9,8 +10,8 @@ describe('public api', function() {
       [BOB.publicUrl + '/card']: {publicKey: BOB.keyPair.publicKey},
     }
     let fetchCard = (url) => cards[url]
-    this.tmp = temporaryIdentity()
-    let server = await identityserver(this.tmp.path, ALICE.publicUrl, '',
+    this.tmp = tmp.dirSync({unsafeCleanup: true})
+    let server = await identityserver(this.tmp.name, ALICE.publicUrl, '',
       fetchCard)
     await server.setKeyPair(ALICE.keyPair)
     await server.setName(ALICE.name)
@@ -18,7 +19,7 @@ describe('public api', function() {
   })
 
   after(function() {
-    this.tmp.cleanup()
+    this.tmp.removeCallback()
   })
 
   it('responds to card', async function() {

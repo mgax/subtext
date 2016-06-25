@@ -1,4 +1,3 @@
-import tmp from 'tmp'
 import fs from 'fs'
 import request from 'supertest'
 import { createBox } from '../src/messages.js'
@@ -52,16 +51,6 @@ export const EVE = {
   name: "Eve",
   authToken: '--eve-token--',
   publicUrl: "http://eve.example.com",
-}
-
-export function temporaryIdentity() {
-  let tmpdir = tmp.dirSync({unsafeCleanup: true})
-
-  return {
-    path: tmpdir.name,
-    cleanup: tmpdir.removeCallback,
-  }
-
 }
 
 export function client(app) {
