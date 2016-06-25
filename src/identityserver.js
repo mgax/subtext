@@ -168,12 +168,13 @@ class IdentityServer {
   async initialize(identityPath, fetchCard, send) {
     this.identityPath = identityPath
     this.fetchCard = fetchCard
-    let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
-    let {keyPair, publicUrl, authToken} = config
-    let myPublicUrl = publicUrl + '/card'
-    let events = new EventEmitter()
-    this.events = events
+    this.config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
+    this.myPublicUrl = this.config.publicUrl + '/card'
+    this.events = new EventEmitter()
 
+    let {keyPair, publicUrl, authToken, name} = this.config
+    let myPublicUrl = this.myPublicUrl
+    let events = this.events
     let db = this.db.bind(this)
     let getPeer = this.getPeer.bind(this)
     let getPeerByUrl = this.getPeerByUrl.bind(this)
@@ -213,7 +214,7 @@ class IdentityServer {
       res.send({
         publicKey: keyPair.publicKey,
         inboxUrl: publicUrl + '/message',
-        name: config.name,
+        name: name,
       })
     })
 
