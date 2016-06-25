@@ -69,7 +69,7 @@ describe('private api', function() {
     this.http = new TestServer(server)
     await this.http.start()
     this.socket = new SocketClient()
-    this.pub = client(server.publicApp)
+    this.pub = client(server.createApp())
     let rv = await this.socket.auth('--alice-token--')
   })
 

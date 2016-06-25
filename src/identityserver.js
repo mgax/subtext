@@ -315,7 +315,6 @@ class IdentityServer {
 
   async initialize() {
     await this.dbUpgrade()
-    this.publicApp = this.createApp()
   }
 
 }

@@ -11,7 +11,7 @@ describe('public api', function() {
     let fetchCard = (url) => cards[url]
     this.tmp = temporaryIdentity(ALICE)
     let server = await identityserver(this.tmp.path, fetchCard)
-    this.pub = client(server.publicApp)
+    this.pub = client(server.createApp())
   })
 
   after(function() {
