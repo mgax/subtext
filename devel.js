@@ -45,11 +45,10 @@ async function build() {
   fs.writeFileSync('./build/index.html', indexHtml, 'utf8')
 }
 
-async function devserver(path) {
+async function devserver(path, publicUrl) {
   let app = express()
-  let config = fs.readFileSync(identityPath + '/config.json')
   let authToken = process.env.AUTH_TOKEN || ''
-  let identity = await identityServer(path, config.publicUrl, authToken)
+  let identity = await identityServer(path, publicUrl, authToken)
   app.use(identity.createApp())
   app.use(webpackDevMiddleware(webpack(WEBAPP_OPTIONS), {publicPath: '/'}))
   app.get('/', function(req, res) { res.send(index_html()) })
@@ -112,7 +111,7 @@ async function createidentity(path) {
       return await build()
 
     case 'devserver':
-      return await devserver(process.argv[3])
+      return await devserver(process.argv[3], process.argv[4])
 
     case 'createidentity':
       return await createidentity(process.argv[3])
