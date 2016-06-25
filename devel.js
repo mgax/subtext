@@ -6,7 +6,6 @@ import readlineLib from 'readline'
 import request from 'request'
 import { randomKeyPair, createBox, randomToken } from './src/messages.js'
 import identityServer from './src/identityserver.js'
-import nodeAsync from './src/nodeAsync.js'
 
 const WEBAPP_OPTIONS = {
   entry: './src/app.js',
