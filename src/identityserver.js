@@ -160,6 +160,11 @@ class IdentityServer {
     }
   }
 
+  async markAsRead(peerId) {
+    await this.db(`UPDATE message SET unread = 0 WHERE peer_id = ? AND unread = 1`,
+      peerId)
+  }
+
   async initialize(identityPath, fetchCard, send) {
     this.identityPath = identityPath
     this.fetchCard = fetchCard
@@ -179,11 +184,7 @@ class IdentityServer {
     let getPeersWithUnread = this.getPeersWithUnread.bind(this)
     let saveMessage = this.saveMessage.bind(this)
     let loadMessage = this.loadMessage.bind(this)
-
-    async function markAsRead(peerId) {
-      await db(`UPDATE message SET unread = 0 WHERE peer_id = ? AND unread = 1`,
-        peerId)
-    }
+    let markAsRead = this.markAsRead.bind(this)
 
     async function receive({box, from, to}) {
       if(to != myPublicUrl) {
