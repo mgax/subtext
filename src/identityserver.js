@@ -57,6 +57,11 @@ class IdentityServer {
   }
 
   async dbUpgrade() {
+    await this.db(`CREATE TABLE IF NOT EXISTS prop (
+        key TEXT UNIQUE,
+        value TEXT
+      )`)
+
     let dbVersion = await this.prop('dbVersion')
     switch(dbVersion) {
 
@@ -174,11 +179,6 @@ class IdentityServer {
       await saveMessage(peer.id, message, false)
       return {ok: true}
     }
-
-    await this.db(`CREATE TABLE IF NOT EXISTS prop (
-        key TEXT UNIQUE,
-        value TEXT
-      )`)
 
     await this.dbUpgrade()
 
