@@ -23,13 +23,13 @@ async function defaultSend(url, envelope) {
 
 class IdentityServer {
 
-  constructor(identityPath, authToken, fetchCard, send) {
-    this.identityPath = identityPath
+  constructor(varPath, authToken, fetchCard, send) {
+    this.varPath = varPath
     this.authToken = authToken
     this.fetchCard = fetchCard
     this.send = send
 
-    this.config = JSON.parse(fs.readFileSync(this.identityPath + '/config.json'))
+    this.config = JSON.parse(fs.readFileSync(this.varPath + '/config.json'))
     this.publicUrl = this.config.publicUrl
     this.myPublicUrl = this.publicUrl + '/card'
     this.events = new EventEmitter()
@@ -42,7 +42,7 @@ class IdentityServer {
 
   async db(query, ...args) {
     let conn = await new Promise((resolve, reject) => {
-      let db = new sqlite3.Database(this.identityPath + '/db.sqlite', (err) => {
+      let db = new sqlite3.Database(this.varPath + '/db.sqlite', (err) => {
         if(err) reject(err); else resolve(db)
       })
     })
@@ -328,8 +328,8 @@ class IdentityServer {
 
 }
 
-export default async function(identityPath, authToken, fetchCard=defaultFetchCard, send=defaultSend) {
-  let rv = new IdentityServer(identityPath, authToken, fetchCard, send)
+export default async function(varPath, authToken, fetchCard=defaultFetchCard, send=defaultSend) {
+  let rv = new IdentityServer(varPath, authToken, fetchCard, send)
   await rv.initialize()
   return rv
 }
