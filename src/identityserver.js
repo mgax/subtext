@@ -142,6 +142,23 @@ class IdentityServer {
     return rows.map((row) => row.peer_id)
   }
 
+  async receive({box, from, to}) {
+    if(to != this.myPublicUrl) {
+      return {error: "Message is not for me"}
+    }
+
+    let peer = await this.getPeerByUrl(from)
+
+    let message
+    try {
+      message = openBox(box, this.keyPair.privateKey, peer.card.publicKey)
+    }
+    catch(e) { return {error: "Could not decrypt message"} }
+
+    await this.saveMessage(peer.id, message, false)
+    return {ok: true}
+  }
+
   async saveMessage(peerId, message, me) {
     let res = await this.db(`INSERT INTO message(peer_id, time, me, message, unread)
       VALUES(?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), ?, ?, ?)`,
@@ -272,26 +289,6 @@ class IdentityServer {
     this.events = new EventEmitter()
 
     let {keyPair, publicUrl, name} = this.config
-    let myPublicUrl = this.myPublicUrl
-    let getPeerByUrl = this.getPeerByUrl.bind(this)
-    let saveMessage = this.saveMessage.bind(this)
-
-    async function receive({box, from, to}) {
-      if(to != myPublicUrl) {
-        return {error: "Message is not for me"}
-      }
-
-      let peer = await getPeerByUrl(from)
-
-      let message
-      try {
-        message = openBox(box, keyPair.privateKey, peer.card.publicKey)
-      }
-      catch(e) { return {error: "Could not decrypt message"} }
-
-      await saveMessage(peer.id, message, false)
-      return {ok: true}
-    }
 
     await this.dbUpgrade()
 
@@ -308,7 +305,7 @@ class IdentityServer {
     })
 
     publicApp.post('/message', _wrap(async (req, res) => {
-      let result = await receive(req.body)
+      let result = await this.receive(req.body)
       res.send(result)
     }))
 
