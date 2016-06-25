@@ -276,7 +276,7 @@ class IdentityServer {
 
   }
 
-  websocket(server) {
+  createWebsocket(server) {
     socketioAuth(SocketIO(server), {
       authenticate: (socket, token, cb) => {
         cb(null, token == this.config.authToken)

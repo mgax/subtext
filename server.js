@@ -7,7 +7,7 @@ async function main() {
   app.use(identity.createApp())
   app.use(express.static(`${__dirname}/build`))
   let server = app.listen(+(process.env.PORT || 8000))
-  identity.websocket(server)
+  identity.createWebsocket(server)
 }
 
 main().catch((e) => { console.error(e.stack || e) })

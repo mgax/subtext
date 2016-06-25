@@ -10,7 +10,7 @@ const PORT = 17604
 class TestServer {
 
   constructor(identityServer) {
-    this.server = identityServer.websocket(http.createServer())
+    this.server = identityServer.createWebsocket(http.createServer())
   }
 
   start() {
