@@ -47,7 +47,8 @@ async function build() {
 
 async function devserver(path) {
   let app = express()
-  let identity = await identityServer(path)
+  let config = fs.readFileSync(identityPath + '/config.json')
+  let identity = await identityServer(path, config.authToken)
   app.use(identity.createApp())
   app.use(webpackDevMiddleware(webpack(WEBAPP_OPTIONS), {publicPath: '/'}))
   app.get('/', function(req, res) { res.send(index_html()) })

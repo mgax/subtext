@@ -23,8 +23,9 @@ async function defaultSend(url, envelope) {
 
 class IdentityServer {
 
-  constructor(identityPath, fetchCard, send) {
+  constructor(identityPath, authToken, fetchCard, send) {
     this.identityPath = identityPath
+    this.authToken = authToken
     this.fetchCard = fetchCard
     this.send = send
 
@@ -292,7 +293,7 @@ class IdentityServer {
   createWebsocket(server) {
     socketioAuth(SocketIO(server), {
       authenticate: (socket, token, cb) => {
-        cb(null, token == this.config.authToken)
+        cb(null, token == this.authToken)
       },
       postAuthenticate: (sock) => {
         this.websocketConnection(sock)
@@ -328,8 +329,8 @@ class IdentityServer {
 
 }
 
-export default async function(identityPath, fetchCard=defaultFetchCard, send=defaultSend) {
-  let rv = new IdentityServer(identityPath, fetchCard, send)
+export default async function(identityPath, authToken, fetchCard=defaultFetchCard, send=defaultSend) {
+  let rv = new IdentityServer(identityPath, authToken, fetchCard, send)
   await rv.initialize()
   return rv
 }
