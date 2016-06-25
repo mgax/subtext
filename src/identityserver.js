@@ -56,6 +56,41 @@ class IdentityServer {
     return value
   }
 
+  async dbUpgrade() {
+    let dbVersion = await this.prop('dbVersion')
+    switch(dbVersion) {
+
+      case undefined:
+        await this.db(`CREATE TABLE peer (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            url TEXT UNIQUE,
+            card TEXT
+          )`)
+        await this.db(`CREATE TABLE message (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            peer_id INTEGER,
+            time TEXT,
+            me BOOL,
+            message TEXT,
+            unread BOOL,
+            FOREIGN KEY(peer_id) REFERENCES peer(id)
+          )`)
+        await this.prop('dbVersion', 3)
+
+      case 3:
+        await this.db(`ALTER TABLE peer ADD COLUMN props TEXT`)
+        await this.db(`UPDATE peer SET props = '{}'`)
+        await this.prop('dbVersion', 4)
+
+      case 4:
+        return
+
+      default:
+        throw Error(`Unknown DB version ${dbVersion}`)
+
+    }
+  }
+
   loadPeer({card, props, ... row}) {
     return {
       ... row,
@@ -105,7 +140,6 @@ class IdentityServer {
     let events = new EventEmitter()
 
     let db = this.db.bind(this)
-    let prop = this.prop.bind(this)
     let getPeer = this.getPeer.bind(this)
     let getPeerByUrl = this.getPeerByUrl.bind(this)
     let loadPeer = this.loadPeer.bind(this)
@@ -146,42 +180,7 @@ class IdentityServer {
         value TEXT
       )`)
 
-    async function dbUpgrade() {
-      let dbVersion = await prop('dbVersion')
-      switch(dbVersion) {
-
-        case undefined:
-          await db(`CREATE TABLE peer (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              url TEXT UNIQUE,
-              card TEXT
-            )`)
-          await db(`CREATE TABLE message (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              peer_id INTEGER,
-              time TEXT,
-              me BOOL,
-              message TEXT,
-              unread BOOL,
-              FOREIGN KEY(peer_id) REFERENCES peer(id)
-            )`)
-          await prop('dbVersion', 3)
-
-        case 3:
-          await db(`ALTER TABLE peer ADD COLUMN props TEXT`)
-          await db(`UPDATE peer SET props = '{}'`)
-          await prop('dbVersion', 4)
-
-        case 4:
-          return
-
-        default:
-          throw Error(`Unknown DB version ${dbVersion}`)
-
-      }
-    }
-
-    await dbUpgrade()
+    await this.dbUpgrade()
 
     let publicApp = express()
     publicApp.use(bodyParser.json())
