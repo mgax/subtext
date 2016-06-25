@@ -52,6 +52,11 @@ class IdentityServer {
     }
   }
 
+  async getPeer(id) {
+    let [row] = await this.db('SELECT * FROM peer WHERE id = ?', id)
+    return this.loadPeer(row)
+  }
+
   async getPeerByUrl(url) {
     let [row] = await this.db('SELECT * FROM peer WHERE url = ?', url)
     if(row) return this.loadPeer(row)
@@ -71,6 +76,7 @@ class IdentityServer {
     let events = new EventEmitter()
 
     let db = this.db.bind(this)
+    let getPeer = this.getPeer.bind(this)
     let getPeerByUrl = this.getPeerByUrl.bind(this)
     let loadPeer = this.loadPeer.bind(this)
 
@@ -84,11 +90,6 @@ class IdentityServer {
     async function setPeerProps(peerId, props) {
       await db('UPDATE peer SET props = ? WHERE id = ?',
         JSON.stringify(props), peerId)
-    }
-
-    async function getPeer(id) {
-      let [row] = await db('SELECT * FROM peer WHERE id = ?', id)
-      return loadPeer(row)
     }
 
     async function deletePeerById(id) {
