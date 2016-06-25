@@ -1,7 +1,6 @@
 import 'babel-polyfill'
 import classNames from 'classnames'
 import './style.scss'
-import { randomKeyPair, createBox, boxId } from './messages.js'
 import {
   createStore,
   newPeer,
