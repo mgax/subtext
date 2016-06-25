@@ -194,8 +194,6 @@ class IdentityServer {
   }
 
   websocket(server) {
-    let db = this.db.bind(this)
-
     socketioAuth(SocketIO(server), {
       authenticate: (socket, token, cb) => {
         cb(null, token == this.config.authToken)
@@ -248,7 +246,7 @@ class IdentityServer {
       })
 
       on('getPeers', async () => {
-        let rows = await db('SELECT * FROM peer')
+        let rows = await this.db('SELECT * FROM peer')
         let peers = rows.map(this.loadPeer)
         return peers
       })
@@ -267,7 +265,7 @@ class IdentityServer {
 
       on('getMessages', async (peerId) => {
         let peer = await this.getPeer(peerId)
-        let rows = await db(`SELECT * FROM message WHERE peer_id = ?
+        let rows = await this.db(`SELECT * FROM message WHERE peer_id = ?
           ORDER BY id DESC LIMIT 10`, peer.id)
         return rows.map(this.loadMessage)
       })
