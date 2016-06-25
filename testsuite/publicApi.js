@@ -9,7 +9,7 @@ describe('public api', function() {
       [BOB.publicUrl + '/card']: {publicKey: BOB.keyPair.publicKey},
     }
     let fetchCard = (url) => cards[url]
-    this.tmp = temporaryIdentity(ALICE)
+    this.tmp = temporaryIdentity()
     let server = await identityserver(this.tmp.path, ALICE.publicUrl, '',
       fetchCard)
     await server.setKeyPair(ALICE.keyPair)
