@@ -165,27 +165,118 @@ class IdentityServer {
       peerId)
   }
 
+  websocket(server) {
+    let db = this.db.bind(this)
+
+    socketioAuth(SocketIO(server), {
+      authenticate: (socket, token, cb) => {
+        cb(null, token == this.config.authToken)
+      },
+      postAuthenticate: connection.bind(this),
+    })
+
+    function connection(socket) {
+
+      function on(type, callback) {
+        socket.on(type, async function(args, respond) {
+          try {
+            let res = await callback(... args)
+            respond([null, res])
+          }
+          catch(err) {
+            console.error(err.stack || err)
+            respond([''+err])
+          }
+        })
+      }
+
+      let subscribe = (type) => {
+        function handler() {
+          socket.emit(type, ... arguments)
+        }
+
+        this.events.on(type, handler)
+
+        socket.on('disconnect', () => {
+          this.events.removeListener(type, handler)
+        })
+      }
+
+      on('addPeer', async (url) => {
+        return await this.getPeerByUrl(url)
+      })
+
+      on('deletePeer', async (peerId) => {
+        await this.deletePeerById(peerId)
+      })
+
+      on('updatePeerCard', async (peerId) => {
+        await this.updatePeerCard(peerId)
+        return await this.getPeer(peerId)
+      })
+
+      on('setPeerProps', async (peerId, props) => {
+        await this.setPeerProps(peerId, props)
+      })
+
+      on('getPeers', async () => {
+        let rows = await db('SELECT * FROM peer')
+        let peers = rows.map(this.loadPeer)
+        return peers
+      })
+
+      on('sendMessage', async (peerId, message) => {
+        let peer = await this.getPeer(peerId)
+        let envelope = {
+          type: 'Envelope',
+          box: createBox(message, this.keyPair.privateKey, peer.card.publicKey),
+          from: this.myPublicUrl,
+          to: peer.url,
+        }
+        await this.saveMessage(peer.id, message, true)
+        await this.send(peer.card.inboxUrl, envelope)
+      })
+
+      on('getMessages', async (peerId) => {
+        let peer = await this.getPeer(peerId)
+        let rows = await db(`SELECT * FROM message WHERE peer_id = ?
+          ORDER BY id DESC LIMIT 10`, peer.id)
+        return rows.map(this.loadMessage)
+      })
+
+      on('getPeersWithUnread', async () => {
+        return await this.getPeersWithUnread()
+      })
+
+      on('markAsRead', async (peerId) => {
+        await this.markAsRead(peerId)
+        this.events.emit('markAsRead', peerId)
+      })
+
+      subscribe('message')
+
+      subscribe('markAsRead')
+
+    }
+
+    return server
+  }
+
   async initialize(identityPath, fetchCard, send) {
     this.identityPath = identityPath
     this.fetchCard = fetchCard
+    this.send = send
     this.config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
+    this.keyPair = this.config.keyPair
     this.myPublicUrl = this.config.publicUrl + '/card'
     this.events = new EventEmitter()
 
-    let {keyPair, publicUrl, authToken, name} = this.config
+    this.websocket = this.websocket.bind(this)
+
+    let {keyPair, publicUrl, name} = this.config
     let myPublicUrl = this.myPublicUrl
-    let events = this.events
-    let db = this.db.bind(this)
-    let getPeer = this.getPeer.bind(this)
     let getPeerByUrl = this.getPeerByUrl.bind(this)
-    let loadPeer = this.loadPeer.bind(this)
-    let deletePeerById = this.deletePeerById.bind(this)
-    let setPeerProps = this.setPeerProps.bind(this)
-    let updatePeerCard = this.updatePeerCard.bind(this)
-    let getPeersWithUnread = this.getPeersWithUnread.bind(this)
     let saveMessage = this.saveMessage.bind(this)
-    let loadMessage = this.loadMessage.bind(this)
-    let markAsRead = this.markAsRead.bind(this)
 
     async function receive({box, from, to}) {
       if(to != myPublicUrl) {
@@ -223,101 +314,7 @@ class IdentityServer {
       res.send(result)
     }))
 
-    function websocket(server) {
-      socketioAuth(SocketIO(server), {
-        authenticate: (socket, token, cb) => { cb(null, token == authToken) },
-        postAuthenticate: connection,
-      })
-
-      function connection(socket) {
-
-        function on(type, callback) {
-          socket.on(type, async function(args, respond) {
-            try {
-              let res = await callback(... args)
-              respond([null, res])
-            }
-            catch(err) {
-              console.error(err.stack || err)
-              respond([''+err])
-            }
-          })
-        }
-
-        function subscribe(type) {
-          function handler() {
-            socket.emit(type, ... arguments)
-          }
-
-          events.on(type, handler)
-
-          socket.on('disconnect', () => {
-            events.removeListener(type, handler)
-          })
-        }
-
-        on('addPeer', async (url) => {
-          return await getPeerByUrl(url)
-        })
-
-        on('deletePeer', async (peerId) => {
-          await deletePeerById(peerId)
-        })
-
-        on('updatePeerCard', async (peerId) => {
-          await updatePeerCard(peerId)
-          return await getPeer(peerId)
-        })
-
-        on('setPeerProps', async (peerId, props) => {
-          await setPeerProps(peerId, props)
-        })
-
-        on('getPeers', async () => {
-          let rows = await db('SELECT * FROM peer')
-          let peers = rows.map(loadPeer)
-          return peers
-        })
-
-        on('sendMessage', async (peerId, message) => {
-          let peer = await getPeer(peerId)
-          let envelope = {
-            type: 'Envelope',
-            box: createBox(message, keyPair.privateKey, peer.card.publicKey),
-            from: myPublicUrl,
-            to: peer.url,
-          }
-          await saveMessage(peer.id, message, true)
-          await send(peer.card.inboxUrl, envelope)
-        })
-
-        on('getMessages', async (peerId) => {
-          let peer = await getPeer(peerId)
-          let rows = await db(`SELECT * FROM message WHERE peer_id = ?
-            ORDER BY id DESC LIMIT 10`, peer.id)
-          return rows.map(loadMessage)
-        })
-
-        on('getPeersWithUnread', async () => {
-          return await getPeersWithUnread()
-        })
-
-        on('markAsRead', async (peerId) => {
-          await markAsRead(peerId)
-          events.emit('markAsRead', peerId)
-        })
-
-        subscribe('message')
-
-        subscribe('markAsRead')
-
-      }
-
-      return server
-    }
-
     this.publicApp = publicApp
-    this.websocket = websocket
   }
 
 }
