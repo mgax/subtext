@@ -233,6 +233,13 @@ class IdentityServer {
       })
     }
 
+    on('getConfig', async () => {
+      return {
+        name: await this.prop('name'),
+        hasKeyPair: !! this.keyPair,
+      }
+    })
+
     on('addPeer', async (url) => {
       return await this.getPeerByUrl(url)
     })

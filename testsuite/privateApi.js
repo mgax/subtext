@@ -83,6 +83,19 @@ describe('private api', function() {
     this.tmp.removeCallback()
   })
 
+  it('fetches config', async function() {
+    assert.deepEqual(await this.socket.send('getConfig'), {
+      name: "Alice",
+      hasKeyPair: true,
+    })
+    await this.identityServer.setName(null)
+    await this.identityServer.setKeyPair(null)
+    assert.deepEqual(await this.socket.send('getConfig'), {
+      name: null,
+      hasKeyPair: false,
+    })
+  })
+
   it('saves new peer', async function() {
     const bobUrl = 'http://bob.example.com/card'
     const eveUrl = 'http://eve.example.com/card'
