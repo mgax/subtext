@@ -67,7 +67,7 @@ class IdentityServer {
     return value
   }
 
-  async dbUpgrade() {
+  async migrate() {
     await this.db(`CREATE TABLE IF NOT EXISTS prop (
         key TEXT UNIQUE,
         value TEXT
@@ -313,14 +313,10 @@ class IdentityServer {
     return publicApp
   }
 
-  async initialize() {
-    await this.dbUpgrade()
-  }
-
 }
 
 export default async function(identityPath, fetchCard=defaultFetchCard, send=defaultSend) {
   let rv = new IdentityServer(identityPath, fetchCard, send)
-  await rv.initialize()
+  await rv.migrate()
   return rv
 }
