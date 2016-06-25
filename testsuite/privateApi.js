@@ -67,6 +67,7 @@ describe('private api', function() {
     this.tmp = temporaryIdentity(ALICE)
     let server = await identityserver(this.tmp.path, fetchCard, send)
     await server.setKeyPair(ALICE.keyPair)
+    await server.setName(ALICE.name)
     this.http = new TestServer(server)
     await this.http.start()
     this.socket = new SocketClient()

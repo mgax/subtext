@@ -116,6 +116,10 @@ class IdentityServer {
     this.keyPair = keyPair
   }
 
+  async setName(name) {
+    await this.prop('name', name)
+  }
+
   loadPeer({card, props, ... row}) {
     return {
       ... row,
@@ -299,19 +303,20 @@ class IdentityServer {
   }
 
   createApp() {
-    let {publicUrl, name} = this.config
+    let {publicUrl} = this.config
 
     let publicApp = express()
     publicApp.use(bodyParser.json())
 
     let _wrap = (fn) => (...args) => fn(...args).catch(args[2])
-    publicApp.get('/card', (req, res) => {
+    publicApp.get('/card', _wrap(async (req, res) => {
+      let name = await this.prop('name')
       res.send({
         publicKey: this.keyPair.publicKey,
         inboxUrl: publicUrl + '/message',
         name: name,
       })
-    })
+    }))
 
     publicApp.post('/message', _wrap(async (req, res) => {
       let result = await this.receive(req.body)

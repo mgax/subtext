@@ -12,6 +12,7 @@ describe('public api', function() {
     this.tmp = temporaryIdentity(ALICE)
     let server = await identityserver(this.tmp.path, fetchCard)
     await server.setKeyPair(ALICE.keyPair)
+    await server.setName(ALICE.name)
     this.pub = client(server.createApp())
   })
 
