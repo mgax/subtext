@@ -8,7 +8,7 @@ import { randomKeyPair, createBox, randomToken } from './src/server/messages.js'
 import identityServer from './src/server/identityserver.js'
 
 const WEBAPP_OPTIONS = {
-  entry: './src/app.js',
+  entry: './src/ui/app.js',
   devtool: '#inline-source-map',
   output: {path: __dirname + '/build', filename: 'webapp.js'},
   module: {
@@ -30,7 +30,7 @@ function webpackBuild(options) {
 }
 
 function index_html(webappHash) {
-  let src = fs.readFileSync('./src/index.html', 'utf8')
+  let src = fs.readFileSync('./src/ui/index.html', 'utf8')
   return src.replace('{{ webappHash }}', webappHash||'')
 }
 
