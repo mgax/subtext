@@ -23,6 +23,17 @@ async function defaultSend(url, envelope) {
 
 class IdentityServer {
 
+  constructor(identityPath, fetchCard, send) {
+    this.identityPath = identityPath
+    this.fetchCard = fetchCard
+    this.send = send
+
+    this.config = JSON.parse(fs.readFileSync(this.identityPath + '/config.json'))
+    this.keyPair = this.config.keyPair
+    this.myPublicUrl = this.config.publicUrl + '/card'
+    this.events = new EventEmitter()
+  }
+
   async db(query, ...args) {
     let conn = await new Promise((resolve, reject) => {
       let db = new sqlite3.Database(this.identityPath + '/db.sqlite', (err) => {
@@ -279,15 +290,7 @@ class IdentityServer {
     return server
   }
 
-  async initialize(identityPath, fetchCard, send) {
-    this.identityPath = identityPath
-    this.fetchCard = fetchCard
-    this.send = send
-    this.config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
-    this.keyPair = this.config.keyPair
-    this.myPublicUrl = this.config.publicUrl + '/card'
-    this.events = new EventEmitter()
-
+  async initialize() {
     let {keyPair, publicUrl, name} = this.config
 
     await this.dbUpgrade()
@@ -315,7 +318,7 @@ class IdentityServer {
 }
 
 export default async function(identityPath, fetchCard=defaultFetchCard, send=defaultSend) {
-  let rv = new IdentityServer()
-  await rv.initialize(identityPath, fetchCard, send)
+  let rv = new IdentityServer(identityPath, fetchCard, send)
+  await rv.initialize()
   return rv
 }
