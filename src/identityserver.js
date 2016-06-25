@@ -30,7 +30,8 @@ class IdentityServer {
     this.send = send
 
     this.config = JSON.parse(fs.readFileSync(this.identityPath + '/config.json'))
-    this.myPublicUrl = this.config.publicUrl + '/card'
+    this.publicUrl = this.config.publicUrl
+    this.myPublicUrl = this.publicUrl + '/card'
     this.events = new EventEmitter()
   }
 
@@ -304,8 +305,6 @@ class IdentityServer {
   }
 
   createApp() {
-    let {publicUrl} = this.config
-
     let publicApp = express()
     publicApp.use(bodyParser.json())
 
@@ -314,7 +313,7 @@ class IdentityServer {
       let name = await this.prop('name')
       res.send({
         publicKey: this.keyPair.publicKey,
-        inboxUrl: publicUrl + '/message',
+        inboxUrl: this.publicUrl + '/message',
         name: name,
       })
     }))
