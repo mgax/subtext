@@ -271,8 +271,6 @@ class IdentityServer {
     this.myPublicUrl = this.config.publicUrl + '/card'
     this.events = new EventEmitter()
 
-    this.websocket = this.websocket.bind(this)
-
     let {keyPair, publicUrl, name} = this.config
     let myPublicUrl = this.myPublicUrl
     let getPeerByUrl = this.getPeerByUrl.bind(this)
