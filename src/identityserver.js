@@ -290,10 +290,8 @@ class IdentityServer {
     return server
   }
 
-  async initialize() {
+  createApp() {
     let {keyPair, publicUrl, name} = this.config
-
-    await this.dbUpgrade()
 
     let publicApp = express()
     publicApp.use(bodyParser.json())
@@ -312,7 +310,12 @@ class IdentityServer {
       res.send(result)
     }))
 
-    this.publicApp = publicApp
+    return publicApp
+  }
+
+  async initialize() {
+    await this.dbUpgrade()
+    this.publicApp = this.createApp()
   }
 
 }
