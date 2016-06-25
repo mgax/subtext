@@ -67,6 +67,11 @@ class IdentityServer {
     return this.getPeerByUrl(url)
   }
 
+  async setPeerProps(peerId, props) {
+    await this.db('UPDATE peer SET props = ? WHERE id = ?',
+      JSON.stringify(props), peerId)
+  }
+
   async deletePeerById(id) {
     await this.db('DELETE FROM message WHERE peer_id = ?', id)
     await this.db('DELETE FROM peer WHERE id = ?', id)
@@ -85,17 +90,13 @@ class IdentityServer {
     let getPeerByUrl = this.getPeerByUrl.bind(this)
     let loadPeer = this.loadPeer.bind(this)
     let deletePeerById = this.deletePeerById.bind(this)
+    let setPeerProps = this.setPeerProps.bind(this)
 
     async function updatePeerCard(peerId) {
       let peer = await getPeer(peerId)
       let card = await fetchCard(peer.url)
       await db('UPDATE peer SET card = ? WHERE id = ?',
         JSON.stringify(card), peerId)
-    }
-
-    async function setPeerProps(peerId, props) {
-      await db('UPDATE peer SET props = ? WHERE id = ?',
-        JSON.stringify(props), peerId)
     }
 
     async function getPeersWithUnread() {
