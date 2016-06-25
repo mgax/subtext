@@ -136,6 +136,24 @@ class IdentityServer {
     await this.db('DELETE FROM peer WHERE id = ?', id)
   }
 
+  async saveMessage(peerId, message, me) {
+    let res = await this.db(`INSERT INTO message(peer_id, time, me, message, unread)
+      VALUES(?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), ?, ?, ?)`,
+      peerId, me, JSON.stringify(message), ! me)
+    let id = await res.lastInsertId()
+    let [row] = await this.db(`SELECT * FROM message WHERE id = ?`, id)
+    this.events.emit('message', peerId, this.loadMessage(row))
+  }
+
+  loadMessage({message, me, unread, ... row}) {
+    return {
+      ... row,
+      me: !! me,
+      unread: !! unread,
+      message: JSON.parse(message),
+    }
+  }
+
   async initialize(identityPath, fetchCard, send) {
     this.identityPath = identityPath
     this.fetchCard = fetchCard
@@ -143,6 +161,7 @@ class IdentityServer {
     let {keyPair, publicUrl, authToken} = config
     let myPublicUrl = publicUrl + '/card'
     let events = new EventEmitter()
+    this.events = events
 
     let db = this.db.bind(this)
     let getPeer = this.getPeer.bind(this)
@@ -151,6 +170,8 @@ class IdentityServer {
     let deletePeerById = this.deletePeerById.bind(this)
     let setPeerProps = this.setPeerProps.bind(this)
     let updatePeerCard = this.updatePeerCard.bind(this)
+    let saveMessage = this.saveMessage.bind(this)
+    let loadMessage = this.loadMessage.bind(this)
 
     async function getPeersWithUnread() {
       let rows = await db(`SELECT peer_id FROM message
@@ -290,24 +311,6 @@ class IdentityServer {
       }
 
       return server
-    }
-
-    async function saveMessage(peerId, message, me) {
-      let res = await db(`INSERT INTO message(peer_id, time, me, message, unread)
-        VALUES(?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), ?, ?, ?)`,
-        peerId, me, JSON.stringify(message), ! me)
-      let id = await res.lastInsertId()
-      let [row] = await db(`SELECT * FROM message WHERE id = ?`, id)
-      events.emit('message', peerId, loadMessage(row))
-    }
-
-    function loadMessage({message, me, unread, ... row}) {
-      return {
-        ... row,
-        me: !! me,
-        unread: !! unread,
-        message: JSON.parse(message),
-      }
     }
 
     this.publicApp = publicApp
