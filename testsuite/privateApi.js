@@ -66,14 +66,14 @@ describe('private api', function() {
     let fetchCard = (url) => cards[url]
     let send = (url, envelope) => { sent.push({url, envelope}) }
     this.tmp = tmp.dirSync({unsafeCleanup: true})
-    let server = await identityserver(this.tmp.name, ALICE.publicUrl,
+    this.identityServer = await identityserver(this.tmp.name, ALICE.publicUrl,
       ALICE.authToken, fetchCard, send)
-    await server.setKeyPair(ALICE.keyPair)
-    await server.setName(ALICE.name)
-    this.http = new TestServer(server)
+    await this.identityServer.setKeyPair(ALICE.keyPair)
+    await this.identityServer.setName(ALICE.name)
+    this.http = new TestServer(this.identityServer)
     await this.http.start()
     this.socket = new SocketClient()
-    this.pub = client(server.createApp())
+    this.pub = client(this.identityServer.createApp())
     let rv = await this.socket.auth('--alice-token--')
   })
 
