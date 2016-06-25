@@ -136,6 +136,12 @@ class IdentityServer {
     await this.db('DELETE FROM peer WHERE id = ?', id)
   }
 
+  async getPeersWithUnread() {
+    let rows = await this.db(`SELECT peer_id FROM message
+      WHERE unread = 1 GROUP BY peer_id`)
+    return rows.map((row) => row.peer_id)
+  }
+
   async saveMessage(peerId, message, me) {
     let res = await this.db(`INSERT INTO message(peer_id, time, me, message, unread)
       VALUES(?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), ?, ?, ?)`,
@@ -170,14 +176,9 @@ class IdentityServer {
     let deletePeerById = this.deletePeerById.bind(this)
     let setPeerProps = this.setPeerProps.bind(this)
     let updatePeerCard = this.updatePeerCard.bind(this)
+    let getPeersWithUnread = this.getPeersWithUnread.bind(this)
     let saveMessage = this.saveMessage.bind(this)
     let loadMessage = this.loadMessage.bind(this)
-
-    async function getPeersWithUnread() {
-      let rows = await db(`SELECT peer_id FROM message
-        WHERE unread = 1 GROUP BY peer_id`)
-      return rows.map((row) => row.peer_id)
-    }
 
     async function markAsRead(peerId) {
       await db(`UPDATE message SET unread = 0 WHERE peer_id = ? AND unread = 1`,
