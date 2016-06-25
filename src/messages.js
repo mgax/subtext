@@ -1,4 +1,4 @@
-import { sodium } from './vendor.js'
+const sodium = require('libsodium-wrappers')
 
 const to_publickey = (key) => ({type: 'PublicKey', key: sodium.to_base64(key)})
 const to_privatekey = (key) => ({type: 'PrivateKey', key: sodium.to_base64(key)})

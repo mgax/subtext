@@ -1,5 +1,3 @@
-import { Redux } from './vendor.js'
-
 const NEW_PEER = 'NEW_PEER'
 export function newPeer(peer) {
   return {type: NEW_PEER, peer}
