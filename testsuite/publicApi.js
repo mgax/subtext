@@ -24,6 +24,7 @@ describe('public api', function() {
     assert.equal(body.publicKey.key,
       'YRgaMPzdZPAQiWFiiCggx5qppkN5LNsFTvuoXFF5kDA=')
     assert.equal(body.inboxUrl, 'http://alice.example.com/message')
+    assert.equal(body.name, 'Alice')
   })
 
   it('accepts valid incoming message', async function() {
