@@ -23,14 +23,13 @@ async function defaultSend(url, envelope) {
 
 class IdentityServer {
 
-  constructor(varPath, authToken, fetchCard, send) {
+  constructor(varPath, publicUrl, authToken, fetchCard, send) {
     this.varPath = varPath
+    this.publicUrl = publicUrl
     this.authToken = authToken
     this.fetchCard = fetchCard
     this.send = send
 
-    this.config = JSON.parse(fs.readFileSync(this.varPath + '/config.json'))
-    this.publicUrl = this.config.publicUrl
     this.myPublicUrl = this.publicUrl + '/card'
     this.events = new EventEmitter()
   }
@@ -328,8 +327,8 @@ class IdentityServer {
 
 }
 
-export default async function(varPath, authToken, fetchCard=defaultFetchCard, send=defaultSend) {
-  let rv = new IdentityServer(varPath, authToken, fetchCard, send)
+export default async function(varPath, publicUrl, authToken, fetchCard=defaultFetchCard, send=defaultSend) {
+  let rv = new IdentityServer(varPath, publicUrl, authToken, fetchCard, send)
   await rv.initialize()
   return rv
 }

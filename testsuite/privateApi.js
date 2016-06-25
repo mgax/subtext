@@ -65,8 +65,8 @@ describe('private api', function() {
     let fetchCard = (url) => cards[url]
     let send = (url, envelope) => { sent.push({url, envelope}) }
     this.tmp = temporaryIdentity(ALICE)
-    let server = await identityserver(this.tmp.path, ALICE.authToken,
-      fetchCard, send)
+    let server = await identityserver(this.tmp.path, ALICE.publicUrl,
+      ALICE.authToken, fetchCard, send)
     await server.setKeyPair(ALICE.keyPair)
     await server.setName(ALICE.name)
     this.http = new TestServer(server)
