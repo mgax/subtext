@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { randomKeyPair, createBox, openBox } from '../src/messages.js'
+import { randomKeyPair, createBox, openBox } from '../src/server/messages.js'
 
 describe('identity', function() {
 

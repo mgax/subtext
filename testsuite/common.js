@@ -1,6 +1,6 @@
 import fs from 'fs'
 import request from 'supertest'
-import { createBox } from '../src/messages.js'
+import { createBox } from '../src/server/messages.js'
 
 export const ALICE = {
   keyPair: {

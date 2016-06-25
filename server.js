@@ -1,5 +1,5 @@
 import express from 'express'
-import identityServer from './src/identityserver.js'
+import identityServer from './src/server/identityserver.js'
 
 async function main() {
   let varPath = process.argv[2]

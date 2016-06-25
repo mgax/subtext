@@ -1,7 +1,7 @@
 import tmp from 'tmp'
 import {assert} from 'chai'
 import {ALICE, BOB, EVE, client, message} from './common.js'
-import identityserver from '../src/identityserver.js'
+import identityserver from '../src/server/identityserver.js'
 
 describe('public api', function() {
 

@@ -4,8 +4,8 @@ import webpack from 'webpack'
 import fs from 'fs'
 import readlineLib from 'readline'
 import request from 'request'
-import { randomKeyPair, createBox, randomToken } from './src/messages.js'
-import identityServer from './src/identityserver.js'
+import { randomKeyPair, createBox, randomToken } from './src/server/messages.js'
+import identityServer from './src/server/identityserver.js'
 
 const WEBAPP_OPTIONS = {
   entry: './src/app.js',

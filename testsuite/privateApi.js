@@ -3,8 +3,8 @@ import io from 'socket.io-client'
 import tmp from 'tmp'
 import {assert} from 'chai'
 import {ALICE, BOB, client, message} from './common.js'
-import identityserver from '../src/identityserver.js'
-import {openBox} from '../src/messages.js'
+import identityserver from '../src/server/identityserver.js'
+import {openBox} from '../src/server/messages.js'
 
 const PORT = 17604
 
