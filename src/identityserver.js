@@ -4,7 +4,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import SocketIO from 'socket.io'
 import socketioAuth from 'socketio-auth'
-import {createBox, openBox, boxId} from './messages.js'
+import {createBox, openBox, randomKeyPair, boxId} from './messages.js'
 import request from 'request'
 import sqlite3 from 'sqlite3'
 import nodeAsync from './nodeAsync.js'
@@ -238,6 +238,14 @@ class IdentityServer {
         name: await this.prop('name'),
         hasKeyPair: !! this.keyPair,
       }
+    })
+
+    on('setName', async (name) => {
+      await this.setName(name)
+    })
+
+    on('createKeyPair', async () => {
+      await this.setKeyPair(randomKeyPair())
     })
 
     on('addPeer', async (url) => {

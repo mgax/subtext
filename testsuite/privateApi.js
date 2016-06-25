@@ -83,16 +83,18 @@ describe('private api', function() {
     this.tmp.removeCallback()
   })
 
-  it('fetches config', async function() {
-    assert.deepEqual(await this.socket.send('getConfig'), {
-      name: "Alice",
-      hasKeyPair: true,
-    })
+  it('gets and updates config', async function() {
     await this.identityServer.setName(null)
     await this.identityServer.setKeyPair(null)
     assert.deepEqual(await this.socket.send('getConfig'), {
       name: null,
       hasKeyPair: false,
+    })
+    await this.socket.send('setName', 'Alice')
+    await this.socket.send('createKeyPair')
+    assert.deepEqual(await this.socket.send('getConfig'), {
+      name: "Alice",
+      hasKeyPair: true,
     })
   })
 
