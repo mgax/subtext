@@ -44,6 +44,18 @@ class IdentityServer {
     return rows
   }
 
+  async prop(key, value) {
+    if(value === undefined) {
+      let res = await this.db(`SELECT value FROM prop WHERE key = ?`, key)
+      if(res.length > 0) value = JSON.parse(res[0].value)
+    }
+    else {
+      await this.db(`INSERT OR REPLACE INTO prop (key, value) VALUES (?, ?)`,
+          key, JSON.stringify(value))
+    }
+    return value
+  }
+
   loadPeer({card, props, ... row}) {
     return {
       ... row,
@@ -93,6 +105,7 @@ class IdentityServer {
     let events = new EventEmitter()
 
     let db = this.db.bind(this)
+    let prop = this.prop.bind(this)
     let getPeer = this.getPeer.bind(this)
     let getPeerByUrl = this.getPeerByUrl.bind(this)
     let loadPeer = this.loadPeer.bind(this)
@@ -132,18 +145,6 @@ class IdentityServer {
         key TEXT UNIQUE,
         value TEXT
       )`)
-
-    async function prop(key, value) {
-      if(value === undefined) {
-        let res = await db(`SELECT value FROM prop WHERE key = ?`, key)
-        if(res.length > 0) value = JSON.parse(res[0].value)
-      }
-      else {
-        await db(`INSERT OR REPLACE INTO prop (key, value) VALUES (?, ?)`,
-            key, JSON.stringify(value))
-      }
-      return value
-    }
 
     async function dbUpgrade() {
       let dbVersion = await prop('dbVersion')
