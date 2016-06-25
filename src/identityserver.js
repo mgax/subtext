@@ -29,9 +29,13 @@ class IdentityServer {
     this.send = send
 
     this.config = JSON.parse(fs.readFileSync(this.identityPath + '/config.json'))
-    this.keyPair = this.config.keyPair
     this.myPublicUrl = this.config.publicUrl + '/card'
     this.events = new EventEmitter()
+  }
+
+  async initialize() {
+    await this.migrate()
+    this.keyPair = await this.prop('keyPair')
   }
 
   async db(query, ...args) {
@@ -105,6 +109,11 @@ class IdentityServer {
         throw Error(`Unknown DB version ${dbVersion}`)
 
     }
+  }
+
+  async setKeyPair(keyPair) {
+    await this.prop('keyPair', keyPair)
+    this.keyPair = keyPair
   }
 
   loadPeer({card, props, ... row}) {
@@ -290,7 +299,7 @@ class IdentityServer {
   }
 
   createApp() {
-    let {keyPair, publicUrl, name} = this.config
+    let {publicUrl, name} = this.config
 
     let publicApp = express()
     publicApp.use(bodyParser.json())
@@ -298,7 +307,7 @@ class IdentityServer {
     let _wrap = (fn) => (...args) => fn(...args).catch(args[2])
     publicApp.get('/card', (req, res) => {
       res.send({
-        publicKey: keyPair.publicKey,
+        publicKey: this.keyPair.publicKey,
         inboxUrl: publicUrl + '/message',
         name: name,
       })
@@ -316,6 +325,6 @@ class IdentityServer {
 
 export default async function(identityPath, fetchCard=defaultFetchCard, send=defaultSend) {
   let rv = new IdentityServer(identityPath, fetchCard, send)
-  await rv.migrate()
+  await rv.initialize()
   return rv
 }
