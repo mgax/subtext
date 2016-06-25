@@ -44,24 +44,35 @@ class IdentityServer {
     return rows
   }
 
+  loadPeer({card, props, ... row}) {
+    return {
+      ... row,
+      card: JSON.parse(card),
+      props: JSON.parse(props),
+    }
+  }
+
+  async getPeerByUrl(url) {
+    let [row] = await this.db('SELECT * FROM peer WHERE url = ?', url)
+    if(row) return this.loadPeer(row)
+
+    let card = await this.fetchCard(url)
+    await this.db(`INSERT INTO peer(url, card, props) VALUES (?, ?, '{}')`,
+      url, JSON.stringify(card))
+    return this.getPeerByUrl(url)
+  }
+
   async initialize(identityPath, fetchCard, send) {
     this.identityPath = identityPath
+    this.fetchCard = fetchCard
     let config = JSON.parse(fs.readFileSync(identityPath + '/config.json'))
     let {keyPair, publicUrl, authToken} = config
     let myPublicUrl = publicUrl + '/card'
     let events = new EventEmitter()
 
     let db = this.db.bind(this)
-
-    async function getPeerByUrl(url) {
-      let [row] = await db('SELECT * FROM peer WHERE url = ?', url)
-      if(row) return loadPeer(row)
-
-      let card = await fetchCard(url)
-      await db(`INSERT INTO peer(url, card, props) VALUES (?, ?, '{}')`,
-        url, JSON.stringify(card))
-      return getPeerByUrl(url)
-    }
+    let getPeerByUrl = this.getPeerByUrl.bind(this)
+    let loadPeer = this.loadPeer.bind(this)
 
     async function updatePeerCard(peerId) {
       let peer = await getPeer(peerId)
@@ -284,14 +295,6 @@ class IdentityServer {
       let id = await res.lastInsertId()
       let [row] = await db(`SELECT * FROM message WHERE id = ?`, id)
       events.emit('message', peerId, loadMessage(row))
-    }
-
-    function loadPeer({card, props, ... row}) {
-      return {
-        ... row,
-        card: JSON.parse(card),
-        props: JSON.parse(props),
-      }
     }
 
     function loadMessage({message, me, unread, ... row}) {
