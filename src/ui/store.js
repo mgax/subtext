@@ -1,3 +1,11 @@
+export const APP_STATE_LOADING = 'APP_STATE_LOADING'
+export const APP_STATE_CHAT = 'APP_STATE_CHAT'
+
+const SET_APP_STATE = 'SET_APP_STATE'
+export function setAppState(appState) {
+  return {type: SET_APP_STATE, appState}
+}
+
 const NEW_PEER = 'NEW_PEER'
 export function newPeer(peer) {
   return {type: NEW_PEER, peer}
@@ -19,11 +27,18 @@ export function markUnread(peerId, unread) {
 }
 
 const INITIAL_STATE = {
+  appState: APP_STATE_LOADING,
   peers: {},
 }
 
 function reduce(state=INITIAL_STATE, action) {
   switch(action.type) {
+
+    case SET_APP_STATE:
+      return {
+        ... state,
+        appState: action.appState,
+      }
 
     case NEW_PEER: {
       return {

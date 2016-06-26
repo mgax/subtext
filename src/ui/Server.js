@@ -1,5 +1,7 @@
 import { waiter } from './utils.js'
 import {
+  APP_STATE_CHAT,
+  setAppState,
   newPeer,
   newMessage,
   selectPeer,
@@ -61,6 +63,8 @@ export default class Server {
       this.store.dispatch(selectPeer(selectedPeerId))
       await this.call('markAsRead', peerId)
     }
+
+    this.store.dispatch(setAppState(APP_STATE_CHAT))
   }
 
   mapDispatchToProps(dispatch) {

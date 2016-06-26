@@ -20,3 +20,8 @@ export function waiter(promise) {
     .then((rv) => { if(rv !== undefined) console.log(rv) })
     .catch((e) => { console.error(e.stack || e) })
 }
+
+export function errorScreen(message, ... log) {
+  console.warn(... log)
+  return <p>{message}</p>
+}
