@@ -53,8 +53,13 @@ export default class Server {
       this.store.dispatch(markUnread(peerId, false))
     })
 
+    await this.loadConfig()
+  }
+
+  async loadConfig() {
     let config = await this.call('getConfig')
     if(config.name && config.hasKeyPair) {
+      this.store.dispatch(setAppState(APP_STATE_LOADING))
       return this.loadChat()
     }
     else {
@@ -91,10 +96,12 @@ export default class Server {
 
       generateKeyPair: async () => {
         await this.call('generateKeyPair')
+        await this.loadConfig()
       },
 
       setName: async (name) => {
         await this.call('setName', name)
+        await this.loadConfig()
       },
 
       addPeer: async (url) => {
