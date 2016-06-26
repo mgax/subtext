@@ -6,38 +6,15 @@ import { waiter } from './utils.js'
 import {
   createStore,
   newPeer,
-  newMessage,
   selectPeer,
-  markUnread,
 } from './store.js'
+import Server from './Server.js'
 import App from './components/App.js'
 
 window.main = function() { waiter((async function() {
 
   let store = createStore()
-  const socket = io.connect('/')
-
-  socket.on('unauthorized', (err) => {
-    console.error('socket.io unauthorized:', err)
-    localStorage.subtext_authToken = prompt("Please enter authToken")
-    window.location.reload()
-  })
-
-  socket.on('connect', () => {
-    socket.emit('authentication', localStorage.subtext_authToken)
-  })
-
-  socket.on('authenticated', () => {
-    waiter(loadState(), false)
-  })
-
-  async function call(type, ... args) {
-    let [err, res] = await new Promise((resolve) => {
-      socket.emit(type, args, resolve)
-    })
-    if(err) throw new Error(err)
-    return res
-  }
+  let server = new Server(store)
 
   const ConnectedApp = connect((state) => state, mapDispatchToProps)(App)
   let app = ReactDOM.render((
@@ -55,28 +32,28 @@ window.main = function() { waiter((async function() {
   function mapDispatchToProps(dispatch) { return {
 
     addPeer: async function(url) {
-      let peer = await call('addPeer', url)
+      let peer = await server.call('addPeer', url)
       dispatch(newPeer(peer))
     },
 
     deletePeer: async function(peerId) {
-      await call('deletePeer', peerId)
+      await server.call('deletePeer', peerId)
       window.location.reload()
     },
 
     sendMessage: async function(peerId, message) {
-      await call('sendMessage', peerId, message)
+      await server.call('sendMessage', peerId, message)
     },
 
     updatePeerCard: async function(peerId) {
-      let peer = await call('updatePeerCard', peerId)
+      let peer = await server.call('updatePeerCard', peerId)
       dispatch(newPeer(peer))
     },
 
     selectPeer: async function(peerId) {
       localStorage.subtext_selectedPeerId = peerId
       dispatch(selectPeer(peerId))
-      await call('markAsRead', peerId)
+      await server.call('markAsRead', peerId)
     },
 
   }}
@@ -84,36 +61,8 @@ window.main = function() { waiter((async function() {
   window.S = {
     app: app,
     store: store,
-    call: call,
+    server: server,
     waiter: waiter,
-  }
-
-  async function loadState() {
-    socket.on('message', (peerId, message) => {
-      store.dispatch(newMessage(peerId, message))
-      store.dispatch(markUnread(peerId, true))
-    })
-    socket.on('markAsRead', (peerId) => {
-      store.dispatch(markUnread(peerId, false))
-    })
-    let peers = await call('getPeers')
-    for(let peer of peers) {
-      store.dispatch(newPeer(peer))
-      let messages = await call('getMessages', peer.id)
-      for(let message of messages) {
-        store.dispatch(newMessage(peer.id, message))
-      }
-    }
-    let unreadPeers = await call('getPeersWithUnread')
-    for(let peerId of unreadPeers) {
-      store.dispatch(markUnread(peerId, true))
-    }
-
-    let selectedPeerId = +localStorage.subtext_selectedPeerId
-    if(selectedPeerId) {
-      store.dispatch(selectPeer(selectedPeerId))
-      await call('markAsRead', peerId)
-    }
   }
 
 })(), false) }
