@@ -15,8 +15,8 @@ export function sorted(list, keyFunc=((i) => i)) {
   })
 }
 
-export function waiter(promise, printRv=true) {
+export function waiter(promise) {
   promise
-    .then((rv) => { if(printRv || rv !== undefined) console.log(rv) })
+    .then((rv) => { if(rv !== undefined) console.log(rv) })
     .catch((e) => { console.error(e.stack || e) })
 }

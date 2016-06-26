@@ -23,7 +23,7 @@ export default class Server {
     })
 
     this.socket.on('authenticated', () => {
-      waiter(this.loadState(), false)
+      waiter(this.loadState())
     })
   }
 

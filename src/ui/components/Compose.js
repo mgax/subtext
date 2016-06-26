@@ -33,7 +33,7 @@ export default class Compose extends React.Component {
     waiter(sendMessage(peer.id, {
       type: 'Message',
       text: input.value,
-    }), false)
+    }))
     input.value = ''
   }
 

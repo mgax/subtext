@@ -65,4 +65,4 @@ window.main = function() { waiter((async function() {
     waiter: waiter,
   }
 
-})(), false) }
+})()) }
