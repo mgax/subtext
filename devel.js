@@ -5,7 +5,7 @@ import fs from 'fs'
 import readlineLib from 'readline'
 import request from 'request'
 import { randomKeyPair, createBox, randomToken } from './src/server/messages.js'
-import identityServer from './src/server/identityserver.js'
+import createServer from './src/server/create.js'
 
 const WEBAPP_OPTIONS = {
   entry: './src/ui/app.js',
@@ -42,14 +42,9 @@ async function build() {
 }
 
 async function devserver(path, publicUrl) {
-  let app = express()
-  let authToken = process.env.AUTH_TOKEN || ''
-  let identity = await identityServer(path, publicUrl, authToken)
-  app.use(identity.createApp())
+  let { app } = await createServer(path, publicUrl)
   app.use(webpackDevMiddleware(webpack(WEBAPP_OPTIONS), {publicPath: '/'}))
   app.get('/', function(req, res) { res.send(index_html()) })
-  let server = app.listen(+(process.env.PORT || 8000))
-  identity.createWebsocket(server)
 }
 
 function prompt({question, defaultValue = '', valid = (() => true)}) {

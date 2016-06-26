@@ -1,16 +1,13 @@
 import express from 'express'
-import identityServer from './src/server/identityserver.js'
+import waiter from './src/waiter.js'
+import createServer from './src/server/create.js'
 
-async function main() {
-  let varPath = process.argv[2]
-  let publicUrl = process.argv[3]
-  let authToken = process.env.AUTH_TOKEN || ''
-  let identity = await identityServer(varPath, publicUrl, authToken)
-  let app = express()
-  app.use(identity.createApp())
+waiter((async function() {
+
+  let [varPath, publicUrl, cmd] = process.argv.slice(2)
+
+  let { app } = await createServer(varPath, publicUrl)
+
   app.use(express.static(`${__dirname}/build`))
-  let server = app.listen(+(process.env.PORT || 8000))
-  identity.createWebsocket(server)
-}
 
-main().catch((e) => { console.error(e.stack || e) })
+})())
