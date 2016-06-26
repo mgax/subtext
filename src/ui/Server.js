@@ -1,5 +1,6 @@
 import { waiter } from './utils.js'
 import {
+  APP_STATE_LOADING,
   APP_STATE_WELCOME,
   APP_STATE_CHAT,
   setAppState,
