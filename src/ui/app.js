@@ -31,7 +31,7 @@ window.main = function() { waiter((async function() {
     waiter(loadState(), false)
   })
 
-  async function send(type, ... args) {
+  async function call(type, ... args) {
     let [err, res] = await new Promise((resolve) => {
       socket.emit(type, args, resolve)
     })
@@ -55,28 +55,28 @@ window.main = function() { waiter((async function() {
   function mapDispatchToProps(dispatch) { return {
 
     addPeer: async function(url) {
-      let peer = await send('addPeer', url)
+      let peer = await call('addPeer', url)
       dispatch(newPeer(peer))
     },
 
     deletePeer: async function(peerId) {
-      await send('deletePeer', peerId)
+      await call('deletePeer', peerId)
       window.location.reload()
     },
 
     sendMessage: async function(peerId, message) {
-      await send('sendMessage', peerId, message)
+      await call('sendMessage', peerId, message)
     },
 
     updatePeerCard: async function(peerId) {
-      let peer = await send('updatePeerCard', peerId)
+      let peer = await call('updatePeerCard', peerId)
       dispatch(newPeer(peer))
     },
 
     selectPeer: async function(peerId) {
       localStorage.subtext_selectedPeerId = peerId
       dispatch(selectPeer(peerId))
-      await send('markAsRead', peerId)
+      await call('markAsRead', peerId)
     },
 
   }}
@@ -84,7 +84,7 @@ window.main = function() { waiter((async function() {
   window.S = {
     app: app,
     store: store,
-    send: send,
+    call: call,
     waiter: waiter,
   }
 
@@ -96,15 +96,15 @@ window.main = function() { waiter((async function() {
     socket.on('markAsRead', (peerId) => {
       store.dispatch(markUnread(peerId, false))
     })
-    let peers = await send('getPeers')
+    let peers = await call('getPeers')
     for(let peer of peers) {
       store.dispatch(newPeer(peer))
-      let messages = await send('getMessages', peer.id)
+      let messages = await call('getMessages', peer.id)
       for(let message of messages) {
         store.dispatch(newMessage(peer.id, message))
       }
     }
-    let unreadPeers = await send('getPeersWithUnread')
+    let unreadPeers = await call('getPeersWithUnread')
     for(let peerId of unreadPeers) {
       store.dispatch(markUnread(peerId, true))
     }
@@ -112,7 +112,7 @@ window.main = function() { waiter((async function() {
     let selectedPeerId = +localStorage.subtext_selectedPeerId
     if(selectedPeerId) {
       store.dispatch(selectPeer(selectedPeerId))
-      await send('markAsRead', peerId)
+      await call('markAsRead', peerId)
     }
   }
 
