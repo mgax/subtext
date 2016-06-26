@@ -16,13 +16,17 @@ export default class StatefulButton extends React.Component {
         onClick={h(async () => {
           this.setState({busy: true})
           let done = await onClick()
-          if(this.isMounted() && ! done) this.setState({busy: false})
+          if(! (this.unmounted || done)) this.setState({busy: false})
         })}
         >
         {children}
         {this.state.busy && ' ...'}
       </button>
     )
+  }
+
+  componentWillUnmount() {
+    this.unmounted = true
   }
 
 }
