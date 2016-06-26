@@ -1,5 +1,6 @@
 import { waiter } from './utils.js'
 import {
+  APP_STATE_WELCOME,
   APP_STATE_CHAT,
   setAppState,
   newPeer,
@@ -45,6 +46,17 @@ export default class Server {
     this.socket.on('markAsRead', (peerId) => {
       this.store.dispatch(markUnread(peerId, false))
     })
+
+    let config = await this.call('getConfig')
+    if(config.name && config.hasKeyPair) {
+      return this.loadChat()
+    }
+    else {
+      this.store.dispatch(setAppState(APP_STATE_WELCOME))
+    }
+  }
+
+  async loadChat() {
     let peers = await this.call('getPeers')
     for(let peer of peers) {
       this.store.dispatch(newPeer(peer))

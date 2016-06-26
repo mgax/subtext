@@ -1,0 +1,52 @@
+import StatefulButton from './StatefulButton.js'
+
+export default class Welcome extends React.Component {
+
+  render() {
+    return (
+      <div className='container-fluid'>
+
+        <h1>Welcome to subtext!</h1>
+
+        <h2>Key pair</h2>
+
+        <form className='form-inline'>
+
+          <div className='form-group'>
+            <p className='form-control-static'>
+              You don't have a key pair. Generate one?
+            </p>
+          </div>{' '}
+
+          <StatefulButton
+            className='btn btn-primary'
+            >generate</StatefulButton>
+
+        </form>
+
+        <h2>Public name</h2>
+
+        <form className='form-inline'>
+
+          <div className='form-group'>
+            <label htmlFor='welcome-name'>Name</label>{' '}
+            <input
+              type='text'
+              className='form-control'
+              id='welcome-name'
+              placeholder='Jane Doe'
+              />
+          </div>{' '}
+
+          <StatefulButton
+            type='submit'
+            className='btn btn-primary'
+            >Save</StatefulButton>
+
+        </form>
+
+      </div>
+    )
+  }
+
+}
