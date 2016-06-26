@@ -1,3 +1,5 @@
+export waiter from '../waiter.js'
+
 export function h(callback, ... args) {
   return function(e) {
     e.preventDefault()
