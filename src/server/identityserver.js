@@ -185,7 +185,8 @@ class IdentityServer {
   }
 
   async saveMessage(peerId, message, me) {
-    let res = await this.db(`INSERT INTO message(peer_id, time, me, message, unread)
+    let res = await this.db(
+      `INSERT INTO message(peer_id, time, me, message, unread)
       VALUES(?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), ?, ?, ?)`,
       peerId, me, JSON.stringify(message), ! me)
     let id = await res.lastInsertId()
@@ -203,8 +204,8 @@ class IdentityServer {
   }
 
   async markAsRead(peerId) {
-    await this.db(`UPDATE message SET unread = 0 WHERE peer_id = ? AND unread = 1`,
-      peerId)
+    await this.db(`UPDATE message SET unread = 0
+      WHERE peer_id = ? AND unread = 1`, peerId)
   }
 
   websocketConnection(socket) {
@@ -342,8 +343,13 @@ class IdentityServer {
 
 }
 
-export default async function(varPath, publicUrl, authToken, fetchCard=defaultFetchCard, send=defaultSend) {
+export default async function(
+    varPath, publicUrl, authToken,
+    fetchCard=defaultFetchCard, send=defaultSend
+  ) {
+
   let rv = new IdentityServer(varPath, publicUrl, authToken, fetchCard, send)
   await rv.initialize()
   return rv
+
 }
