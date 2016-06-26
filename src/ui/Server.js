@@ -83,7 +83,7 @@ export default class Server {
     let selectedPeerId = +localStorage.subtext_selectedPeerId
     if(selectedPeerId) {
       this.store.dispatch(selectPeer(selectedPeerId))
-      await this.call('markAsRead', peerId)
+      await this.call('markAsRead', selectedPeerId)
     }
 
     this.store.dispatch(setAppState(APP_STATE_CHAT))
