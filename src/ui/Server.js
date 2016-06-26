@@ -63,4 +63,37 @@ export default class Server {
     }
   }
 
+  mapDispatchToProps(dispatch) {
+
+    return {
+
+      addPeer: async (url) => {
+        let peer = await this.call('addPeer', url)
+        dispatch(newPeer(peer))
+      },
+
+      deletePeer: async (peerId) => {
+        await this.call('deletePeer', peerId)
+        window.location.reload()
+      },
+
+      sendMessage: async (peerId, message) => {
+        await this.call('sendMessage', peerId, message)
+      },
+
+      updatePeerCard: async (peerId) => {
+        let peer = await this.call('updatePeerCard', peerId)
+        dispatch(newPeer(peer))
+      },
+
+      selectPeer: async (peerId) => {
+        localStorage.subtext_selectedPeerId = peerId
+        dispatch(selectPeer(peerId))
+        await this.call('markAsRead', peerId)
+      },
+
+    }
+
+  }
+
 }
