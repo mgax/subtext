@@ -26,7 +26,15 @@ export default class Server {
     })
 
     this.socket.on('authenticated', () => {
-      waiter(this.loadState())
+      this.socket.on('message', (peerId, message) => {
+        this.store.dispatch(newMessage(peerId, message))
+        this.store.dispatch(markUnread(peerId, true))
+      })
+      this.socket.on('markAsRead', (peerId) => {
+        this.store.dispatch(markUnread(peerId, false))
+      })
+
+      waiter(this.loadConfig())
     })
   }
 
@@ -42,18 +50,6 @@ export default class Server {
     })
     if(err) throw new Error(err)
     return res
-  }
-
-  async loadState() {
-    this.socket.on('message', (peerId, message) => {
-      this.store.dispatch(newMessage(peerId, message))
-      this.store.dispatch(markUnread(peerId, true))
-    })
-    this.socket.on('markAsRead', (peerId) => {
-      this.store.dispatch(markUnread(peerId, false))
-    })
-
-    await this.loadConfig()
   }
 
   async loadConfig() {
