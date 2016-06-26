@@ -29,6 +29,11 @@ case $COMMAND in
     exec ./run babel-node server.js "$@"
     ;;
 
+  shell)
+    set -x
+    exec ./run babel-node shell.js "$@"
+    ;;
+
   createidentity)
     set -x
     exec ./run babel-node devel.js createidentity "$@"
