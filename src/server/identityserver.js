@@ -244,7 +244,7 @@ class IdentityServer {
       await this.setName(name)
     })
 
-    on('createKeyPair', async () => {
+    on('generateKeyPair', async () => {
       await this.setKeyPair(randomKeyPair())
     })
 

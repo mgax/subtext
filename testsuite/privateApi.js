@@ -91,7 +91,7 @@ describe('private api', function() {
       hasKeyPair: false,
     })
     await this.socket.send('setName', 'Alice')
-    await this.socket.send('createKeyPair')
+    await this.socket.send('generateKeyPair')
     assert.deepEqual(await this.socket.send('getConfig'), {
       name: "Alice",
       hasKeyPair: true,
