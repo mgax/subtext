@@ -4,6 +4,7 @@ import {
   APP_STATE_WELCOME,
   APP_STATE_CHAT,
   setAppState,
+  setConfig,
   newPeer,
   newMessage,
   selectPeer,
@@ -55,6 +56,7 @@ export default class Server {
 
   async loadConfig() {
     let config = await this.call('getConfig')
+    this.store.dispatch(setConfig(config))
     if(config.name && config.hasKeyPair) {
       this.store.dispatch(setAppState(APP_STATE_LOADING))
       return this.loadChat()

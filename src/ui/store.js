@@ -7,6 +7,11 @@ export function setAppState(appState) {
   return {type: SET_APP_STATE, appState}
 }
 
+const SET_CONFIG = 'SET_CONFIG'
+export function setConfig(config) {
+  return {type: SET_CONFIG, config}
+}
+
 const NEW_PEER = 'NEW_PEER'
 export function newPeer(peer) {
   return {type: NEW_PEER, peer}
@@ -39,6 +44,12 @@ function reduce(state=INITIAL_STATE, action) {
       return {
         ... state,
         appState: action.appState,
+      }
+
+    case SET_CONFIG:
+      return {
+        ... state,
+        config: action.config,
       }
 
     case NEW_PEER: {
