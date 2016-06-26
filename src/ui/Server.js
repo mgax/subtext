@@ -93,6 +93,10 @@ export default class Server {
         await this.call('generateKeyPair')
       },
 
+      setName: async (name) => {
+        await this.call('setName', name)
+      },
+
       addPeer: async (url) => {
         let peer = await this.call('addPeer', url)
         dispatch(newPeer(peer))

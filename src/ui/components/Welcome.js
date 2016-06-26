@@ -39,12 +39,17 @@ export default class Welcome extends React.Component {
               className='form-control'
               id='welcome-name'
               placeholder='Jane Doe'
+              ref='name'
               />
           </div>{' '}
 
           <StatefulButton
             type='submit'
             className='btn btn-primary'
+            onClick={async () => {
+              await this.props.setName(this.refs.name.value)
+              return true
+            }}
             >Save</StatefulButton>
 
         </form>
