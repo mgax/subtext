@@ -31,8 +31,14 @@ export default class Server {
   }
 
   async call(type, ... args) {
+    console.debug('-->', type, ... args)
     let [err, res] = await new Promise((resolve) => {
-      this.socket.emit(type, args, resolve)
+      this.socket.emit(type, args, (resp) => {
+        let [err, rv] = resp
+        if(err) console.debug('<-error-', err)
+        else console.debug('<--', rv)
+        resolve(resp)
+      })
     })
     if(err) throw new Error(err)
     return res
