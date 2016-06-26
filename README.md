@@ -1,36 +1,31 @@
 ## Installation
 
-You will need a recent version of node.js (5.x).
-
-
-1. Clone the repository, install dependencies
+1. Clone the repository, install dependencies, build the UI:
 
    ```shell
    git clone https://github.com/mgax/subtext.git
    cd subtext
    npm install
-   ```
-
-2. Create an identity. This will generate a keypair for communication with
-   peers and an authentication token to log into your account from a web
-   browser.
-
-   You will be asked about the URL of the server. That URL will be used for two
-   things: for you to access your account, and for an API where peers will send
-   messages.
-
-   ```shell
-   ./run createidentity ../foo
-   ```
-
-3. Build the front-end app and start the server
-
-   ```shell
    ./run build
-   ./run server ../foo
    ```
 
-4. Optionally set up a reverse proxy. This is what you'd write in the nginx
+2. Run the server. You need to pass in two arguments: the path to a data
+   folder, where subtext will create its database, and the public URL where the
+   app will be accessible to peers.
+
+   You can also set the `AUTH_TOKEN` environment variable to a password, that
+   will be needed to access the UI, so that other people can't read your
+   private conversations.
+
+   ```shell
+   export AUTH_TOKEN='something secret'
+   ./run server /var/lib/subtext http://me.example.com
+   ```
+
+   The server will listen on port 8000; you can change this by setting the
+   `PORT` environment variable.
+
+3. Optionally set up a reverse proxy. This is what you'd write in the nginx
    config:
 
    ```nginx
@@ -43,12 +38,7 @@ You will need a recent version of node.js (5.x).
 
    It's a good idea to secure your server with https at this point.
 
-5. Open the public URL in your browser. Open a javascript console and set this
-   variable, replacing the authentication token generated in step 2, then
-   refresh the page.
-
-   ```javascript
-   localStorage.subtext_authToken = 'MY_AUTH_TOKEN'
-   ```
+4. Open the public URL in your browser. If you set `AUTH_TOKEN`, the app will
+   ask you for it, and save it in `localStorage`.
 
    Then, add a peer (like `https://mgax.grep.ro/card`), and chat away!
