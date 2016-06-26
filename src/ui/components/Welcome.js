@@ -20,6 +20,10 @@ export default class Welcome extends React.Component {
 
           <StatefulButton
             className='btn btn-primary'
+            onClick={async () => {
+              await this.props.generateKeyPair()
+              return true
+            }}
             >generate</StatefulButton>
 
         </form>
