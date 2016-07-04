@@ -1,11 +1,10 @@
 import fs from 'fs'
 import EventEmitter from 'events'
-import SocketIO from 'socket.io'
-import socketioAuth from 'socketio-auth'
-import {createBox, openBox, randomKeyPair, boxId} from './messages.js'
+import { openBox } from './messages.js'
 import request from 'request'
 import sqlite3 from 'sqlite3'
 import nodeAsync from './nodeAsync.js'
+import PrivateApi from './PrivateApi.js'
 import PublicApi from './PublicApi.js'
 
 async function defaultFetchCard(url) {
@@ -207,115 +206,9 @@ class IdentityServer {
       WHERE peer_id = ? AND unread = 1`, peerId)
   }
 
-  websocketConnection(socket) {
-    function on(type, callback) {
-      socket.on(type, async function(args, respond) {
-        try {
-          let res = await callback(... args)
-          respond([null, res])
-        }
-        catch(err) {
-          console.error(err.stack || err)
-          respond([''+err])
-        }
-      })
-    }
-
-    let subscribe = (type) => {
-      function handler() {
-        socket.emit(type, ... arguments)
-      }
-
-      this.events.on(type, handler)
-
-      socket.on('disconnect', () => {
-        this.events.removeListener(type, handler)
-      })
-    }
-
-    on('getConfig', async () => {
-      return {
-        name: await this.prop('name'),
-        hasKeyPair: !! this.keyPair,
-      }
-    })
-
-    on('setName', async (name) => {
-      await this.setName(name)
-    })
-
-    on('generateKeyPair', async () => {
-      await this.setKeyPair(randomKeyPair())
-    })
-
-    on('addPeer', async (url) => {
-      return await this.getPeerByUrl(url)
-    })
-
-    on('deletePeer', async (peerId) => {
-      await this.deletePeerById(peerId)
-    })
-
-    on('updatePeerCard', async (peerId) => {
-      await this.updatePeerCard(peerId)
-      return await this.getPeer(peerId)
-    })
-
-    on('setPeerProps', async (peerId, props) => {
-      await this.setPeerProps(peerId, props)
-    })
-
-    on('getPeers', async () => {
-      let rows = await this.db('SELECT * FROM peer')
-      let peers = rows.map(this.loadPeer)
-      return peers
-    })
-
-    on('sendMessage', async (peerId, message) => {
-      let peer = await this.getPeer(peerId)
-      let envelope = {
-        type: 'Envelope',
-        box: createBox(message, this.keyPair.privateKey, peer.card.publicKey),
-        from: this.myPublicUrl,
-        to: peer.url,
-      }
-      await this.saveMessage(peer.id, message, true)
-      await this.send(peer.card.inboxUrl, envelope)
-    })
-
-    on('getMessages', async (peerId) => {
-      let peer = await this.getPeer(peerId)
-      let rows = await this.db(`SELECT * FROM message WHERE peer_id = ?
-        ORDER BY id DESC LIMIT 10`, peer.id)
-      return rows.map(this.loadMessage)
-    })
-
-    on('getPeersWithUnread', async () => {
-      return await this.getPeersWithUnread()
-    })
-
-    on('markAsRead', async (peerId) => {
-      await this.markAsRead(peerId)
-      this.events.emit('markAsRead', peerId)
-    })
-
-    subscribe('message')
-
-    subscribe('markAsRead')
-
-  }
-
   createWebsocket(server) {
-    socketioAuth(SocketIO(server), {
-      authenticate: (socket, token, cb) => {
-        cb(null, token == this.authToken)
-      },
-      postAuthenticate: (sock) => {
-        this.websocketConnection(sock)
-      }
-    })
-
-    return server
+    let privateApi = new PrivateApi(this)
+    return privateApi.createWebsocket(server)
   }
 
   createApp() {
