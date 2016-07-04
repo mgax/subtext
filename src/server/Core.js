@@ -151,12 +151,12 @@ export default class Core {
     return rows.map((row) => row.peer_id)
   }
 
-  async receive({box, from, to}) {
+  async receive({box, cardUrl, to}) {
     if(to != this.myCardUrl) {
       return {error: "Message is not for me"}
     }
 
-    let peer = await this.getPeerByUrl(from)
+    let peer = await this.getPeerByUrl(cardUrl)
 
     let message
     try {
