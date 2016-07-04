@@ -44,7 +44,7 @@ describe('public api', function() {
 
   it('rejects message that does not decrypt', async function() {
     let msg = message(BOB, EVE, "hi")
-    msg.to = ALICE.publicUrl + '/card'
+    msg.to = ALICE.keyPair.publicKey
     let {body} = await this.pub.post('/message', msg)
     assert.equal(body.error, 'Could not decrypt message')
   })

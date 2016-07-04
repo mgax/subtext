@@ -91,6 +91,6 @@ export function message(from, to, content) {
     box: createBox(content, from.keyPair.privateKey, to.keyPair.publicKey),
     cardUrl: from.publicUrl + '/card',
     from: from.keyPair.publicKey,
-    to: to.publicUrl + '/card',
+    to: to.keyPair.publicKey,
   }
 }

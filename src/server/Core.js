@@ -162,7 +162,7 @@ export default class Core {
   }
 
   async receive({box, cardUrl, from, to}) {
-    if(to != this.myCardUrl) {
+    if(! keysEqual(to, this.keyPair.publicKey)) {
       return {error: "Message is not for me"}
     }
 

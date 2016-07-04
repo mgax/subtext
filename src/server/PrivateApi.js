@@ -79,7 +79,7 @@ export default class PrivateApi {
         box: createBox(message, this.core.keyPair.privateKey, peer.card.publicKey),
         cardUrl: this.core.myCardUrl,
         from: this.core.keyPair.publicKey,
-        to: peer.url,
+        to: peer.card.publicKey,
       }
       await this.core.saveMessage(peer.id, message, true)
       await this.core.send(peer.card.inboxUrl, envelope)

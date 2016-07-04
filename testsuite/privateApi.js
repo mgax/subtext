@@ -4,7 +4,7 @@ import tmp from 'tmp'
 import {assert} from 'chai'
 import {ALICE, BOB, client, message} from './common.js'
 import identityserver from '../src/server/identityserver.js'
-import {openBox} from '../src/server/messages.js'
+import {openBox, keysEqual} from '../src/server/messages.js'
 
 const PORT = 17604
 
@@ -146,7 +146,7 @@ describe('private api', function() {
 
     let {url, envelope} = this.sent[0]
     assert.equal(url, BOB.publicUrl + '/message')
-    assert.equal(envelope.to, bobUrl)
+    assert.isTrue(keysEqual(envelope.to, BOB.keyPair.publicKey))
     let boxedMessage = openBox(envelope.box,
       BOB.keyPair.privateKey, ALICE.keyPair.publicKey)
     assert.deepEqual(boxedMessage, msg)
