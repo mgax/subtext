@@ -90,6 +90,7 @@ export function message(from, to, content) {
   return {
     box: createBox(content, from.keyPair.privateKey, to.keyPair.publicKey),
     cardUrl: from.publicUrl + '/card',
+    from: from.keyPair.publicKey,
     to: to.publicUrl + '/card',
   }
 }
