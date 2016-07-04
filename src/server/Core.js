@@ -128,6 +128,16 @@ export default class Core {
     return this.getPeerByUrl(url)
   }
 
+  async getPeerByPublicKey(publicKey) {
+    let rows = await this.db(`SELECT id, card FROM peer`)
+    for(let row of rows) {
+      let card = JSON.parse(row.card)
+      if(card.publicKey && card.publicKey.key === publicKey.key) {
+        return await this.getPeer(row.id)
+      }
+    }
+  }
+
   async setPeerProps(peerId, props) {
     await this.db('UPDATE peer SET props = ? WHERE id = ?',
       JSON.stringify(props), peerId)
@@ -151,12 +161,13 @@ export default class Core {
     return rows.map((row) => row.peer_id)
   }
 
-  async receive({box, cardUrl, to}) {
+  async receive({box, cardUrl, from, to}) {
     if(to != this.myCardUrl) {
       return {error: "Message is not for me"}
     }
 
-    let peer = await this.getPeerByUrl(cardUrl)
+    let peer = await this.getPeerByPublicKey(from)
+    if(! peer) peer = await this.getPeerByUrl(cardUrl)
 
     let message
     try {
