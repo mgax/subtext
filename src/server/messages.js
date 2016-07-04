@@ -66,3 +66,7 @@ export function boxId(cryptoBox) {
   let [ciphertext] = from_cryptobox(cryptoBox)
   return sodium.to_base64(sodium.crypto_hash(ciphertext).slice(0, 32))
 }
+
+export function keysEqual(publicKeyA, publicKeyB) {
+  return !! (publicKeyA && publicKeyB && publicKeyA.key === publicKeyB.key)
+}

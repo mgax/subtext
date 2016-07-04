@@ -1,6 +1,6 @@
 import fs from 'fs'
 import EventEmitter from 'events'
-import { openBox } from './messages.js'
+import { openBox, keysEqual } from './messages.js'
 import sqlite3 from 'sqlite3'
 import PrivateApi from './PrivateApi.js'
 import PublicApi from './PublicApi.js'
@@ -132,7 +132,7 @@ export default class Core {
     let rows = await this.db(`SELECT id, card FROM peer`)
     for(let row of rows) {
       let card = JSON.parse(row.card)
-      if(card.publicKey && card.publicKey.key === publicKey.key) {
+      if(keysEqual(publicKey, card.publicKey)) {
         return await this.getPeer(row.id)
       }
     }
