@@ -1,13 +1,12 @@
 import fs from 'fs'
 import EventEmitter from 'events'
-import express from 'express'
-import bodyParser from 'body-parser'
 import SocketIO from 'socket.io'
 import socketioAuth from 'socketio-auth'
 import {createBox, openBox, randomKeyPair, boxId} from './messages.js'
 import request from 'request'
 import sqlite3 from 'sqlite3'
 import nodeAsync from './nodeAsync.js'
+import PublicApi from './PublicApi.js'
 
 async function defaultFetchCard(url) {
   let res = await nodeAsync(request.get)(url, {json: true})
@@ -320,25 +319,8 @@ class IdentityServer {
   }
 
   createApp() {
-    let publicApp = express()
-    publicApp.use(bodyParser.json())
-
-    let _wrap = (fn) => (...args) => fn(...args).catch(args[2])
-    publicApp.get('/card', _wrap(async (req, res) => {
-      let name = await this.prop('name')
-      res.send({
-        publicKey: this.keyPair.publicKey,
-        inboxUrl: this.publicUrl + '/message',
-        name: name,
-      })
-    }))
-
-    publicApp.post('/message', _wrap(async (req, res) => {
-      let result = await this.receive(req.body)
-      res.send(result)
-    }))
-
-    return publicApp
+    let publicApi = new PublicApi(this)
+    return publicApi.app
   }
 
 }
