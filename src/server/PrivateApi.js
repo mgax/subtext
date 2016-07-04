@@ -77,7 +77,7 @@ export default class PrivateApi {
       let envelope = {
         type: 'Envelope',
         box: createBox(message, this.core.keyPair.privateKey, peer.card.publicKey),
-        from: this.core.myPublicUrl,
+        from: this.core.myCardUrl,
         to: peer.url,
       }
       await this.core.saveMessage(peer.id, message, true)

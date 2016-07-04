@@ -14,7 +14,7 @@ export default class Core {
     this.fetchCard = fetchCard
     this.send = send
 
-    this.myPublicUrl = this.publicUrl + '/card'
+    this.myCardUrl = this.publicUrl + '/card'
     this.events = new EventEmitter()
   }
 
@@ -152,7 +152,7 @@ export default class Core {
   }
 
   async receive({box, from, to}) {
-    if(to != this.myPublicUrl) {
+    if(to != this.myCardUrl) {
       return {error: "Message is not for me"}
     }
 
