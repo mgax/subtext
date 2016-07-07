@@ -16,7 +16,7 @@ async function defaultSend(url, envelope) {
 
 export default async function(
     varPath, publicUrl, authToken,
-    fetchCard=defaultFetchCard, send=defaultSend
+    {fetchCard=defaultFetchCard, send=defaultSend},
   ) {
 
   let rv = new Core(varPath, publicUrl, authToken, fetchCard, send)

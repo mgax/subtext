@@ -67,7 +67,7 @@ describe('private api', function() {
     let send = (url, envelope) => { sent.push({url, envelope}) }
     this.tmp = tmp.dirSync({unsafeCleanup: true})
     this.identityServer = await identityserver(this.tmp.name, ALICE.publicUrl,
-      ALICE.authToken, fetchCard, send)
+      ALICE.authToken, {fetchCard, send})
     await this.identityServer.setKeyPair(ALICE.keyPair)
     await this.identityServer.setName(ALICE.name)
     this.http = new TestServer(this.identityServer)

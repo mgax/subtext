@@ -12,7 +12,7 @@ describe('public api', function() {
     let fetchCard = (url) => cards[url]
     this.tmp = tmp.dirSync({unsafeCleanup: true})
     let server = await identityserver(this.tmp.name, ALICE.publicUrl, '',
-      fetchCard)
+      {fetchCard})
     await server.setKeyPair(ALICE.keyPair)
     await server.setName(ALICE.name)
     this.pub = client(server.createApp())
