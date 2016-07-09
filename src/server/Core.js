@@ -20,48 +20,8 @@ export default class Core {
   }
 
   async initialize() {
-    await this.migrate()
+    await this.db.migrate()
     this.keyPair = await this.db.prop('keyPair')
-  }
-
-  async migrate() {
-    await this.db.run(`CREATE TABLE IF NOT EXISTS prop (
-        key TEXT UNIQUE,
-        value TEXT
-      )`)
-
-    let dbVersion = await this.db.prop('dbVersion')
-    switch(dbVersion) {
-
-      case undefined:
-        await this.db.run(`CREATE TABLE peer (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            url TEXT UNIQUE,
-            card TEXT
-          )`)
-        await this.db.run(`CREATE TABLE message (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            peer_id INTEGER,
-            time TEXT,
-            me BOOL,
-            message TEXT,
-            unread BOOL,
-            FOREIGN KEY(peer_id) REFERENCES peer(id)
-          )`)
-        await this.db.prop('dbVersion', 3)
-
-      case 3:
-        await this.db.run(`ALTER TABLE peer ADD COLUMN props TEXT`)
-        await this.db.run(`UPDATE peer SET props = '{}'`)
-        await this.db.prop('dbVersion', 4)
-
-      case 4:
-        return
-
-      default:
-        throw Error(`Unknown DB version ${dbVersion}`)
-
-    }
   }
 
   async setKeyPair(keyPair) {

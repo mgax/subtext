@@ -39,4 +39,44 @@ export default class DB {
     return value
   }
 
+  async migrate() {
+    await this.run(`CREATE TABLE IF NOT EXISTS prop (
+        key TEXT UNIQUE,
+        value TEXT
+      )`)
+
+    let dbVersion = await this.prop('dbVersion')
+    switch(dbVersion) {
+
+      case undefined:
+        await this.run(`CREATE TABLE peer (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            url TEXT UNIQUE,
+            card TEXT
+          )`)
+        await this.run(`CREATE TABLE message (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            peer_id INTEGER,
+            time TEXT,
+            me BOOL,
+            message TEXT,
+            unread BOOL,
+            FOREIGN KEY(peer_id) REFERENCES peer(id)
+          )`)
+        await this.prop('dbVersion', 3)
+
+      case 3:
+        await this.run(`ALTER TABLE peer ADD COLUMN props TEXT`)
+        await this.run(`UPDATE peer SET props = '{}'`)
+        await this.prop('dbVersion', 4)
+
+      case 4:
+        return
+
+      default:
+        throw Error(`Unknown DB version ${dbVersion}`)
+
+    }
+  }
+
 }
