@@ -1,7 +1,7 @@
 import fs from 'fs'
 import EventEmitter from 'events'
 import { openBox, keysEqual } from './messages.js'
-import sqlite3 from 'sqlite3'
+import DB from './DB.js'
 import PrivateApi from './PrivateApi.js'
 import PublicApi from './PublicApi.js'
 
@@ -15,6 +15,7 @@ export default class Core {
     this.send = send
 
     this.myCardUrl = this.publicUrl + '/card'
+    this.db = new DB(this.varPath + '/db.sqlite')
     this.events = new EventEmitter()
   }
 
@@ -23,41 +24,20 @@ export default class Core {
     this.keyPair = await this.prop('keyPair')
   }
 
-  async db(query, ...args) {
-    let conn = await new Promise((resolve, reject) => {
-      let db = new sqlite3.Database(this.varPath + '/db.sqlite', (err) => {
-        if(err) reject(err); else resolve(db)
-      })
-    })
-    async function run(query, ...args) {
-      return await new Promise((resolve, reject) => {
-        conn.all(query, ...args, (err, rows) => {
-          if(err) reject(err); else resolve(rows)
-        })
-      })
-    }
-    let rows = await run(query, ...args)
-    rows.lastInsertId = async function() {
-      let [{id}] = await run(`SELECT last_insert_rowid() as id`)
-      return id
-    }
-    return rows
-  }
-
   async prop(key, value) {
     if(value === undefined) {
-      let res = await this.db(`SELECT value FROM prop WHERE key = ?`, key)
+      let res = await this.db.run(`SELECT value FROM prop WHERE key = ?`, key)
       if(res.length > 0) value = JSON.parse(res[0].value)
     }
     else {
-      await this.db(`INSERT OR REPLACE INTO prop (key, value) VALUES (?, ?)`,
-          key, JSON.stringify(value))
+      await this.db.run(`INSERT OR REPLACE INTO prop (key, value)
+        VALUES (?, ?)`, key, JSON.stringify(value))
     }
     return value
   }
 
   async migrate() {
-    await this.db(`CREATE TABLE IF NOT EXISTS prop (
+    await this.db.run(`CREATE TABLE IF NOT EXISTS prop (
         key TEXT UNIQUE,
         value TEXT
       )`)
@@ -66,12 +46,12 @@ export default class Core {
     switch(dbVersion) {
 
       case undefined:
-        await this.db(`CREATE TABLE peer (
+        await this.db.run(`CREATE TABLE peer (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             url TEXT UNIQUE,
             card TEXT
           )`)
-        await this.db(`CREATE TABLE message (
+        await this.db.run(`CREATE TABLE message (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             peer_id INTEGER,
             time TEXT,
@@ -83,8 +63,8 @@ export default class Core {
         await this.prop('dbVersion', 3)
 
       case 3:
-        await this.db(`ALTER TABLE peer ADD COLUMN props TEXT`)
-        await this.db(`UPDATE peer SET props = '{}'`)
+        await this.db.run(`ALTER TABLE peer ADD COLUMN props TEXT`)
+        await this.db.run(`UPDATE peer SET props = '{}'`)
         await this.prop('dbVersion', 4)
 
       case 4:
@@ -114,22 +94,22 @@ export default class Core {
   }
 
   async getPeer(id) {
-    let [row] = await this.db('SELECT * FROM peer WHERE id = ?', id)
+    let [row] = await this.db.run('SELECT * FROM peer WHERE id = ?', id)
     return this.loadPeer(row)
   }
 
   async getPeerByUrl(url) {
-    let [row] = await this.db('SELECT * FROM peer WHERE url = ?', url)
+    let [row] = await this.db.run('SELECT * FROM peer WHERE url = ?', url)
     if(row) return this.loadPeer(row)
 
     let card = await this.fetchCard(url)
-    await this.db(`INSERT INTO peer(url, card, props) VALUES (?, ?, '{}')`,
+    await this.db.run(`INSERT INTO peer(url, card, props) VALUES (?, ?, '{}')`,
       url, JSON.stringify(card))
     return this.getPeerByUrl(url)
   }
 
   async getPeerByPublicKey(publicKey) {
-    let rows = await this.db(`SELECT id, card FROM peer`)
+    let rows = await this.db.run(`SELECT id, card FROM peer`)
     for(let row of rows) {
       let card = JSON.parse(row.card)
       if(keysEqual(publicKey, card.publicKey)) {
@@ -139,24 +119,24 @@ export default class Core {
   }
 
   async setPeerProps(peerId, props) {
-    await this.db('UPDATE peer SET props = ? WHERE id = ?',
+    await this.db.run('UPDATE peer SET props = ? WHERE id = ?',
       JSON.stringify(props), peerId)
   }
 
   async updatePeerCard(peerId) {
     let peer = await this.getPeer(peerId)
     let card = await this.fetchCard(peer.url)
-    await this.db('UPDATE peer SET card = ? WHERE id = ?',
+    await this.db.run('UPDATE peer SET card = ? WHERE id = ?',
       JSON.stringify(card), peerId)
   }
 
   async deletePeerById(id) {
-    await this.db('DELETE FROM message WHERE peer_id = ?', id)
-    await this.db('DELETE FROM peer WHERE id = ?', id)
+    await this.db.run('DELETE FROM message WHERE peer_id = ?', id)
+    await this.db.run('DELETE FROM peer WHERE id = ?', id)
   }
 
   async getPeersWithUnread() {
-    let rows = await this.db(`SELECT peer_id FROM message
+    let rows = await this.db.run(`SELECT peer_id FROM message
       WHERE unread = 1 GROUP BY peer_id`)
     return rows.map((row) => row.peer_id)
   }
@@ -180,12 +160,12 @@ export default class Core {
   }
 
   async saveMessage(peerId, message, me) {
-    let res = await this.db(
+    let res = await this.db.run(
       `INSERT INTO message(peer_id, time, me, message, unread)
       VALUES(?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), ?, ?, ?)`,
       peerId, me, JSON.stringify(message), ! me)
     let id = await res.lastInsertId()
-    let [row] = await this.db(`SELECT * FROM message WHERE id = ?`, id)
+    let [row] = await this.db.run(`SELECT * FROM message WHERE id = ?`, id)
     this.events.emit('message', peerId, this.loadMessage(row))
   }
 
@@ -199,7 +179,7 @@ export default class Core {
   }
 
   async markAsRead(peerId) {
-    await this.db(`UPDATE message SET unread = 0
+    await this.db.run(`UPDATE message SET unread = 0
       WHERE peer_id = ? AND unread = 1`, peerId)
   }
 

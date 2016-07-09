@@ -67,7 +67,7 @@ export default class PrivateApi {
     })
 
     on('getPeers', async () => {
-      let rows = await this.core.db('SELECT * FROM peer')
+      let rows = await this.core.db.run('SELECT * FROM peer')
       let peers = rows.map(this.core.loadPeer)
       return peers
     })
@@ -87,8 +87,8 @@ export default class PrivateApi {
 
     on('getMessages', async (peerId) => {
       let peer = await this.core.getPeer(peerId)
-      let rows = await this.core.db(`SELECT * FROM message WHERE peer_id = ?
-        ORDER BY id DESC LIMIT 10`, peer.id)
+      let rows = await this.core.db.run(`SELECT * FROM message
+        WHERE peer_id = ? ORDER BY id DESC LIMIT 10`, peer.id)
       return rows.map(this.core.loadMessage)
     })
 
