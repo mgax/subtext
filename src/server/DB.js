@@ -1,5 +1,30 @@
 import sqlite3 from 'sqlite3'
 
+function connect(dbFile) {
+  return new Promise((resolve, reject) => {
+    let db = new sqlite3.Database(dbFile, (err) => {
+      if(err) reject(err); else resolve(db)
+    })
+  })
+}
+
+function execute(conn, query, ...args) {
+  return new Promise((resolve, reject) => {
+    conn.all(query, ...args, (err, rows) => {
+      if(err) reject(err); else resolve(rows)
+    })
+  })
+}
+
+async function run(conn, query, ...args) {
+  let rows = await execute(conn, query, ...args)
+  rows.lastInsertId = async function() {
+    let [{id}] = await execute(conn, `SELECT last_insert_rowid() as id`)
+    return id
+  }
+  return rows
+}
+
 export default class DB {
 
   constructor(dbFile) {
@@ -7,24 +32,8 @@ export default class DB {
   }
 
   async run(query, ...args) {
-    let conn = await new Promise((resolve, reject) => {
-      let db = new sqlite3.Database(this.dbFile, (err) => {
-        if(err) reject(err); else resolve(db)
-      })
-    })
-    async function run(query, ...args) {
-      return await new Promise((resolve, reject) => {
-        conn.all(query, ...args, (err, rows) => {
-          if(err) reject(err); else resolve(rows)
-        })
-      })
-    }
-    let rows = await run(query, ...args)
-    rows.lastInsertId = async function() {
-      let [{id}] = await run(`SELECT last_insert_rowid() as id`)
-      return id
-    }
-    return rows
+    let conn = await connect(this.dbFile)
+    return await run(conn, query, ...args)
   }
 
   async prop(key, value) {
