@@ -80,6 +80,11 @@ export default class DB {
         await this.prop('dbVersion', 4)
 
       case 4:
+        await this.run(`ALTER TABLE message ADD COLUMN notified BOOL`)
+        await this.run(`UPDATE message SET notified = 1`)
+        await this.prop('dbVersion', 5)
+
+      case 5:
         return
 
       default:

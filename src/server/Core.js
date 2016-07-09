@@ -111,8 +111,8 @@ export default class Core {
   async saveMessage(peerId, message, me) {
     let time = new Date(this.now()).toJSON()
     let res = await this.db.run(
-      `INSERT INTO message(peer_id, time, me, message, unread)
-      VALUES(?, ?, ?, ?, ?)`,
+      `INSERT INTO message(peer_id, time, me, message, unread, notified)
+      VALUES(?, ?, ?, ?, ?, 0)`,
       peerId, time, me, JSON.stringify(message), ! me)
     let id = await res.lastInsertId()
     let [row] = await this.db.run(`SELECT * FROM message WHERE id = ?`, id)
