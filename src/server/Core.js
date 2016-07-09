@@ -7,12 +7,13 @@ import PublicApi from './PublicApi.js'
 
 export default class Core {
 
-  constructor(varPath, publicUrl, authToken, fetchCard, send, now) {
+  constructor(varPath, publicUrl, authToken, fetchCard, send, sendMail, now) {
     this.varPath = varPath
     this.publicUrl = publicUrl
     this.authToken = authToken
     this.fetchCard = fetchCard
     this.send = send
+    this.sendMail = sendMail
     this.now = now
 
     this.myCardUrl = this.publicUrl + '/card'
@@ -141,6 +142,10 @@ export default class Core {
   createApp() {
     let publicApi = new PublicApi(this)
     return publicApi.app
+  }
+
+  async mail(text) {
+    return await this.sendMail({text})
   }
 
 }

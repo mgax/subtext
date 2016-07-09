@@ -18,14 +18,20 @@ function defaultNow() {
   return new Date().getTime()
 }
 
+async function defaultSendMail(options) {
+  console.log('sending email:', options)
+}
+
 export default async function(varPath, publicUrl, authToken, patches) {
   let {
     fetchCard=defaultFetchCard,
     send=defaultSend,
+    sendMail=defaultSendMail,
     now=defaultNow,
   } = patches
 
-  let rv = new Core(varPath, publicUrl, authToken, fetchCard, send, now)
+  let rv = new Core(varPath, publicUrl, authToken, fetchCard, send,
+    sendMail, now)
   await rv.initialize()
   return rv
 
