@@ -27,4 +27,16 @@ export default class DB {
     return rows
   }
 
+  async prop(key, value) {
+    if(value === undefined) {
+      let res = await this.run(`SELECT value FROM prop WHERE key = ?`, key)
+      if(res.length > 0) value = JSON.parse(res[0].value)
+    }
+    else {
+      await this.run(`INSERT OR REPLACE INTO prop (key, value)
+        VALUES (?, ?)`, key, JSON.stringify(value))
+    }
+    return value
+  }
+
 }

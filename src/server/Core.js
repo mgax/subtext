@@ -21,19 +21,7 @@ export default class Core {
 
   async initialize() {
     await this.migrate()
-    this.keyPair = await this.prop('keyPair')
-  }
-
-  async prop(key, value) {
-    if(value === undefined) {
-      let res = await this.db.run(`SELECT value FROM prop WHERE key = ?`, key)
-      if(res.length > 0) value = JSON.parse(res[0].value)
-    }
-    else {
-      await this.db.run(`INSERT OR REPLACE INTO prop (key, value)
-        VALUES (?, ?)`, key, JSON.stringify(value))
-    }
-    return value
+    this.keyPair = await this.db.prop('keyPair')
   }
 
   async migrate() {
@@ -42,7 +30,7 @@ export default class Core {
         value TEXT
       )`)
 
-    let dbVersion = await this.prop('dbVersion')
+    let dbVersion = await this.db.prop('dbVersion')
     switch(dbVersion) {
 
       case undefined:
@@ -60,12 +48,12 @@ export default class Core {
             unread BOOL,
             FOREIGN KEY(peer_id) REFERENCES peer(id)
           )`)
-        await this.prop('dbVersion', 3)
+        await this.db.prop('dbVersion', 3)
 
       case 3:
         await this.db.run(`ALTER TABLE peer ADD COLUMN props TEXT`)
         await this.db.run(`UPDATE peer SET props = '{}'`)
-        await this.prop('dbVersion', 4)
+        await this.db.prop('dbVersion', 4)
 
       case 4:
         return
@@ -77,12 +65,12 @@ export default class Core {
   }
 
   async setKeyPair(keyPair) {
-    await this.prop('keyPair', keyPair)
+    await this.db.prop('keyPair', keyPair)
     this.keyPair = keyPair
   }
 
   async setName(name) {
-    await this.prop('name', name)
+    await this.db.prop('name', name)
   }
 
   loadPeer({card, props, ... row}) {

@@ -36,7 +36,7 @@ export default class PrivateApi {
 
     on('getConfig', async () => {
       return {
-        name: await this.core.prop('name'),
+        name: await this.core.db.prop('name'),
         hasKeyPair: !! this.core.keyPair,
       }
     })
