@@ -88,4 +88,24 @@ export default class DB {
     }
   }
 
+  async _transaction(type, callback) {
+    let conn = await connect(this.dbFile)
+    let _run = (query, ...args) => run(conn, query, ...args)
+
+    await _run(`BEGIN ${type} TRANSACTION`)
+    try {
+      await callback(_run)
+    }
+    catch(e) {
+      console.warn('error during transaction, will roll back:', e)
+      await _run(`ROLLBACK`)
+      throw e
+    }
+    await _run(`COMMIT`)
+  }
+
+  async exclusive(callback) {
+    return await this._transaction('EXCLUSIVE', callback)
+  }
+
 }
