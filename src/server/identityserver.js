@@ -14,12 +14,18 @@ async function defaultSend(url, envelope) {
   throw new Error(`Request to ${url} failed with code ${res.statusCode}`)
 }
 
-export default async function(
-    varPath, publicUrl, authToken,
-    {fetchCard=defaultFetchCard, send=defaultSend},
-  ) {
+function defaultNow() {
+  return new Date().getTime()
+}
 
-  let rv = new Core(varPath, publicUrl, authToken, fetchCard, send)
+export default async function(varPath, publicUrl, authToken, patches) {
+  let {
+    fetchCard=defaultFetchCard,
+    send=defaultSend,
+    now=defaultNow,
+  } = patches
+
+  let rv = new Core(varPath, publicUrl, authToken, fetchCard, send, now)
   await rv.initialize()
   return rv
 

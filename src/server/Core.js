@@ -7,12 +7,13 @@ import PublicApi from './PublicApi.js'
 
 export default class Core {
 
-  constructor(varPath, publicUrl, authToken, fetchCard, send) {
+  constructor(varPath, publicUrl, authToken, fetchCard, send, now) {
     this.varPath = varPath
     this.publicUrl = publicUrl
     this.authToken = authToken
     this.fetchCard = fetchCard
     this.send = send
+    this.now = now
 
     this.myCardUrl = this.publicUrl + '/card'
     this.db = new DB(this.varPath + '/db.sqlite')
@@ -108,10 +109,11 @@ export default class Core {
   }
 
   async saveMessage(peerId, message, me) {
+    let time = new Date(this.now()).toJSON()
     let res = await this.db.run(
       `INSERT INTO message(peer_id, time, me, message, unread)
-      VALUES(?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), ?, ?, ?)`,
-      peerId, me, JSON.stringify(message), ! me)
+      VALUES(?, ?, ?, ?, ?)`,
+      peerId, time, me, JSON.stringify(message), ! me)
     let id = await res.lastInsertId()
     let [row] = await this.db.run(`SELECT * FROM message WHERE id = ?`, id)
     this.events.emit('message', peerId, this.loadMessage(row))
