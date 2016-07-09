@@ -148,4 +148,21 @@ export default class Core {
     return await this.sendMail({text})
   }
 
+  async cron() {
+    let now = new Date(this.now()).toJSON()
+    await this.db.exclusive(async (run) => {
+      let [{ due }] = await run(`SELECT count(*) as due
+        FROM message
+        WHERE unread
+        AND not notified
+        AND strftime('%s', ?) - strftime('%s', time) > 300`,
+        now)
+      if(! due) return
+      let [{ messages }] = await run(`SELECT count(*) as messages
+        FROM message WHERE unread AND not notified`)
+      await this.mail(`You have ${messages} new messages.`)
+      await run(`UPDATE message SET notified=1 WHERE unread AND not notified`)
+    })
+  }
+
 }
