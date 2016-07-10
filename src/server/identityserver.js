@@ -20,6 +20,7 @@ function defaultNow() {
 }
 
 function defaultSendMail(options) {
+  console.info(`sending email: ${JSON.stringify(options)}`)
   let {host, port, from, to} = options.smtp
   let text = options.text
   let subject = "SubText notification"
