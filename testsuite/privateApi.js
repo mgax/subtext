@@ -83,19 +83,35 @@ describe('private api', function() {
     this.tmp.removeCallback()
   })
 
-  it('gets and updates config', async function() {
+  it('gets and updates name', async function() {
+    let getNameAndKeyPair = async () => {
+      let {name, hasKeyPair} = await this.socket.send('getConfig')
+      return {name, hasKeyPair}
+    }
     await this.identityServer.setName(null)
     await this.identityServer.setKeyPair(null)
-    assert.deepEqual(await this.socket.send('getConfig'), {
+    assert.deepEqual(await getNameAndKeyPair(), {
       name: null,
       hasKeyPair: false,
     })
     await this.socket.send('setName', 'Alice')
     await this.socket.send('generateKeyPair')
-    assert.deepEqual(await this.socket.send('getConfig'), {
+    assert.deepEqual(await getNameAndKeyPair(), {
       name: "Alice",
       hasKeyPair: true,
     })
+  })
+
+  it('gets and updates smtp', async function() {
+    let getSmtp = async () => (await this.socket.send('getConfig')).smtp
+    const smtp = {
+      server: 'smtp.example.com',
+      port: 2525,
+      from: 'subtext@example.com',
+    }
+    assert.isUndefined(await getSmtp())
+    await this.socket.send('setSmtp', smtp)
+    assert.deepEqual(await getSmtp(), smtp)
   })
 
   it('saves new peer', async function() {

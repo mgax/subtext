@@ -35,6 +35,10 @@ export default class Core {
     await this.db.prop('name', name)
   }
 
+  async setSmtp(smtp) {
+    await this.db.prop('smtp', smtp)
+  }
+
   loadPeer({card, props, ... row}) {
     return {
       ... row,

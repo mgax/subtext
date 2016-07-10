@@ -37,12 +37,17 @@ export default class PrivateApi {
     on('getConfig', async () => {
       return {
         name: await this.core.db.prop('name'),
+        smtp: await this.core.db.prop('smtp'),
         hasKeyPair: !! this.core.keyPair,
       }
     })
 
     on('setName', async (name) => {
       await this.core.setName(name)
+    })
+
+    on('setSmtp', async (smtp) => {
+      await this.core.setSmtp(smtp)
     })
 
     on('generateKeyPair', async () => {
