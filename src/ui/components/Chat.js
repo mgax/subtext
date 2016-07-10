@@ -1,4 +1,4 @@
-import { h } from '../utils.js'
+import ChatHeader from './ChatHeader.js'
 import PeerList from './PeerList.js'
 import Conversation from './Conversation.js'
 
@@ -13,12 +13,9 @@ export default function Chat({
     <div className='container-fluid'>
       <div className='row'>
         <div className='col-sm-4 app-peers'>
-          <button
-            onClick={h(() => {
-              let url = prompt('peer url')
-              if(url) addPeer(url)
-            })}
-            >add peer</button>
+          <ChatHeader
+            addPeer={addPeer}
+            />
           <PeerList
             store={store}
             peers={peers}
