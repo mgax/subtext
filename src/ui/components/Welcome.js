@@ -3,7 +3,7 @@ import StatefulButton from './StatefulButton.js'
 export default class Welcome extends React.Component {
 
   render() {
-    let { config } = this.props
+    let { config, setName, generateKeyPair } = this.props
 
     return (
       <div className='container-fluid'>
@@ -31,7 +31,7 @@ export default class Welcome extends React.Component {
                 type='submit'
                 className='btn btn-primary'
                 onClick={async () => {
-                  await this.props.setName(this.refs.name.value)
+                  await setName(this.refs.name.value)
                   return true
                 }}
                 >Save</StatefulButton>
@@ -55,7 +55,7 @@ export default class Welcome extends React.Component {
               <StatefulButton
                 className='btn btn-primary'
                 onClick={async () => {
-                  await this.props.generateKeyPair()
+                  await generateKeyPair()
                   return true
                 }}
                 >generate</StatefulButton>
