@@ -3,11 +3,11 @@ import Icon from './Icon.js'
 
 export default function ChatHeader({addPeer}) {
   return (
-    <div className='clearfix'>
+    <div className='clearfix ChatHeader'>
 
       <button
         type='button'
-        className='btn btn-success-outline'
+        className='pull-left btn btn-success-outline'
         onClick={h(() => {
           console.log('configure')
         })}
@@ -22,6 +22,8 @@ export default function ChatHeader({addPeer}) {
           if(url) addPeer(url)
         })}
         >add peer</button>
+
+      <h1>SubText</h1>
 
     </div>
   )
