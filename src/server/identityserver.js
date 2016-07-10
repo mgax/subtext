@@ -1,4 +1,5 @@
 import request from 'request'
+import emailjs from 'emailjs'
 import nodeAsync from './nodeAsync.js'
 import Core from './Core.js'
 
@@ -18,8 +19,23 @@ function defaultNow() {
   return new Date().getTime()
 }
 
-async function defaultSendMail(options) {
-  console.log('sending email:', options)
+function defaultSendMail(options) {
+  let {host, port, from, to} = options.smtp
+  let text = options.text
+  let subject = "SubText notification"
+
+  return new Promise((resolve, reject) => {
+    let server = emailjs.server.connect({host, port})
+    server.send({from, to, text, subject: subject}, function(err) {
+      if(err) {
+        console.warn("SMTP failed", err)
+        reject(err)
+      }
+      else {
+        resolve(true)
+      }
+    })
+  })
 }
 
 export default async function(varPath, publicUrl, authToken, patches={}) {
