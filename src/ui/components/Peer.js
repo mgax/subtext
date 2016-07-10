@@ -11,10 +11,6 @@ export default function Peer({
 
   let name = peer.card.name || peer.url
 
-  function onInfo() {
-    modal(PeerModal, {peer})
-  }
-
   let className = classNames('peer', {
     'peer-selected': selected,
     'peer-unread': peer.unread,
@@ -22,7 +18,13 @@ export default function Peer({
 
   return (
     <div onClick={h(() => { selectPeer(peer.id) })} className={className}>
-      <button type='button' className='peer-menu' onClick={h(onInfo)}>
+      <button
+        type='button'
+        className='peer-menu'
+        onClick={h(() => {
+          modal(PeerModal, {peer})
+        })}
+        >
         <Icon name='cog' />
       </button>
       <span className='peer-name'>{name}</span>
