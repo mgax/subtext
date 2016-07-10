@@ -3,7 +3,7 @@ import StatefulButton from '../StatefulButton.js'
 export default class Name extends React.Component {
 
   render() {
-    let { setName } = this.props
+    let { value, setName } = this.props
 
     return (
       <div>
@@ -19,6 +19,7 @@ export default class Name extends React.Component {
               id='welcome-name'
               placeholder='Jane Doe'
               ref='name'
+              defaultValue={value}
               />
           </div>{' '}
 
@@ -27,7 +28,6 @@ export default class Name extends React.Component {
             className='btn btn-primary'
             onClick={async () => {
               await setName(this.refs.name.value)
-              return true
             }}
             >Save</StatefulButton>
 

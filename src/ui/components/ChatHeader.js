@@ -1,7 +1,8 @@
 import { h } from '../utils.js'
 import Icon from './Icon.js'
+import ConfigModal from './ConfigModal.js'
 
-export default function ChatHeader({addPeer}) {
+export default function ChatHeader({modal, addPeer}) {
   return (
     <div className='clearfix ChatHeader'>
 
@@ -9,7 +10,7 @@ export default function ChatHeader({addPeer}) {
         type='button'
         className='pull-left btn btn-success-outline'
         onClick={h(() => {
-          console.log('configure')
+          modal(ConfigModal)
         })}
         >
         <Icon name='cog' />
