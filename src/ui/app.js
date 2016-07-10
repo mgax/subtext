@@ -22,7 +22,9 @@ window.main = function() { waiter((async function() {
   function modal(content) {
     let container = document.querySelector('#modal')
     ReactDOM.render(content, container)
-    $('.modal', container).modal()
+    $('.modal', container).modal().on('hidden.bs.modal', () => {
+      ReactDOM.unmountComponentAtNode(container)
+    })
   }
 
   function mapDispatchToProps(dispatch) {
