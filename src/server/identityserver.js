@@ -22,7 +22,7 @@ async function defaultSendMail(options) {
   console.log('sending email:', options)
 }
 
-export default async function(varPath, publicUrl, authToken, patches) {
+export default async function(varPath, publicUrl, authToken, patches={}) {
   let {
     fetchCard=defaultFetchCard,
     send=defaultSend,
