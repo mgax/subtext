@@ -1,6 +1,6 @@
 import 'babel-polyfill'
 import classNames from 'classnames'
-const { Provider, connect } = ReactRedux
+const { Provider } = ReactRedux
 import './style.scss'
 import { waiter } from './utils.js'
 import { createStore } from './store.js'
@@ -12,7 +12,7 @@ window.main = function() { waiter((async function() {
   let store = createStore()
   let server = new Server(store)
 
-  const ConnectedApp = connect((state) => state, mapDispatchToProps)(App)
+  const ConnectedApp = connect(App)
   let app = ReactDOM.render((
     <Provider store={store}>
       <ConnectedApp store={store} modal={modal} />
@@ -25,6 +25,10 @@ window.main = function() { waiter((async function() {
     $('.modal', container).modal().on('hidden.bs.modal', () => {
       ReactDOM.unmountComponentAtNode(container)
     })
+  }
+
+  function connect(component) {
+    return ReactRedux.connect((state) => state, mapDispatchToProps)(component)
   }
 
   function mapDispatchToProps(dispatch) {
