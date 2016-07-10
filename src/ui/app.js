@@ -1,6 +1,6 @@
 import 'babel-polyfill'
 import classNames from 'classnames'
-const { Provider } = ReactRedux
+const { Provider, connect } = ReactRedux
 import './style.scss'
 import { waiter } from './utils.js'
 import { createStore } from './store.js'
@@ -12,36 +12,26 @@ window.main = function() { waiter((async function() {
   let store = createStore()
   let server = new Server(store)
 
-  const ConnectedApp = connect(App)
-  let app = ReactDOM.render((
-    <Provider store={store}>
-      <ConnectedApp
-        modal={modal}
-        />
-    </Provider>
-  ), document.querySelector('#app'))
-
-  function modal(Component, props={}) {
-    let container = document.querySelector('#modal')
-    let ConnectedComponent = connect(Component)
+  function mount(node, Component, props) {
+    let mapState = (state) => state
+    let mapDispatch = (dispatch) => server.mapDispatchToProps(dispatch)
+    let ConnectedComponent = connect(mapState, mapDispatch)(Component)
     ReactDOM.render((
       <Provider store={store}>
         <ConnectedComponent {... props} />
       </Provider>
-    ), container)
-    $('.modal', container).modal().on('hidden.bs.modal', () => {
-      ReactDOM.unmountComponentAtNode(container)
+    ), node)
+  }
+
+  function modal(Component, props) {
+    let node = document.querySelector('#modal')
+    mount(node, Component, props)
+    $('.modal', node).modal().on('hidden.bs.modal', () => {
+      ReactDOM.unmountComponentAtNode(node)
     })
   }
 
-  function connect(component) {
-    return ReactRedux.connect((state) => state, mapDispatchToProps)(component)
-  }
-
-  function mapDispatchToProps(dispatch) {
-    let serverProps = server.mapDispatchToProps(dispatch)
-    return serverProps
-  }
+  mount(document.querySelector('#app'), App, {modal})
 
   window.S = {
     app: app,
