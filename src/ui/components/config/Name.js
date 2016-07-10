@@ -12,11 +12,11 @@ export default class Name extends React.Component {
         <form className='form-inline'>
 
           <div className='form-group'>
-            <label htmlFor='welcome-name'>Name</label>{' '}
+            <label htmlFor='Name-input'>Name</label>{' '}
             <input
               type='text'
               className='form-control'
-              id='welcome-name'
+              id='Name-input'
               placeholder='Jane Doe'
               ref='name'
               defaultValue={value}
