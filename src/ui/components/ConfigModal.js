@@ -13,6 +13,7 @@ export default function ConfigModal({ config, setName, setSmtp }) {
         />
 
       <Smtp
+        smtp={config.smtp}
         setSmtp={setSmtp}
         />
 

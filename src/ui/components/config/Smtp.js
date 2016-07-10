@@ -3,7 +3,7 @@ import StatefulButton from '../StatefulButton.js'
 export default class Smtp extends React.Component {
 
   render() {
-    let { setSmtp } = this.props
+    let { smtp={}, setSmtp } = this.props
 
     return (
       <div>
@@ -12,37 +12,39 @@ export default class Smtp extends React.Component {
         <form className='form-inline'>
 
           <div className='form-group'>
-            <label htmlFor='MailServer-host'>SMTP server</label>{' '}
+            <label htmlFor='Mail-host'>SMTP server</label>{' '}
             <input
               type='text'
               className='form-control'
-              id='MailServer-host'
+              id='Mail-host'
               ref='host'
               placeholder='smtp.example.com'
+              defaultValue={smtp.host}
               />
           </div>{' '}
 
           <div className='form-group'>
-            <label htmlFor='MailServer-port'>port</label>{' '}
+            <label htmlFor='Mail-port'>port</label>{' '}
             <input
               type='number'
               className='form-control'
-              id='MailServer-port'
+              id='Mail-port'
               ref='port'
-              defaultValue='25'
+              defaultValue={smtp.port || 25}
               />
           </div>{' '}
 
           <div className='form-group'>
-            <label htmlFor='MailServer-from'>
+            <label htmlFor='Mail-from'>
               email address of SubText app
             </label>{' '}
             <input
               type='text'
               className='form-control'
-              id='MailServer-from'
+              id='Mail-from'
               ref='from'
               placeholder='subtext@example.com'
+              defaultValue={smtp.from}
               />
           </div>{' '}
 
