@@ -1,30 +1,18 @@
 import classNames from 'classnames'
-const { Provider, connect } = ReactRedux
+const { Provider } = ReactRedux
 import { h } from '../utils.js'
 import Icon from './Icon.js'
 import PeerModal from './PeerModal.js'
 
 export default function Peer({
-    store, peer, updatePeerCard, selectPeer, modal, deletePeer, selected
+    modal, peer, selected,
+    updatePeerCard, selectPeer, deletePeer,
   }) {
 
   let name = peer.card.name || peer.url
 
   function onInfo() {
-
-    let mapModalState = (state) => ({
-      peer: state.peers[peer.id]
-    })
-
-    const ConnectedPeerModal = connect(mapModalState)(PeerModal)
-    modal(
-      <Provider store={store}>
-        <ConnectedPeerModal
-          updatePeerCard={updatePeerCard}
-          deletePeer={deletePeer}
-          />
-      </Provider>
-    )
+    modal(PeerModal, {peer})
   }
 
   let className = classNames('peer', {

@@ -1,8 +1,8 @@
 import Peer from './Peer.js'
 
 export default function PeerList({
-    store, peers, modal, selectedPeerId, updatePeerCard, selectPeer,
-    deletePeer,
+    modal, peers,
+    selectedPeerId, updatePeerCard, selectPeer, deletePeer,
   }) {
 
   return (
@@ -10,12 +10,11 @@ export default function PeerList({
       {Object.values(peers).map((peer) => (
         <li key={peer.id}>
           <Peer
-            store={store}
+            modal={modal}
             peer={peer}
             updatePeerCard={updatePeerCard}
             selectPeer={selectPeer}
             deletePeer={deletePeer}
-            modal={modal}
             selected={selectedPeerId == peer.id}
             />
         </li>

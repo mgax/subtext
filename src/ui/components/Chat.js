@@ -3,8 +3,8 @@ import PeerList from './PeerList.js'
 import Conversation from './Conversation.js'
 
 export default function Chat({
-    store, peers, modal, selectedPeerId, updatePeerCard, selectPeer, addPeer,
-    deletePeer, sendMessage
+    modal, config, peers, selectedPeerId,
+    updatePeerCard, selectPeer, addPeer, deletePeer, sendMessage,
   }) {
 
   let selectedPeer = peers[selectedPeerId]
@@ -14,12 +14,12 @@ export default function Chat({
       <div className='row'>
         <div className='col-sm-4 app-peers'>
           <ChatHeader
+            modal={modal}
             addPeer={addPeer}
             />
           <PeerList
-            store={store}
-            peers={peers}
             modal={modal}
+            peers={peers}
             selectedPeerId={selectedPeerId}
             updatePeerCard={updatePeerCard}
             selectPeer={selectPeer}

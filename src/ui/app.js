@@ -15,13 +15,20 @@ window.main = function() { waiter((async function() {
   const ConnectedApp = connect(App)
   let app = ReactDOM.render((
     <Provider store={store}>
-      <ConnectedApp store={store} modal={modal} />
+      <ConnectedApp
+        modal={modal}
+        />
     </Provider>
   ), document.querySelector('#app'))
 
-  function modal(content) {
+  function modal(Component, props={}) {
     let container = document.querySelector('#modal')
-    ReactDOM.render(content, container)
+    let ConnectedComponent = connect(Component)
+    ReactDOM.render((
+      <Provider store={store}>
+        <ConnectedComponent {... props} />
+      </Provider>
+    ), container)
     $('.modal', container).modal().on('hidden.bs.modal', () => {
       ReactDOM.unmountComponentAtNode(container)
     })
