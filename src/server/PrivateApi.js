@@ -50,6 +50,10 @@ export default class PrivateApi {
       await this.core.setSmtp(smtp)
     })
 
+    on('testSmtp', async () => {
+      return await this.core.mail('smtp test')
+    })
+
     on('generateKeyPair', async () => {
       await this.core.setKeyPair(randomKeyPair())
     })

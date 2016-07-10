@@ -63,11 +63,18 @@ describe('private api', function() {
       },
     }
     let sent = this.sent = []
+    this.inbox = []
+    this.emailSuccess = true
+    let sendMail = async ({text}) => {
+      if(! this.emailSuccess) return false
+      this.inbox.push(text)
+      return true
+    }
     let fetchCard = (url) => cards[url]
     let send = (url, envelope) => { sent.push({url, envelope}) }
     this.tmp = tmp.dirSync({unsafeCleanup: true})
     this.identityServer = await identityserver(this.tmp.name, ALICE.publicUrl,
-      ALICE.authToken, {fetchCard, send})
+      ALICE.authToken, {fetchCard, send, sendMail})
     await this.identityServer.setKeyPair(ALICE.keyPair)
     await this.identityServer.setName(ALICE.name)
     this.http = new TestServer(this.identityServer)
@@ -108,10 +115,20 @@ describe('private api', function() {
       server: 'smtp.example.com',
       port: 2525,
       from: 'subtext@example.com',
+      to: 'me@example.com',
     }
     assert.isUndefined(await getSmtp())
     await this.socket.send('setSmtp', smtp)
     assert.deepEqual(await getSmtp(), smtp)
+  })
+
+  it('performs an smtp test', async function() {
+    let checkInbox = () => { let rv = this.inbox; this.inbox = []; return rv }
+    assert.isTrue(await this.socket.send('testSmtp'))
+    assert.deepEqual(checkInbox(), ['smtp test'])
+    this.emailSuccess = false
+    assert.isFalse(await this.socket.send('testSmtp'))
+    assert.deepEqual(checkInbox(), [])
   })
 
   it('saves new peer', async function() {
