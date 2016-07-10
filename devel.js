@@ -1,10 +1,6 @@
-import express from 'express'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpack from 'webpack'
 import fs from 'fs'
-import readlineLib from 'readline'
-import request from 'request'
-import { randomKeyPair, createBox, randomToken } from './src/server/messages.js'
 import createServer from './src/server/create.js'
 
 const WEBAPP_OPTIONS = {
@@ -47,52 +43,6 @@ async function devserver(path, publicUrl) {
   app.get('/', function(req, res) { res.send(index_html()) })
 }
 
-function prompt({question, defaultValue = '', valid = (() => true)}) {
-  let rl = readlineLib.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  })
-  let defaultText = defaultValue ? ` [${defaultValue}]` : ''
-  let text = `${question}${defaultText}: `
-  return new Promise((resolve) => {
-    function ask() {
-      rl.question(text, (resp) => {
-        let value = resp || defaultValue
-        if(valid(resp)) {
-          resolve(value)
-          rl.close()
-        }
-        else {
-          console.log('Not a valid answer:', value)
-          ask()
-        }
-      })
-    }
-    ask()
-  })
-}
-
-async function createidentity(path) {
-  let name = await prompt({
-    question: 'Name',
-    defaultValue: process.env.USER,
-  })
-  let publicUrl = await prompt({
-    question: 'URL where the subtext server will respond, no trailing\n' +
-        'slash, e.g. "http://subtext.example.com"',
-    valid: (url) => url.match(/^http[s]?:\/\/.+[^/]$/),
-  })
-  let authToken = randomToken(20)
-  fs.mkdirSync(path)
-  fs.writeFileSync(path + '/config.json', JSON.stringify({
-    keyPair: randomKeyPair(),
-    name: name,
-    publicUrl: publicUrl,
-    authToken: authToken,
-  }, null, 2), {mode: 0o600})
-  console.log('Your authentication token:', authToken)
-}
-
 (async function() {
   let cmd = process.argv[2]
 
@@ -103,9 +53,6 @@ async function createidentity(path) {
 
     case 'devserver':
       return await devserver(process.argv[3], process.argv[4])
-
-    case 'createidentity':
-      return await createidentity(process.argv[3])
 
     default:
       throw new Error("Unknown command " + cmd)
