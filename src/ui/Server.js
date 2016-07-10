@@ -103,6 +103,11 @@ export default class Server {
         await this.loadConfig()
       },
 
+      setSmtp: async (smtp) => {
+        await this.call('setSmtp', smtp)
+        await this.loadConfig()
+      },
+
       addPeer: async (url) => {
         let peer = await this.call('addPeer', url)
         dispatch(newPeer(peer))
