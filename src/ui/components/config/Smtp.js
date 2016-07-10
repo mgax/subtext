@@ -1,9 +1,10 @@
 import StatefulButton from '../StatefulButton.js'
+import TestSmtp from './TestSmtp.js'
 
 export default class Smtp extends React.Component {
 
   render() {
-    let { smtp={}, setSmtp } = this.props
+    let { smtp={}, setSmtp, testSmtp } = this.props
 
     return (
       <div>
@@ -74,6 +75,9 @@ export default class Smtp extends React.Component {
             >Save</StatefulButton>
 
         </form>
+
+        <TestSmtp smtp={smtp} testSmtp={testSmtp} />
+
       </div>
     )
   }

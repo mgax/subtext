@@ -2,7 +2,7 @@ import Modal from './Modal.js'
 import Name from './config/Name.js'
 import Smtp from './config/Smtp.js'
 
-export default function ConfigModal({ config, setName, setSmtp }) {
+export default function ConfigModal({ config, setName, setSmtp, testSmtp }) {
 
   return (
     <Modal title="Configuration">
@@ -15,6 +15,7 @@ export default function ConfigModal({ config, setName, setSmtp }) {
       <Smtp
         smtp={config.smtp}
         setSmtp={setSmtp}
+        testSmtp={testSmtp}
         />
 
     </Modal>
