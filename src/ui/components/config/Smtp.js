@@ -48,6 +48,18 @@ export default class Smtp extends React.Component {
               />
           </div>{' '}
 
+          <div className='form-group'>
+            <label htmlFor='Smtp-to'>your address</label>{' '}
+            <input
+              type='text'
+              className='form-control'
+              id='Smtp-to'
+              ref='to'
+              placeholder='me@example.com'
+              defaultValue={smtp.to}
+              />
+          </div>{' '}
+
           <StatefulButton
             type='submit'
             className='btn btn-primary'
@@ -56,6 +68,7 @@ export default class Smtp extends React.Component {
                 host: this.refs.host.value,
                 port: this.refs.port.value,
                 from: this.refs.from.value,
+                to: this.refs.to.value,
               })
             }}
             >Save</StatefulButton>
