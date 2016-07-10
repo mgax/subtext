@@ -64,9 +64,9 @@ describe('private api', function() {
     }
     let sent = this.sent = []
     this.inbox = []
-    this.emailSuccess = true
+    this.smtpErr = null
     let sendMail = async ({text}) => {
-      if(! this.emailSuccess) return false
+      if(this.smtpErr) throw(this.smtpErr)
       this.inbox.push(text)
       return true
     }
@@ -124,10 +124,11 @@ describe('private api', function() {
 
   it('performs an smtp test', async function() {
     let checkInbox = () => { let rv = this.inbox; this.inbox = []; return rv }
-    assert.isTrue(await this.socket.send('testSmtp'))
+    assert.deepEqual(await this.socket.send('testSmtp'), {success: true})
     assert.deepEqual(checkInbox(), ['smtp test'])
-    this.emailSuccess = false
-    assert.isFalse(await this.socket.send('testSmtp'))
+    this.smtpErr = 'some error'
+    assert.deepEqual(await this.socket.send('testSmtp'),
+      {success: false, err: 'some error'})
     assert.deepEqual(checkInbox(), [])
   })
 

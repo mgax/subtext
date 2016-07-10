@@ -51,7 +51,13 @@ export default class PrivateApi {
     })
 
     on('testSmtp', async () => {
-      return await this.core.mail('smtp test')
+      try {
+        await this.core.mail('smtp test')
+        return {success: true}
+      }
+      catch(err) {
+        return {success: false, err: err}
+      }
     })
 
     on('generateKeyPair', async () => {
