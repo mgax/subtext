@@ -1,5 +1,5 @@
 import { h } from '../utils.js'
-import Peer from './Peer.js'
+import PeerList from './PeerList.js'
 import Conversation from './Conversation.js'
 
 export default function Chat({
@@ -19,21 +19,15 @@ export default function Chat({
               if(url) addPeer(url)
             })}
             >add peer</button>
-          <ul>
-            {Object.values(peers).map((peer) => (
-              <li key={peer.id}>
-                <Peer
-                  store={store}
-                  peer={peer}
-                  updatePeerCard={updatePeerCard}
-                  selectPeer={selectPeer}
-                  deletePeer={deletePeer}
-                  modal={modal}
-                  selected={selectedPeerId == peer.id}
-                  />
-              </li>
-            ))}
-          </ul>
+          <PeerList
+            store={store}
+            peers={peers}
+            modal={modal}
+            selectedPeerId={selectedPeerId}
+            updatePeerCard={updatePeerCard}
+            selectPeer={selectPeer}
+            deletePeer={deletePeer}
+            />
         </div>
         {selectedPeer && (
           <div className='col-sm-8 app-conversation'>
