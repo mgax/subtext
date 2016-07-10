@@ -148,12 +148,14 @@ export default class Core {
     return publicApi.app
   }
 
-  async mail(text) {
-    return await this.sendMail({text})
+  async mail(text, smtp) {
+    if(smtp === undefined) smtp = await this.db.prop('smtp')
+    return await this.sendMail({text, smtp})
   }
 
   async cron() {
     let now = new Date(this.now()).toJSON()
+    let smtp = await this.db.prop('smtp') || {}
     await this.db.exclusive(async (run) => {
       let [{ due }] = await run(`SELECT count(*) as due
         FROM message
@@ -164,7 +166,7 @@ export default class Core {
       if(! due) return
       let [{ messages }] = await run(`SELECT count(*) as messages
         FROM message WHERE unread AND not notified`)
-      await this.mail(`You have ${messages} new messages.`)
+      await this.mail(`You have ${messages} new messages.`, smtp)
       await run(`UPDATE message SET notified=1 WHERE unread AND not notified`)
     })
   }
