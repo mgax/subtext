@@ -28,7 +28,11 @@ export default class Server {
     })
 
     this.on('authenticated', () => {
-      this.on('message', (peerId, message) => {
+      this.on('message', async (peerId, message) => {
+        if(! this.store.getState().peers[peerId]) {
+          let peer = await this.call('getPeer', peerId)
+          this.store.dispatch(newPeer(peer))
+        }
         this.store.dispatch(newMessage(peerId, message))
         this.store.dispatch(markUnread(peerId, true))
       })
