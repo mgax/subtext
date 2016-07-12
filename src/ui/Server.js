@@ -17,26 +17,33 @@ export default class Server {
     this.store = store
     this.socket = io.connect('/')
 
-    this.socket.on('unauthorized', (err) => {
+    this.on('unauthorized', (err) => {
       console.error('socket.io unauthorized:', err)
       localStorage.subtext_authToken = prompt("Please enter authToken")
       window.location.reload()
     })
 
-    this.socket.on('connect', () => {
+    this.on('connect', () => {
       this.socket.emit('authentication', localStorage.subtext_authToken)
     })
 
-    this.socket.on('authenticated', () => {
-      this.socket.on('message', (peerId, message) => {
+    this.on('authenticated', () => {
+      this.on('message', (peerId, message) => {
         this.store.dispatch(newMessage(peerId, message))
         this.store.dispatch(markUnread(peerId, true))
       })
-      this.socket.on('markAsRead', (peerId) => {
+      this.on('markAsRead', (peerId) => {
         this.store.dispatch(markUnread(peerId, false))
       })
 
       waiter(this.loadConfig())
+    })
+  }
+
+  on(type, callback) {
+    this.socket.on(type, (... args) => {
+      console.debug('<==', type, ... args)
+      callback(... args)
     })
   }
 
