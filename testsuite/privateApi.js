@@ -159,6 +159,10 @@ describe('private api', function() {
     ])
     assert.equal(peers[0].card.publicKey.key, BOB.keyPair.publicKey.key)
 
+    // get a peer by id
+    let peer1 = await this.socket.send('getPeer', 1)
+    assert.deepEqual(peers[0], peer1)
+
     // delete a peer
     await this.socket.send('deletePeer', bobId)
     let newPeers = await this.socket.send('getPeers')

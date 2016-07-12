@@ -87,6 +87,10 @@ export default class PrivateApi {
       return peers
     })
 
+    on('getPeer', async (peerId) => {
+      return await this.core.getPeer(peerId)
+    })
+
     on('sendMessage', async (peerId, message) => {
       let peer = await this.core.getPeer(peerId)
       let envelope = {
