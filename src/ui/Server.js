@@ -127,7 +127,12 @@ export default class Server {
       },
 
       addPeer: async (url) => {
-        let peer = await this.call('addPeer', url)
+        let peer
+        try { peer = await this.call('addPeer', url) }
+        catch(e) {
+          if(e.type == 'CardDownloadError') alert(e.message)
+          throw e
+        }
         dispatch(newPeer(peer))
       },
 
