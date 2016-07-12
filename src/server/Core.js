@@ -56,7 +56,13 @@ export default class Core {
     let [row] = await this.db.run('SELECT * FROM peer WHERE url = ?', url)
     if(row) return this.loadPeer(row)
 
-    let card = await this.fetchCard(url)
+    let card
+    try {
+      card = await this.fetchCard(url)
+    }
+    catch(e) {
+      throw {type: 'CardDownloadError', message: ''+e, error: e}
+    }
     await this.db.run(`INSERT INTO peer(url, card, props) VALUES (?, ?, '{}')`,
       url, JSON.stringify(card))
     return this.getPeerByUrl(url)

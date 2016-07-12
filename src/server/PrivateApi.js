@@ -17,7 +17,7 @@ export default class PrivateApi {
         }
         catch(err) {
           console.error(err.stack || err)
-          respond([''+err])
+          respond([err])
         }
       })
     }
