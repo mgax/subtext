@@ -68,7 +68,10 @@ function reduce(state=INITIAL_STATE, action) {
 
     case NEW_MESSAGE: {
       let peer = state.peers[action.peerId]
-      if(! peer) return state
+      if(! peer) {
+        console.warn('unknown peer', action.peerId)
+        return state
+      }
       if(peer.messages[action.message.id]) return state
       return {
         ... state,
