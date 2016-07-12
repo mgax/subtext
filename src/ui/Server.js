@@ -53,16 +53,19 @@ export default class Server {
 
   async call(type, ... args) {
     console.debug('-->', type, ... args)
-    let [err, res] = await new Promise((resolve) => {
+    let [err, rv] = await new Promise((resolve) => {
       this.socket.emit(type, args, (resp) => {
-        let [err, rv] = resp
-        if(err) console.debug('<-error-', err)
-        else console.debug('<--', rv)
         resolve(resp)
       })
     })
-    if(err) throw new Error(err)
-    return res
+    if(err) {
+      console.debug('<-error-', err)
+      throw err
+    }
+    else {
+      console.debug('<--', rv)
+      return rv
+    }
   }
 
   async loadConfig() {
