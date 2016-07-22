@@ -37,6 +37,11 @@ export default class DB {
   }
 
   async _read_props() {
+    await this.run(`CREATE TABLE IF NOT EXISTS prop (
+        key TEXT UNIQUE,
+        value TEXT
+      )`)
+
     this._props = {}
     for(let {key, value} of await this.run(`SELECT key, value FROM prop`)) {
       this._props[key] = JSON.parse(value)
@@ -65,16 +70,11 @@ export default class DB {
   }
 
   async initialize() {
-    await this._migrate()
     await this._read_props()
+    await this._migrate()
   }
 
   async _migrate() {
-    await this.run(`CREATE TABLE IF NOT EXISTS prop (
-        key TEXT UNIQUE,
-        value TEXT
-      )`)
-
     let dbVersion = await this._get_prop('dbVersion')
     switch(dbVersion) {
 
