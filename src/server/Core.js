@@ -161,6 +161,8 @@ export default class Core {
       await this.send(destination, JSON.parse(envelope))
     }
     catch(_) {
+      await this.db.run(`UPDATE outbox SET last = ? where message_id = ?`,
+        time, messageId)
       return
     }
     await this.db.run(`DELETE FROM outbox WHERE message_id = ?`, messageId)
@@ -218,7 +220,9 @@ export default class Core {
   }
 
   async _cron_outbox() {
-    let outbox = await this.db.run(`SELECT message_id FROM outbox`)
+    let now = new Date(this.now()).toJSON()
+    let outbox = await this.db.run(`SELECT message_id FROM outbox
+      WHERE strftime('%s', ?) - strftime('%s', last) > 30`, now)
     for(let {message_id} of outbox) {
       await this._deliver(message_id)
     }

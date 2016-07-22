@@ -75,9 +75,10 @@ describe('private api', function() {
       if(this.sendFail) throw "SEND FAIL"
       else sent.push({url, envelope})
     }
+    let now = () => this.now || new Date().getTime()
     this.tmp = tmp.dirSync({unsafeCleanup: true})
     this.identityServer = await identityserver(this.tmp.name, ALICE.publicUrl,
-      ALICE.authToken, {fetchCard, send, sendMail})
+      ALICE.authToken, {fetchCard, send, sendMail, now})
     await this.identityServer.setKeyPair(ALICE.keyPair)
     await this.identityServer.setName(ALICE.name)
     this.http = new TestServer(this.identityServer)
@@ -202,22 +203,31 @@ describe('private api', function() {
   })
 
   it('retries sending the message', async function() {
+    let t0 = new Date().getTime()
+    let minute = 60 * 1000
     const bobUrl = 'http://bob.example.com/card'
 
     let {id: bobId} = await this.socket.send('addPeer', bobUrl)
     let msg = {type: 'Message', text: "hi"}
 
+    this.now = t0
     this.sendFail = true
     await this.socket.send('sendMessage', bobId, msg)
     assert.equal(this.sent.length, 0)
 
+    this.now = t0 + 1 * minute
     await this.identityServer.cron()
     assert.equal(this.sent.length, 0)
 
     this.sendFail = false
     await this.identityServer.cron()
+    assert.equal(this.sent.length, 0)
+
+    this.now = t0 + 2 * minute
+    await this.identityServer.cron()
     assert.equal(this.sent.length, 1)
 
+    this.now = t0 + 3 * minute
     await this.identityServer.cron()
     assert.equal(this.sent.length, 1)
   })
