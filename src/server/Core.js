@@ -144,8 +144,19 @@ export default class Core {
     }
   }
 
-  async _deliver(messageId, destination, envelope) {
-    await this.send(destination, envelope)
+  async _writeToOutbox(messageId, destination, envelope) {
+    let time = new Date(this.now()).toJSON()
+    await this.db.run(`INSERT INTO outbox
+      (message_id, last, destination, envelope)
+      VALUES (?, ?, ?, ?)`,
+      messageId, time, destination, JSON.stringify(envelope))
+  }
+
+  async _deliver(messageId) {
+    let [{destination, envelope}] = await this.db.run(`SELECT
+      destination, envelope FROM outbox
+      WHERE message_id = ?`, messageId)
+    await this.send(destination, JSON.parse(envelope))
   }
 
   async sendMessage(peer, message) {
@@ -157,7 +168,8 @@ export default class Core {
       to: peer.card.publicKey,
     }
     let messageId = await this.saveMessage(peer.id, message, true)
-    await this._deliver(messageId, peer.card.inboxUrl, envelope)
+    await this._writeToOutbox(messageId, peer.card.inboxUrl, envelope)
+    await this._deliver(messageId)
   }
 
   async markAsRead(peerId) {
