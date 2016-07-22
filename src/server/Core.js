@@ -1,6 +1,6 @@
 import fs from 'fs'
 import EventEmitter from 'events'
-import { openBox, keysEqual } from './messages.js'
+import { createBox, openBox, keysEqual } from './messages.js'
 import DB from './DB.js'
 import PrivateApi from './PrivateApi.js'
 import PublicApi from './PublicApi.js'
@@ -141,6 +141,18 @@ export default class Core {
       unread: !! unread,
       message: JSON.parse(message),
     }
+  }
+
+  async sendMessage(peer, message) {
+    let envelope = {
+      type: 'Envelope',
+      box: createBox(message, this.keyPair.privateKey, peer.card.publicKey),
+      cardUrl: this.myCardUrl,
+      from: this.keyPair.publicKey,
+      to: peer.card.publicKey,
+    }
+    await this.saveMessage(peer.id, message, true)
+    await this.send(peer.card.inboxUrl, envelope)
   }
 
   async markAsRead(peerId) {

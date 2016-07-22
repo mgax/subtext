@@ -1,6 +1,6 @@
 import SocketIO from 'socket.io'
 import socketioAuth from 'socketio-auth'
-import { createBox, randomKeyPair } from './messages.js'
+import { randomKeyPair } from './messages.js'
 
 export default class PrivateApi {
 
@@ -93,15 +93,7 @@ export default class PrivateApi {
 
     on('sendMessage', async (peerId, message) => {
       let peer = await this.core.getPeer(peerId)
-      let envelope = {
-        type: 'Envelope',
-        box: createBox(message, this.core.keyPair.privateKey, peer.card.publicKey),
-        cardUrl: this.core.myCardUrl,
-        from: this.core.keyPair.publicKey,
-        to: peer.card.publicKey,
-      }
-      await this.core.saveMessage(peer.id, message, true)
-      await this.core.send(peer.card.inboxUrl, envelope)
+      await this.core.sendMessage(peer, message)
     })
 
     on('getMessages', async (peerId) => {
