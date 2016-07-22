@@ -36,6 +36,13 @@ export default class DB {
     return await run(conn, query, ...args)
   }
 
+  async _read_props() {
+    this._props = {}
+    for(let {key, value} of await this.run(`SELECT key, value FROM prop`)) {
+      this._props[key] = JSON.parse(value)
+    }
+  }
+
   async _get_prop(key) {
     let res = await this.run(`SELECT value FROM prop WHERE key = ?`, key)
     return res.length ? JSON.parse(res[0].value) : undefined
@@ -48,9 +55,10 @@ export default class DB {
 
   async prop(key, value) {
     if(value === undefined) {
-      return await this._get_prop(key)
+      return this._props[key]
     }
     else {
+      this._props[key] = value
       await this._set_prop(key, value)
       return value
     }
@@ -58,6 +66,7 @@ export default class DB {
 
   async initialize() {
     await this._migrate()
+    await this._read_props()
   }
 
   async _migrate() {
