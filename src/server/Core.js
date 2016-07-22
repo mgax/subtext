@@ -132,6 +132,7 @@ export default class Core {
     let id = await res.lastInsertId()
     let [row] = await this.db.run(`SELECT * FROM message WHERE id = ?`, id)
     this.events.emit('message', peerId, this.loadMessage(row))
+    return id
   }
 
   loadMessage({message, me, unread, ... row}) {
@@ -143,6 +144,10 @@ export default class Core {
     }
   }
 
+  async _deliver(messageId, destination, envelope) {
+    await this.send(destination, envelope)
+  }
+
   async sendMessage(peer, message) {
     let envelope = {
       type: 'Envelope',
@@ -151,8 +156,8 @@ export default class Core {
       from: this.keyPair.publicKey,
       to: peer.card.publicKey,
     }
-    await this.saveMessage(peer.id, message, true)
-    await this.send(peer.card.inboxUrl, envelope)
+    let messageId = await this.saveMessage(peer.id, message, true)
+    await this._deliver(messageId, peer.card.inboxUrl, envelope)
   }
 
   async markAsRead(peerId) {
