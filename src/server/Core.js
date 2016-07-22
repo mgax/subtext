@@ -22,7 +22,7 @@ export default class Core {
   }
 
   async initialize() {
-    await this.db.migrate()
+    await this.db.initialize()
     this.keyPair = await this.db.prop('keyPair')
   }
 

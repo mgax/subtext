@@ -48,7 +48,11 @@ export default class DB {
     return value
   }
 
-  async migrate() {
+  async initialize() {
+    await this._migrate()
+  }
+
+  async _migrate() {
     await this.run(`CREATE TABLE IF NOT EXISTS prop (
         key TEXT UNIQUE,
         value TEXT
