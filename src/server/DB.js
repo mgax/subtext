@@ -95,6 +95,16 @@ export default class DB {
         await this.set_prop('dbVersion', 5)
 
       case 5:
+        await this.run(`CREATE TABLE outbox (
+            message_id INTEGER UNIQUE,
+            last TEXT,
+            destination TEXT,
+            envelope TEXT,
+            FOREIGN KEY(message_id) REFERENCES message(id)
+          )`)
+        await this.set_prop('dbVersion', 6)
+
+      case 6:
         return
 
       default:
