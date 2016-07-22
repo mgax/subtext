@@ -48,25 +48,14 @@ export default class DB {
     }
   }
 
-  async _get_prop(key) {
-    let res = await this.run(`SELECT value FROM prop WHERE key = ?`, key)
-    return res.length ? JSON.parse(res[0].value) : undefined
-  }
-
-  async _set_prop(key, value) {
+  async set_prop(key, value) {
     await this.run(`INSERT OR REPLACE INTO prop (key, value)
       VALUES (?, ?)`, key, JSON.stringify(value))
+    this._props[key] = value
   }
 
-  async prop(key, value) {
-    if(value === undefined) {
-      return this._props[key]
-    }
-    else {
-      this._props[key] = value
-      await this._set_prop(key, value)
-      return value
-    }
+  get_prop(key) {
+    return this._props[key]
   }
 
   async initialize() {
@@ -75,7 +64,7 @@ export default class DB {
   }
 
   async _migrate() {
-    let dbVersion = await this._get_prop('dbVersion')
+    let dbVersion = this.get_prop('dbVersion')
     switch(dbVersion) {
 
       case undefined:
@@ -93,17 +82,17 @@ export default class DB {
             unread BOOL,
             FOREIGN KEY(peer_id) REFERENCES peer(id)
           )`)
-        await this._set_prop('dbVersion', 3)
+        await this.set_prop('dbVersion', 3)
 
       case 3:
         await this.run(`ALTER TABLE peer ADD COLUMN props TEXT`)
         await this.run(`UPDATE peer SET props = '{}'`)
-        await this._set_prop('dbVersion', 4)
+        await this.set_prop('dbVersion', 4)
 
       case 4:
         await this.run(`ALTER TABLE message ADD COLUMN notified BOOL`)
         await this.run(`UPDATE message SET notified = 1`)
-        await this._set_prop('dbVersion', 5)
+        await this.set_prop('dbVersion', 5)
 
       case 5:
         return

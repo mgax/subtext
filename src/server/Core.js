@@ -23,20 +23,20 @@ export default class Core {
 
   async initialize() {
     await this.db.initialize()
-    this.keyPair = await this.db.prop('keyPair')
+    this.keyPair = this.db.get_prop('keyPair')
   }
 
   async setKeyPair(keyPair) {
-    await this.db.prop('keyPair', keyPair)
+    await this.db.set_prop('keyPair', keyPair)
     this.keyPair = keyPair
   }
 
   async setName(name) {
-    await this.db.prop('name', name)
+    await this.db.set_prop('name', name)
   }
 
   async setSmtp(smtp) {
-    await this.db.prop('smtp', smtp)
+    await this.db.set_prop('smtp', smtp)
   }
 
   loadPeer({card, props, ... row}) {
@@ -155,7 +155,7 @@ export default class Core {
   }
 
   async mail(text) {
-    let smtp = await this.db.prop('smtp')
+    let smtp = this.db.get_prop('smtp')
     return await this.sendMail({text, smtp})
   }
 
