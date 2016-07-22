@@ -11,7 +11,7 @@ export default class PublicApi {
 
     let _wrap = (fn) => (...args) => fn(...args).catch(args[2])
     this.app.get('/card', _wrap(async (req, res) => {
-      let name = this.core.db.get_prop('name')
+      let name = this.core.prop('name')
       res.send({
         publicKey: this.core.keyPair.publicKey,
         inboxUrl: this.core.publicUrl + '/message',

@@ -36,8 +36,8 @@ export default class PrivateApi {
 
     on('getConfig', async () => {
       return {
-        name: this.core.db.get_prop('name'),
-        smtp: this.core.db.get_prop('smtp'),
+        name: this.core.prop('name'),
+        smtp: this.core.prop('smtp'),
         hasKeyPair: !! this.core.keyPair,
       }
     })

@@ -23,7 +23,11 @@ export default class Core {
 
   async initialize() {
     await this.db.initialize()
-    this.keyPair = this.db.get_prop('keyPair')
+    this.keyPair = this.prop('keyPair')
+  }
+
+  prop(key) {
+    return this.db.get_prop(key)
   }
 
   async setKeyPair(keyPair) {
@@ -155,7 +159,7 @@ export default class Core {
   }
 
   async mail(text) {
-    let smtp = this.db.get_prop('smtp')
+    let smtp = this.prop('smtp')
     return await this.sendMail({text, smtp})
   }
 
