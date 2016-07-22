@@ -180,7 +180,7 @@ export default class Core {
     return await this.sendMail({text, smtp})
   }
 
-  async cron() {
+  async _cron_notifications() {
     let now = new Date(this.now()).toJSON()
     let messages
     await this.db.exclusive(async (run) => {
@@ -196,6 +196,10 @@ export default class Core {
       await run(`UPDATE message SET notified=1 WHERE unread AND not notified`)
     })
     if(messages) await this.mail(`You have ${messages} new messages.`)
+  }
+
+  async cron() {
+    await this._cron_notifications()
   }
 
 }
