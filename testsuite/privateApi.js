@@ -71,7 +71,10 @@ describe('private api', function() {
       return true
     }
     let fetchCard = (url) => cards[url]
-    let send = (url, envelope) => { sent.push({url, envelope}) }
+    let send = (url, envelope) => {
+      if(this.sendFail) throw "SEND FAIL"
+      else sent.push({url, envelope})
+    }
     this.tmp = tmp.dirSync({unsafeCleanup: true})
     this.identityServer = await identityserver(this.tmp.name, ALICE.publicUrl,
       ALICE.authToken, {fetchCard, send, sendMail})
@@ -196,6 +199,27 @@ describe('private api', function() {
     assert.equal(notifications[0].peerId, 1)
     assert.deepEqual(notifications[0].message.message, msg)
     assert.isTrue(notifications[0].message.me)
+  })
+
+  it('retries sending the message', async function() {
+    const bobUrl = 'http://bob.example.com/card'
+
+    let {id: bobId} = await this.socket.send('addPeer', bobUrl)
+    let msg = {type: 'Message', text: "hi"}
+
+    this.sendFail = true
+    await this.socket.send('sendMessage', bobId, msg)
+    assert.equal(this.sent.length, 0)
+
+    await this.identityServer.cron()
+    assert.equal(this.sent.length, 0)
+
+    this.sendFail = false
+    await this.identityServer.cron()
+    assert.equal(this.sent.length, 1)
+
+    await this.identityServer.cron()
+    assert.equal(this.sent.length, 1)
   })
 
   it('keeps track of unread messages', async function() {

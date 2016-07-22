@@ -153,10 +153,17 @@ export default class Core {
   }
 
   async _deliver(messageId) {
+    let time = new Date(this.now()).toJSON()
     let [{destination, envelope}] = await this.db.run(`SELECT
       destination, envelope FROM outbox
       WHERE message_id = ?`, messageId)
-    await this.send(destination, JSON.parse(envelope))
+    try {
+      await this.send(destination, JSON.parse(envelope))
+    }
+    catch(_) {
+      return
+    }
+    await this.db.run(`DELETE FROM outbox WHERE message_id = ?`, messageId)
   }
 
   async sendMessage(peer, message) {
@@ -210,8 +217,16 @@ export default class Core {
     if(messages) await this.mail(`You have ${messages} new messages.`)
   }
 
+  async _cron_outbox() {
+    let outbox = await this.db.run(`SELECT message_id FROM outbox`)
+    for(let {message_id} of outbox) {
+      await this._deliver(message_id)
+    }
+  }
+
   async cron() {
     await this._cron_notifications()
+    await this._cron_outbox()
   }
 
 }
