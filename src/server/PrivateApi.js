@@ -39,6 +39,7 @@ export default class PrivateApi {
         name: this.core.prop('name'),
         smtp: this.core.prop('smtp'),
         hasKeyPair: !! this.core.keyPair,
+        myCardUrl: this.core.myCardUrl,
       }
     })
 

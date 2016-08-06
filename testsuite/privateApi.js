@@ -126,6 +126,11 @@ describe('private api', function() {
     assert.deepEqual(await getSmtp(), smtp)
   })
 
+  it('gets card url', async function() {
+    let myCardUrl = (await this.socket.send('getConfig')).myCardUrl
+    assert.equal(myCardUrl, 'http://alice.example.com/card')
+  })
+
   it('performs an smtp test', async function() {
     let checkInbox = () => { let rv = this.inbox; this.inbox = []; return rv }
     assert.deepEqual(await this.socket.send('testSmtp'), {success: true})
