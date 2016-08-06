@@ -7,6 +7,8 @@ export default function ConfigModal({ config, setName, setSmtp, testSmtp }) {
   return (
     <Modal title="Configuration">
 
+      <p>Public contact URL: <code>{config.myCardUrl}</code></p>
+
       <Name
         value={config.name}
         setName={setName}
