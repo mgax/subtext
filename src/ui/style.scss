@@ -149,4 +149,12 @@ body,
     right: 0;
     text-align: right;
   }
+
+  &.message-bleedUp { border-top-right-radius: 5px; }
+  &.message-bleedDown { border-bottom-right-radius: 5px; }
+}
+
+.message-peer {
+  &.message-bleedUp { border-top-left-radius: 5px; }
+  &.message-bleedDown { border-bottom-left-radius: 5px; }
 }
