@@ -118,6 +118,7 @@ body,
   clear: both;
   float: left;
   position: relative;
+  margin-bottom: 1px;
   padding: 3px 15px;
   border-radius: 18px;
   background: #eee;
@@ -140,7 +141,7 @@ body,
 
 .message-me {
   float: right;
-  background: forestgreen;
+  background: #56ac39;
   color: white;
 
   &:hover .time {
