@@ -158,6 +158,11 @@ export default class Server {
         await this.call('markAsRead', peerId)
       },
 
+      markAsRead: async (peerId) => {
+        dispatch(markUnread(peerId, false))
+        await this.call('markAsRead', peerId)
+      },
+
     }
 
   }

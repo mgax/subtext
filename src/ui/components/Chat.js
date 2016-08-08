@@ -4,13 +4,19 @@ import Conversation from './Conversation.js'
 
 export default function Chat({
     modal, config, peers, selectedPeerId,
-    updatePeerCard, selectPeer, addPeer, deletePeer, sendMessage,
+    updatePeerCard, selectPeer, addPeer, deletePeer, sendMessage, markAsRead,
   }) {
 
   let selectedPeer = peers[selectedPeerId]
 
+  let onMouseMove = (e) => {
+    if((selectedPeer || {}).unread) {
+      markAsRead(selectedPeer.id)
+    }
+  }
+
   return (
-    <div className='container-fluid'>
+    <div className='container-fluid' onMouseMove={onMouseMove}>
       <div className='row'>
         <div className='col-sm-4 app-peers'>
           <ChatHeader
