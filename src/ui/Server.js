@@ -34,7 +34,9 @@ export default class Server {
           this.store.dispatch(newPeer(peer))
         }
         this.store.dispatch(newMessage(peerId, message))
-        this.store.dispatch(markUnread(peerId, true))
+        if(! message.me) {
+          this.store.dispatch(markUnread(peerId, true))
+        }
       })
       this.on('markAsRead', (peerId) => {
         this.store.dispatch(markUnread(peerId, false))
