@@ -17,6 +17,13 @@ export function sorted(list, keyFunc=((i) => i)) {
   })
 }
 
+export function any(list) {
+  for(let item of list) {
+    if(item) return true
+  }
+  return false
+}
+
 export function waiter(promise) {
   promise
     .then((rv) => { if(rv !== undefined) console.log(rv) })

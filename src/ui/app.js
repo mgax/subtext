@@ -2,7 +2,7 @@ import 'babel-polyfill'
 import classNames from 'classnames'
 const { Provider, connect } = ReactRedux
 import './style.scss'
-import { waiter } from './utils.js'
+import { waiter, any } from './utils.js'
 import { createStore } from './store.js'
 import Server from './Server.js'
 import App from './components/App.js'
@@ -31,7 +31,17 @@ window.main = function() { waiter((async function() {
     })
   }
 
+  function updateTitle() {
+    let state = store.getState()
+    let peers = Object.values((state || {}).peers || [])
+    let anyUnread = any(peers.map((p) => p.unread))
+    let title = `SubText${anyUnread ? ' *' : ''}`
+    document.querySelector('head title').textContent = title
+  }
+
   mount(document.querySelector('#app'), App, {modal})
+
+  store.subscribe(updateTitle)
 
   window.S = {
     app: app,
