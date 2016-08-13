@@ -27,7 +27,7 @@ export default class Ui {
       setTimeout(() => {
         let state = this.store.getState()
         let peer = ((state || {}).peers || [])[peerId]
-        if(peer.unread) {
+        if(peer.unread && ! message.me) {
           let name = peer.card.name
           let text = message.message.text
           notify(`${name}: ${text}`)
