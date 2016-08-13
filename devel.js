@@ -4,7 +4,7 @@ import fs from 'fs'
 import createServer from './src/server/create.js'
 
 const WEBAPP_OPTIONS = {
-  entry: './src/ui/app.js',
+  entry: './src/ui/main.js',
   devtool: '#inline-source-map',
   output: {path: __dirname + '/build', filename: 'webapp.js'},
   module: {
