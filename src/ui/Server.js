@@ -1,3 +1,4 @@
+import EventEmitter from 'events'
 import { waiter } from './utils.js'
 import {
   APP_STATE_LOADING,
@@ -16,6 +17,7 @@ export default class Server {
   constructor(store) {
     this.store = store
     this.socket = io.connect('/')
+    this.events = new EventEmitter()
 
     this.onSocket('unauthorized', (err) => {
       console.error('socket.io unauthorized:', err)
@@ -37,6 +39,7 @@ export default class Server {
         if(! message.me) {
           this.store.dispatch(markUnread(peerId, true))
         }
+        this.events.emit('message', peerId, message)
       })
       this.onSocket('markAsRead', (peerId) => {
         this.store.dispatch(markUnread(peerId, false))
