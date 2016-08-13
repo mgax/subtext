@@ -9,6 +9,20 @@ export default class Ui {
   constructor() {
     this.store = createStore()
     this.server = new Server(this.store)
+    this.setupNotifications()
+  }
+
+  setupNotifications() {
+    let notify = (text) => {
+      new Notification("SubText", {body: text})
+    }
+    if(Notification.permission == 'default') {
+      Notification.requestPermission((permission) => {
+        if(permission == 'granted') {
+          notify("Yay, I can notify you!")
+        }
+      })
+    }
   }
 
   mountComponent(node, Component, props) {
