@@ -13,6 +13,7 @@ export default class Ui {
   }
 
   setupNotifications() {
+    if(! window.Notification) return
     let notify = (text) => {
       new Notification("SubText", {body: text})
     }
