@@ -1,6 +1,6 @@
 {
-  "name": "subtext",
-  "version": "0.0.1",
+  "name": "subtext-app",
+  "version": "0.1.0",
   "dependencies": {
     "babel-cli": "^6.10.1",
     "babel-loader": "^6.2.4",
