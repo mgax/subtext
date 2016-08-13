@@ -17,18 +17,18 @@ export default class Server {
     this.store = store
     this.socket = io.connect('/')
 
-    this.on('unauthorized', (err) => {
+    this.onSocket('unauthorized', (err) => {
       console.error('socket.io unauthorized:', err)
       localStorage.subtext_authToken = prompt("Please enter authToken")
       window.location.reload()
     })
 
-    this.on('connect', () => {
+    this.onSocket('connect', () => {
       this.socket.emit('authentication', localStorage.subtext_authToken)
     })
 
-    this.on('authenticated', () => {
-      this.on('message', async (peerId, message) => {
+    this.onSocket('authenticated', () => {
+      this.onSocket('message', async (peerId, message) => {
         if(! this.store.getState().peers[peerId]) {
           let peer = await this.call('getPeer', peerId)
           this.store.dispatch(newPeer(peer))
@@ -38,7 +38,7 @@ export default class Server {
           this.store.dispatch(markUnread(peerId, true))
         }
       })
-      this.on('markAsRead', (peerId) => {
+      this.onSocket('markAsRead', (peerId) => {
         this.store.dispatch(markUnread(peerId, false))
       })
 
@@ -46,7 +46,7 @@ export default class Server {
     })
   }
 
-  on(type, callback) {
+  onSocket(type, callback) {
     this.socket.on(type, (... args) => {
       console.debug('<==', type, ... args)
       callback(... args)
