@@ -24,11 +24,15 @@ export default class Ui {
       })
     }
     this.server.events.on('message', (peerId, message) => {
-      let state = this.store.getState()
-      let peer = ((state || {}).peers || [])[peerId]
-      let name = peer.card.name
-      let text = message.message.text
-      notify(`${name}: ${text}`)
+      setTimeout(() => {
+        let state = this.store.getState()
+        let peer = ((state || {}).peers || [])[peerId]
+        if(peer.unread) {
+          let name = peer.card.name
+          let text = message.message.text
+          notify(`${name}: ${text}`)
+        }
+      }, 3000)
     })
   }
 
