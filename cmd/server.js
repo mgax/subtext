@@ -1,6 +1,6 @@
 import express from 'express'
-import waiter from './src/waiter.js'
-import createServer from './src/server/create.js'
+import waiter from '../src/waiter.js'
+import createServer from '../src/server/create.js'
 
 waiter((async function() {
 

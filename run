@@ -26,12 +26,12 @@ case $COMMAND in
 
   server)
     set -x
-    exec ./run babel-node server.js "$@"
+    exec ./run babel-node cmd/server.js "$@"
     ;;
 
   shell)
     set -x
-    exec ./run babel-node shell.js "$@"
+    exec ./run babel-node cmd/shell.js "$@"
     ;;
 
   *)
