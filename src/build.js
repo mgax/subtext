@@ -8,7 +8,7 @@ const BUILD = `${__dirname}/../build`
 const webpackOptions = {
   entry: `${UI}/main.js`,
   devtool: '#inline-source-map',
-  output: {path: BUILD, filename: 'webapp.js'},
+  output: {path: BUILD, filename: 'ui.js'},
   module: {
     loaders: [
       {test: /\.js$/, loader: 'babel', query: {presets: 'es2015,stage-0,react'}},
