@@ -9,7 +9,7 @@ const BUILD = `${__dirname}/build`
 function getIndex() {
   let data = fs.readFileSync(`${BUILD}/ui.js`)
   let hash = crypto.createHash(data).digest('hex')
-  return index(hash)
+  return index('ui.js', hash)
 }
 
 waiter((async function() {
