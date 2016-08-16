@@ -158,3 +158,9 @@ body,
   &.message-bleedUp { border-top-left-radius: 5px; }
   &.message-bleedDown { border-bottom-left-radius: 5px; }
 }
+
+.markdown {
+  > :last-child {
+    margin-bottom: 0;
+  }
+}

@@ -1,4 +1,18 @@
 import classNames from 'classnames'
+import marked from 'marked'
+
+class Renderer extends marked.Renderer {
+  image() {
+    return '[images are not supported]'
+  }
+}
+
+function render(text) {
+  return marked(text, {
+    renderer: new Renderer,
+    sanitize: true,
+  })
+}
 
 export default function Message({
       message: {me, time, message: {text}},
@@ -13,7 +27,8 @@ export default function Message({
   return (
     <li className={cls}>
       <div className='time'>{moment(time).calendar()}</div>
-      {text}
+      <div className='markdown'
+        dangerouslySetInnerHTML={{__html: render(text)}} />
     </li>
   )
 }
