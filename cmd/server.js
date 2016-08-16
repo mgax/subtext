@@ -5,11 +5,12 @@ import {index} from '../src/build.js'
 import createServer from '../src/server/create.js'
 
 const BUILD = `${__dirname}/build`
+const UI_JS = process.env.SUBTEXT_UI_JS || 'ui.js'
 
 function getIndex() {
   let data = fs.readFileSync(`${BUILD}/ui.js`)
   let hash = crypto.createHash(data).digest('hex')
-  return index('ui.js', hash)
+  return index(UI_JS, hash)
 }
 
 waiter((async function() {
