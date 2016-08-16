@@ -11,7 +11,7 @@ case $COMMAND in
 
   testsuite)
     set -x
-    exec ./run babel-node testsuite/run.js
+    exec ./run babel-node cmd/testsuite.js
     ;;
 
   build)
