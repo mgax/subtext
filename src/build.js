@@ -32,9 +32,5 @@ export function buildJs() {
 
 export function index(hash) {
   let template = fs.readFileSync(`${UI}/index.html`, 'utf8')
-  return template.replace('{{ webappHash }}', hash)
-}
-
-export function buildIndex(hash) {
-  fs.writeFileSync(`${BUILD}/index.html`, index(hash), 'utf8')
+  return template.replace('{{ hash }}', hash)
 }

@@ -1,6 +1,16 @@
+import crypto from 'crypto'
 import express from 'express'
 import waiter from '../src/waiter.js'
+import {index} from '../src/build.js'
 import createServer from '../src/server/create.js'
+
+const BUILD = `${__dirname}/build`
+
+function getIndex() {
+  let data = fs.readFileSync(`${BUILD}/webapp.js`)
+  let hash = crypto.createHash(data).digest('hex')
+  return index(hash)
+}
 
 waiter((async function() {
 
@@ -8,6 +18,7 @@ waiter((async function() {
 
   let { app } = await createServer(varPath, publicUrl)
 
-  app.use(express.static(`${__dirname}/build`))
+  app.get('/', function(req, res) { res.send(getIndex()) })
+  app.use(express.static(BUILD))
 
 })())
