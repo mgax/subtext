@@ -16,12 +16,12 @@ case $COMMAND in
 
   build)
     set -x
-    exec ./run babel-node devel.js build
+    exec ./run babel-node cmd/build.js "$@"
     ;;
 
   devserver)
     set -x
-    exec ./run babel-node devel.js devserver "$@"
+    exec ./run babel-node cmd/devserver.js "$@"
     ;;
 
   server)
