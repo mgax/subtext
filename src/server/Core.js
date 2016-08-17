@@ -43,6 +43,10 @@ export default class Core {
     await this.db.set_prop('smtp', smtp)
   }
 
+  async setCustomUi(url) {
+    await this.db.set_prop('customUi', url)
+  }
+
   loadPeer({card, props, ... row}) {
     return {
       ... row,

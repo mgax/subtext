@@ -126,6 +126,12 @@ describe('private api', function() {
     assert.deepEqual(await getSmtp(), smtp)
   })
 
+  it('sets customUi', async function() {
+    let url = 'http://example.com/customUi.js'
+    await this.socket.send('setCustomUi', url)
+    assert.equal(this.identityServer.db.get_prop('customUi'), url)
+  })
+
   it('gets card url', async function() {
     let myCardUrl = (await this.socket.send('getConfig')).myCardUrl
     assert.equal(myCardUrl, 'http://alice.example.com/card')

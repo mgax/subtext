@@ -61,6 +61,10 @@ export default class PrivateApi {
       }
     })
 
+    on('setCustomUi', async (url) => {
+      await this.core.setCustomUi(url)
+    })
+
     on('generateKeyPair', async () => {
       await this.core.setKeyPair(randomKeyPair())
     })
