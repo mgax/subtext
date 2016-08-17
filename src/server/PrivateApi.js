@@ -34,6 +34,10 @@ export default class PrivateApi {
       })
     }
 
+    on('test', async (arg) => {
+      return arg
+    })
+
     on('getConfig', async () => {
       return {
         name: this.core.prop('name'),

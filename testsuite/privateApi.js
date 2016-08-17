@@ -94,6 +94,10 @@ describe('private api', function() {
     this.tmp.removeCallback()
   })
 
+  it('replies to test', async function() {
+    assert.equal(await this.socket.send('test', 123), 123)
+  })
+
   it('gets and updates name', async function() {
     let getNameAndKeyPair = async () => {
       let {name, hasKeyPair} = await this.socket.send('getConfig')
