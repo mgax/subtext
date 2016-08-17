@@ -7,4 +7,8 @@ mocha.addFile(`${TESTSUITE}/messages.js`)
 mocha.addFile(`${TESTSUITE}/publicApi.js`)
 mocha.addFile(`${TESTSUITE}/privateApi.js`)
 mocha.addFile(`${TESTSUITE}/sendMail.js`)
-mocha.run()
+mocha.run((failures) => {
+  process.on('exit', () => {
+    process.exit(failures)
+  })
+})
