@@ -31,6 +31,7 @@ body,
 .peer {
   height: 60px;
   border-bottom: 1px solid #ccc;
+  padding: 5px;
 }
 
 .peer-selected {
@@ -48,9 +49,7 @@ body,
 }
 
 .peer-unread {
-  .peer-name {
-    font-weight: bold;
-  }
+  border-left: 5px solid #56ac39;
 }
 
 .conversation {
