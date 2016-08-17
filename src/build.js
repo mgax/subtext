@@ -30,8 +30,6 @@ export function buildJs() {
   })
 }
 
-export function index(uiJs, hash) {
+export function index() {
   return fs.readFileSync(`${UI}/index.html`, 'utf8')
-    .replace('{{ uiJs }}', uiJs)
-    .replace('{{ hash }}', hash)
 }

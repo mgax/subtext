@@ -7,5 +7,5 @@ waiter((async function() {
   let publicUrl = process.argv[3]
   let { app } = await createServer(path, publicUrl)
   app.use(devMiddleware())
-  app.get('/', function(req, res) { res.send(index('ui.js', '')) })
+  app.get('/', function(req, res) { res.send(index()) })
 })())
