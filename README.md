@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mgax/subtext.svg?branch=master)](https://travis-ci.org/mgax/subtext)
+
 ## Installation
 
 1. Clone the repository, install dependencies, build the UI:
