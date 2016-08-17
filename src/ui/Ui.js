@@ -74,4 +74,8 @@ export default class Ui {
     window.S = this
   }
 
+  setCustomUi(url) {
+    this.server.setCustomUi(url)
+  }
+
 }

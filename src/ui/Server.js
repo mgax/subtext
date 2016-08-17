@@ -108,6 +108,10 @@ export default class Server {
     this.store.dispatch(setAppState(APP_STATE_CHAT))
   }
 
+  async setCustomUi(url) {
+    await this.call('setCustomUi', url)
+  }
+
   mapDispatchToProps(dispatch) {
 
     return {
