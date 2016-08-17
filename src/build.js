@@ -30,6 +30,7 @@ export function buildJs() {
   })
 }
 
-export function index() {
+export function index({vanilla=false}={}) {
   return fs.readFileSync(`${UI}/index.html`, 'utf8')
+    .replace('{{ q }}', vanilla ? '?vanilla=y' : '')
 }

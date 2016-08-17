@@ -11,6 +11,7 @@ const UI_JS = process.env.SUBTEXT_UI_JS || 'ui.js'
 function getUi(customUi) {
   let uiUrl = url.resolve(`file://${BUILD}/ui.js`, customUi)
   let m = uiUrl.match(/^file:\/\/(.*)$/)
+  console.log('loading', m[1])
   if(m) return fs.readFileSync(m[1], 'utf8')
   throw Error(`Can't read ui.js from "${uiUrl}"`)
 }
@@ -22,10 +23,12 @@ waiter((async function() {
   let { app, server } = await createServer(varPath, publicUrl)
 
   app.get('/', function(req, res) { res.send(index()) })
+  app.get('/vanilla', function(req, res) { res.send(index({vanilla: true})) })
   app.get('/ui.js', function(req, res) {
-    res.set('Content-Type', 'application/javascript')
     let customUi = server.prop('customUi') || ''
-    res.send(getUi(customUi))
+    let uiUrl = req.query.vanilla == 'y' ? '' : customUi
+    res.set('Content-Type', 'application/javascript')
+    res.send(getUi(uiUrl))
   })
   app.use(express.static(BUILD))
 
