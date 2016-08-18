@@ -1,16 +1,24 @@
 import EventEmitter from 'events'
-import { waiter } from './utils.js'
+import { waiter, timeMs } from './utils.js'
 import {
   APP_STATE_LOADING,
   APP_STATE_WELCOME,
   APP_STATE_CHAT,
+  PING_OK,
+  PING_OFFLINE,
   setAppState,
+  setPing,
   setConfig,
   newPeer,
   newMessage,
   selectPeer,
   markUnread,
 } from './store.js'
+
+const SECOND = 1000
+const PING_LOOP_INTERVAL = SECOND
+const PING_INTERVAL = 10 * SECOND
+const PING_THRESHOLD = 2.5 * PING_INTERVAL
 
 export default class Server {
 
@@ -47,6 +55,8 @@ export default class Server {
 
       waiter(this.loadConfig())
     })
+
+    this.pingLoop()
   }
 
   onSocket(type, callback) {
@@ -172,6 +182,31 @@ export default class Server {
 
     }
 
+  }
+
+  pingLoop() {
+    let lastPing = timeMs()
+    let lastPingReply = timeMs()
+
+    let sendPing = async () => {
+      await this.call('test')
+      lastPingReply = timeMs()
+    }
+
+    let loop = () => {
+      let now = timeMs()
+
+      let timeToPing = now - lastPing > PING_INTERVAL
+      if(timeToPing) {
+        lastPing = now
+        waiter(sendPing())
+      }
+
+      let isLate = now - lastPingReply > PING_THRESHOLD
+      this.store.dispatch(setPing(isLate ? PING_OFFLINE : PING_OK))
+    }
+
+    setInterval(loop, PING_LOOP_INTERVAL)
   }
 
 }

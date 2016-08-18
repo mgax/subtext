@@ -34,3 +34,7 @@ export function errorScreen(message, ... log) {
   console.warn(... log)
   return <p>{message}</p>
 }
+
+export function timeMs() {
+  return new Date().getTime()
+}
