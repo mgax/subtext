@@ -163,3 +163,16 @@ body,
     margin-bottom: 0;
   }
 }
+
+.ping {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 2px 5px;
+  display: none;
+
+  &-offline {
+    background: red;
+    display: block;
+  }
+}

@@ -1,9 +1,11 @@
 import ChatHeader from './ChatHeader.js'
 import PeerList from './PeerList.js'
 import Conversation from './Conversation.js'
+import Ping from './Ping.js'
 
 export default function Chat({
-    modal, config, peers, selectedPeerId,
+    modal, config, ping,
+    peers, selectedPeerId,
     updatePeerCard, selectPeer, addPeer, deletePeer, sendMessage, markAsRead,
   }) {
 
@@ -39,6 +41,7 @@ export default function Chat({
           </div>
         )}
       </div>
+      <Ping ping={ping} />
     </div>
   )
 }
