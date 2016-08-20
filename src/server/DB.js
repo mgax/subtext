@@ -16,7 +16,7 @@ function execute(conn, query, ...args) {
   })
 }
 
-async function run(conn, query, ...args) {
+async function runQuery(conn, query, ...args) {
   let rows = await execute(conn, query, ...args)
   rows.lastInsertId = async function() {
     let [{id}] = await execute(conn, `SELECT last_insert_rowid() as id`)
@@ -33,7 +33,7 @@ export default class DB {
 
   async run(query, ...args) {
     let conn = await connect(this.dbFile)
-    return await run(conn, query, ...args)
+    return await runQuery(conn, query, ...args)
   }
 
   async _read_props() {
@@ -115,7 +115,7 @@ export default class DB {
 
   async _transaction(type, callback) {
     let conn = await connect(this.dbFile)
-    let _run = (query, ...args) => run(conn, query, ...args)
+    let _run = (query, ...args) => runQuery(conn, query, ...args)
 
     await _run(`BEGIN ${type} TRANSACTION`)
     try {
