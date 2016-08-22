@@ -21,7 +21,9 @@
 
    ```shell
    export SUBTEXT_AUTH_TOKEN='something secret'
-   ./run server /var/lib/subtext http://me.example.com
+   export SUBTEXT_VAR='/var/lib/subtext'
+   export SUBTEXT_PUBLIC_URL='http://me.example.com'
+   ./run server
    ```
 
    The server will listen on port 8000; you can change this by setting the

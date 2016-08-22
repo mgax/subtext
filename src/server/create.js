@@ -12,7 +12,8 @@ const pleaseSetAuthToken =
   "Make it a good passphrase."
 
 export default async function main() {
-  let [varPath, publicUrl, cmd] = process.argv.slice(2)
+  let varPath = process.env.SUBTEXT_VAR
+  let publicUrl = process.env.SUBTEXT_PUBLIC_URL
   let authToken = process.env.SUBTEXT_AUTH_TOKEN
   if(! authToken) bail(pleaseSetAuthToken)
   let server = await identityServer(varPath, publicUrl, authToken)
