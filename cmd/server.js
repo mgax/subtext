@@ -6,7 +6,6 @@ import {index} from '../src/build.js'
 import createServer from '../src/server/create.js'
 
 const BUILD = `${__dirname}/../build`
-const UI_JS = process.env.SUBTEXT_UI_JS || 'ui.js'
 
 function getUi(customUi) {
   let uiUrl = url.resolve(`file://${BUILD}/ui.js`, customUi)
