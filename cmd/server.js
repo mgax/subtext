@@ -17,10 +17,7 @@ function getUi(customUi) {
 
 waiter((async function() {
 
-  let [varPath, publicUrl, cmd] = process.argv.slice(2)
-
-  let { app, server } = await createServer(varPath, publicUrl)
-
+  let { app, server } = await createServer()
   app.get('/', function(req, res) { res.send(index()) })
   app.get('/vanilla', function(req, res) { res.send(index({vanilla: true})) })
   app.get('/ui.js', function(req, res) {

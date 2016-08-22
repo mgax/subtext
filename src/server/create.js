@@ -11,7 +11,8 @@ const pleaseSetAuthToken =
   "Please set SUBTEXT_AUTH_TOKEN. " +
   "Make it a good passphrase."
 
-export default async function main(varPath, publicUrl) {
+export default async function main() {
+  let [varPath, publicUrl, cmd] = process.argv.slice(2)
   let authToken = process.env.SUBTEXT_AUTH_TOKEN
   if(! authToken) bail(pleaseSetAuthToken)
   let server = await identityServer(varPath, publicUrl, authToken)
