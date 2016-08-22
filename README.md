@@ -43,7 +43,8 @@
 4. Open the public URL in your browser. If you set `AUTH_TOKEN`, the app will
    ask you for it, and save it in `localStorage`.
 
-   Then, add a peer (like `https://mgax.grep.ro/card`), and chat away!
+   Then, add a peer (I'm at `https://subtext.grep.ro:30443/card`), and chat
+   away!
 
 ### Loading a custom UI
 An easy way to hack on a live server is to replace its UI. Normally the server
