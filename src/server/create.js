@@ -2,8 +2,18 @@ import express from 'express'
 import identityServer from './identityserver.js'
 import cron from './cron.js'
 
+function bail(text) {
+  console.error(text)
+  process.exit(1)
+}
+
+const pleaseSetAuthToken =
+  "Please set AUTH_TOKEN. " +
+  "Make it a good passphrase."
+
 export default async function main(varPath, publicUrl) {
-  let authToken = process.env.AUTH_TOKEN || ''
+  let authToken = process.env.AUTH_TOKEN
+  if(! authToken) bail(pleaseSetAuthToken)
   let server = await identityServer(varPath, publicUrl, authToken)
   let app = express()
   app.use(server.createApp())
