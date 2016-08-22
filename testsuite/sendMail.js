@@ -16,7 +16,10 @@ describe('email notifications', function() {
     }
     this.tmp = tmp.dirSync({unsafeCleanup: true})
     this.inbox = []
-    let sendMail = async ({text}) => { this.inbox.push(text) }
+    let sendMail = async ({text, domain}) => {
+      this.inbox.push(text)
+      assert.equal(domain, 'alice.example.com')
+    }
     let fetchCard = (url) => cards[url]
     let now = () => this.now
     this.identityServer = await identityserver(this.tmp.name, ALICE.publicUrl,

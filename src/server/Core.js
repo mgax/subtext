@@ -1,4 +1,5 @@
 import fs from 'fs'
+import url from 'url'
 import EventEmitter from 'events'
 import { createBox, openBox, keysEqual } from './messages.js'
 import DB from './DB.js'
@@ -202,7 +203,8 @@ export default class Core {
 
   async mail(text) {
     let smtp = this.prop('smtp')
-    return await this.sendMail({text, smtp})
+    let domain = url.parse(this.publicUrl).host
+    return await this.sendMail({text, smtp, domain})
   }
 
   async _cron_notifications() {

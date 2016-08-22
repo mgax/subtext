@@ -21,12 +21,12 @@ function defaultNow() {
 
 function defaultSendMail(options) {
   console.info(`sending email: ${JSON.stringify(options)}`)
-  let {host, port, from, to} = options.smtp
+  let {host, port, from, to, domain} = options.smtp
   let text = options.text
   let subject = "SubText notification"
 
   return new Promise((resolve, reject) => {
-    let server = emailjs.server.connect({host, port})
+    let server = emailjs.server.connect({host, port, domain})
     server.send({from, to, text, subject: subject}, function(err) {
       if(err) {
         console.warn("SMTP failed", err)
