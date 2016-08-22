@@ -38,3 +38,12 @@ export function errorScreen(message, ... log) {
 export function timeMs() {
   return new Date().getTime()
 }
+
+export function escape(txt) {
+  return txt
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&#34;')
+    .replace(/'/g, '&#39;')
+}
