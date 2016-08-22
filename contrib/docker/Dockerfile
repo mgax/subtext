@@ -22,4 +22,4 @@ RUN ./run build
 
 # Start subtext
 ENV AUTH_TOKEN ${auth_token}
-ENTRYPOINT ["./run", "server", "/var/lib/subtext", "http://subtext.hostatic.ro"]
+ENTRYPOINT ["./run", "server", "/var/lib/subtext", "<your_subtext_url>"]
