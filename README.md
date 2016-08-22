@@ -15,12 +15,12 @@
    folder, where subtext will create its database, and the public URL where the
    app will be accessible to peers.
 
-   You can also set the `AUTH_TOKEN` environment variable to a password, that
-   will be needed to access the UI, so that other people can't read your
-   private conversations.
+   Set the `SUBTEXT_AUTH_TOKEN` environment variable to a password, that will
+   be needed to access the UI, so that other people can't read your private
+   conversations.
 
    ```shell
-   export AUTH_TOKEN='something secret'
+   export SUBTEXT_AUTH_TOKEN='something secret'
    ./run server /var/lib/subtext http://me.example.com
    ```
 

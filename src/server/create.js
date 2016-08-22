@@ -8,11 +8,11 @@ function bail(text) {
 }
 
 const pleaseSetAuthToken =
-  "Please set AUTH_TOKEN. " +
+  "Please set SUBTEXT_AUTH_TOKEN. " +
   "Make it a good passphrase."
 
 export default async function main(varPath, publicUrl) {
-  let authToken = process.env.AUTH_TOKEN
+  let authToken = process.env.SUBTEXT_AUTH_TOKEN
   if(! authToken) bail(pleaseSetAuthToken)
   let server = await identityServer(varPath, publicUrl, authToken)
   let app = express()
