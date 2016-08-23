@@ -1,6 +1,21 @@
 Subtext is a peer-to-peer chat app that's meant to be beautiful and hackable.
 It comes in the form of a nodejs web app that you install on your server, and a
-GUI built with react.js that loads as a web page.
+GUI built with react.js that loads as a web page. The project places great
+emphasis on privacy and personal control.
+
+**Privacy**, because nobody should listen in on your conversations. So there's
+end-to-end encryption and you host your own data.
+
+**Personal control**, because no company or individual should have a say in how
+you read and write messages and who you talk to. So the GUI is completely
+hackable, you can even outright replace it. And the community can agree on what
+is acceptable message content, which anyone can express in code and user
+experience.
+
+The actual messages are simple JSON objects, and they can be extended
+arbitrarily. Encryption is done with
+[Curve25519](https://en.wikipedia.org/wiki/Curve25519) but needs the review of
+an infosec expert - ping me if you are one!
 
 [![Build Status](https://travis-ci.org/mgax/subtext.svg?branch=master)](https://travis-ci.org/mgax/subtext)
 
