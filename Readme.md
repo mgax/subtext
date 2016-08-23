@@ -1,7 +1,7 @@
 Subtext is a peer-to-peer chat app that's meant to be beautiful and hackable.
 
-It comes in the form of a _NodeJS_ web app, which runs on your server, and a
-GUI built with _react.js_, that loads as a web page. The project places great
+It comes in the form of a _NodeJS_ web app, which runs on your server, and a UI
+built with _react.js_, that loads as a web page. The project places great
 emphasis on privacy and personal control.
 
 **Privacy**, because nobody should listen in on your conversations. So you host
@@ -10,7 +10,7 @@ your own data and there's end-to-end encryption with
 infosec expert - ping me if you are one!)
 
 **Personal control**, because no company or individual should have a say in how
-you read and write messages and who you talk to. So the GUI is completely
+you read and write messages and who you talk to. So the UI is completely
 hackable, you can even outright replace it. The message protocol is simple,
 open to extension by the community, which will surely agree on mutually
 acceptable messages, and write software that understands them.
@@ -28,13 +28,15 @@ acceptable messages, and write software that understands them.
    ./run build
    ```
 
-2. Run the server. You need to pass in two arguments: the path to a data
-   folder, where subtext will create its database, and the public URL where the
-   app will be accessible to peers.
+2. Set environment variables and run the server.
 
-   Set the `SUBTEXT_AUTH_TOKEN` environment variable to a password, that will
-   be needed to access the UI, so that other people can't read your private
-   conversations.
+   `SUBTEXT_AUTH_TOKEN`: a password that will be required to access the UI, so
+   that other people can't read your private conversations.
+
+   `SUBTEXT_VAR`: path to a data folder where subtext will create its database
+
+   `SUBTEXT_PUBLIC_URL`: the address where you log into the UI and where you
+   receive messages from peers.
 
    ```shell
    export SUBTEXT_AUTH_TOKEN='something secret'
@@ -59,8 +61,8 @@ acceptable messages, and write software that understands them.
 
    It's a good idea to secure your server with https at this point.
 
-4. Open the public URL in your browser. If you set `AUTH_TOKEN`, the app will
-   ask you for it, and save it in `localStorage`.
+4. Open the public URL in your browser. You will be asked for the
+   `SUBTEXT_AUTH_TOKEN` set above.
 
    Then, add a peer (I'm at `https://subtext.grep.ro:30443/card`), and chat
    away!
