@@ -1,3 +1,7 @@
+Subtext is a peer-to-peer chat app that's meant to be beautiful and hackable.
+It comes in the form of a nodejs web app that you install on your server, and a
+GUI built with react.js that loads as a web page.
+
 [![Build Status](https://travis-ci.org/mgax/subtext.svg?branch=master)](https://travis-ci.org/mgax/subtext)
 
 ## Installation
