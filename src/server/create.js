@@ -20,7 +20,7 @@ export default async function main() {
   let server = await identityServer(varPath, publicUrl, authToken)
   let app = express()
   app.use(server.createApp())
-  let http = app.listen(+(process.env.PORT || 8000))
+  let http = app.listen(+(process.env.PORT || 8000), 'localhost')
   server.createWebsocket(http)
   cron(server)
   return { app, server, http }

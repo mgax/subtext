@@ -38,15 +38,14 @@ acceptable messages, and write software that understands them.
    `SUBTEXT_PUBLIC_URL`: the address where you log into the UI and where you
    receive messages from peers.
 
+   `PORT`: which port to listen on, defaults to 8000.
+
    ```shell
    export SUBTEXT_AUTH_TOKEN='something secret'
    export SUBTEXT_VAR='/var/lib/subtext'
    export SUBTEXT_PUBLIC_URL='http://me.example.com'
    ./run server
    ```
-
-   The server will listen on port 8000; you can change this by setting the
-   `PORT` environment variable.
 
 3. Optionally set up a reverse proxy. This is what you'd write in the nginx
    config:
