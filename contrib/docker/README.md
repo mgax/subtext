@@ -1,20 +1,16 @@
 ## Usage
 
-1. Generate an authentication token (password) for yourself, using
-any kind of password generation or generation techniques.
+1. Generate an auth token for yourself, using apg or the like.
 
-2. Edit the provided Dockerfile and edit on the last line the <your_subtext_url>
-entry with your real URL where your Subtext installation will be hosted at.
-
-3. Build the Docker image passing the above mentioned auth token
+2. Build the Docker image by passing the docker build command the
+auth token you have generated above, the public URL where this Subtext
+will live at and the directory where Subtext will store its data
 ```shell
-docker build -t subtext:latest --build-arg auth_token='your_token_here' --build-arg='your_subtext_url' ./
+docker build -t subtext:latest --build-arg auth_token='your_auth_token' --build-arg public_url='http://subtext.example.com' --build-arg var_dir='/var/lib/subtext' ./
 ```
 
-4. Run the container
+3. Run the container. We recomend mounting the dir from the 'var_dir'
+env variable above, to a directory on the host filesystem:
 ```shell
-docker run -d -p 8000:8000 subtext:latest
+docker run -d -p 8000:8000 -v /var/lib/subtext:/var/lib/subtext subtext:latest
 ```
-
-5. Access the application in a browser, on port 8000. It will ask you for
-the auth token. After you provide it, you are done, you can start using it.
