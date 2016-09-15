@@ -44,7 +44,7 @@ const INITIAL_STATE = {
   peers: {},
 }
 
-function reduce(state=INITIAL_STATE, action) {
+function reduce(state=INITIAL_STATE, action, logger) {
   switch(action.type) {
 
     case SET_APP_STATE:
@@ -82,7 +82,7 @@ function reduce(state=INITIAL_STATE, action) {
     case NEW_MESSAGE: {
       let peer = state.peers[action.peerId]
       if(! peer) {
-        console.warn('unknown peer', action.peerId)
+        logger.warn('unknown peer', action.peerId)
         return state
       }
       if(peer.messages[action.message.id]) return state
@@ -133,6 +133,7 @@ function reduce(state=INITIAL_STATE, action) {
   }
 }
 
-export function createStore() {
-  return Redux.createStore(reduce)
+export function createStore({logger}) {
+  let reduceFunction = (state, action) => reduce(state, action, logger)
+  return Redux.createStore(reduceFunction)
 }

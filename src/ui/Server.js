@@ -22,13 +22,14 @@ const PING_THRESHOLD = 2.5 * PING_INTERVAL
 
 export default class Server {
 
-  constructor({store}) {
+  constructor({store, logger}) {
     this.store = store
+    this.logger = logger
     this.socket = io.connect('/')
     this.events = new EventEmitter()
 
     this.onSocket('unauthorized', (err) => {
-      console.error('socket.io unauthorized:', err)
+      this.logger.error('socket.io unauthorized:', err)
       localStorage.subtext_authToken = prompt("Please enter authToken")
       window.location.reload()
     })
@@ -61,24 +62,24 @@ export default class Server {
 
   onSocket(type, callback) {
     this.socket.on(type, (... args) => {
-      console.debug('<==', type, ... args)
+      this.logger.debug('<==', type, ... args)
       callback(... args)
     })
   }
 
   async call(type, ... args) {
-    console.debug('-->', type, ... args)
+    this.logger.debug('-->', type, ... args)
     let [err, rv] = await new Promise((resolve) => {
       this.socket.emit(type, args, (resp) => {
         resolve(resp)
       })
     })
     if(err) {
-      console.debug('<-error-', err)
+      this.logger.debug('<-error-', err)
       throw err
     }
     else {
-      console.debug('<--', rv)
+      this.logger.debug('<--', rv)
       return rv
     }
   }
