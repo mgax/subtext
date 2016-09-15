@@ -3,7 +3,7 @@ import StatefulButton from '../StatefulButton.js'
 export default function KeyPair({ generateKeyPair }) {
   return (
     <div>
-      <h2>Key pair</h2>
+      <h5>Key pair</h5>
 
       <form className='form-inline'>
 

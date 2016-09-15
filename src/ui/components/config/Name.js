@@ -7,7 +7,7 @@ export default class Name extends React.Component {
 
     return (
       <div>
-        <h2>Public name</h2>
+        <h5>Public name</h5>
 
         <form className='form-inline'>
 

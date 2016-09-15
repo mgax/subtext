@@ -8,7 +8,7 @@ export default class Smtp extends React.Component {
 
     return (
       <div>
-        <h2>Email server</h2>
+        <h5>Email server</h5>
 
         <form className='form-inline'>
 
