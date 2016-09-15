@@ -50,6 +50,12 @@ export function escape(txt) {
 
 export class Logger {
 
+  constructor() {
+    this.level = {
+      debug: !! localStorage.subtext_debug,
+    }
+  }
+
   error(... args) {
     console.error(... args)
   }
@@ -63,7 +69,7 @@ export class Logger {
   }
 
   debug(... args) {
-    console.debug(... args)
+    if(this.level.debug) console.debug(... args)
   }
 
 }
