@@ -1,5 +1,5 @@
 const { Provider, connect } = ReactRedux
-import { any } from './utils.js'
+import { any, Logger } from './utils.js'
 import { createStore } from './store.js'
 import Server from './Server.js'
 import App from './components/App.js'
@@ -7,8 +7,9 @@ import App from './components/App.js'
 export default class Ui {
 
   constructor() {
-    this.store = createStore()
-    this.server = new Server({store: this.store})
+    this.logger = new Logger()
+    this.store = createStore({logger: this.logger})
+    this.server = new Server({store: this.store, logger: this.logger})
     this.setupNotifications()
   }
 

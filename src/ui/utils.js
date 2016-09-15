@@ -47,3 +47,23 @@ export function escape(txt) {
     .replace(/"/g, '&#34;')
     .replace(/'/g, '&#39;')
 }
+
+export class Logger {
+
+  error(... args) {
+    console.error(... args)
+  }
+
+  warn(... args) {
+    console.warn(... args)
+  }
+
+  info(... args) {
+    console.log(... args)
+  }
+
+  debug(... args) {
+    console.debug(... args)
+  }
+
+}
