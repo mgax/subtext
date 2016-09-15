@@ -1,6 +1,5 @@
 import classNames from 'classnames'
 import marked from 'marked'
-import {escape} from '../utils.js'
 
 class Renderer extends marked.Renderer {
 
@@ -10,7 +9,7 @@ class Renderer extends marked.Renderer {
 
   link(url, title, text) {
     if(! url.match(/^http[s]?:\/\//)) return ''
-    return `<a href="${escape(url)}" target=_blank>${escape(text)}</a>`
+    return `<a href="${url}" target=_blank>${text}</a>`
   }
 
 }
