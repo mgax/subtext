@@ -37,22 +37,22 @@ export default class Server {
       this.socket.emit('authentication', localStorage.subtext_authToken)
     })
 
-    this.onSocket('authenticated', () => {
-      this.onSocket('message', async (peerId, message) => {
-        if(! this.store.getState().peers[peerId]) {
-          let peer = await this.call('getPeer', peerId)
-          this.store.dispatch(newPeer(peer))
-        }
-        this.store.dispatch(newMessage(peerId, message))
-        if(! message.me) {
-          this.store.dispatch(markUnread(peerId, true))
-        }
-        this.events.emit('message', peerId, message)
-      })
-      this.onSocket('markAsRead', (peerId) => {
-        this.store.dispatch(markUnread(peerId, false))
-      })
+    this.onSocket('message', async (peerId, message) => {
+      if(! this.store.getState().peers[peerId]) {
+        let peer = await this.call('getPeer', peerId)
+        this.store.dispatch(newPeer(peer))
+      }
+      this.store.dispatch(newMessage(peerId, message))
+      if(! message.me) {
+        this.store.dispatch(markUnread(peerId, true))
+      }
+      this.events.emit('message', peerId, message)
+    })
+    this.onSocket('markAsRead', (peerId) => {
+      this.store.dispatch(markUnread(peerId, false))
+    })
 
+    this.onSocket('authenticated', () => {
       waiter(this.loadConfig())
     })
 
