@@ -22,7 +22,7 @@ const PING_THRESHOLD = 2.5 * PING_INTERVAL
 
 export default class Server {
 
-  constructor(store) {
+  constructor({store}) {
     this.store = store
     this.socket = io.connect('/')
     this.events = new EventEmitter()

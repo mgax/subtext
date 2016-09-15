@@ -8,7 +8,7 @@ export default class Ui {
 
   constructor() {
     this.store = createStore()
-    this.server = new Server(this.store)
+    this.server = new Server({store: this.store})
     this.setupNotifications()
   }
 
