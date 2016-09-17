@@ -203,7 +203,8 @@ export default class Core {
 
   async mail(text) {
     let smtp = this.prop('smtp')
-    let domain = url.parse(this.publicUrl).host
+    let host = url.parse(this.publicUrl).host
+    let domain = host.split(':')[0]
     return await this.sendMail({text, smtp, domain})
   }
 
