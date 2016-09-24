@@ -21,7 +21,7 @@ export function devMiddleware() {
   return webpackDevMiddleware(webpack(webpackOptions), {publicPath: '/'})
 }
 
-export function buildJs() {
+export function buildUi() {
   return new Promise((resolve, reject) => {
     webpack(webpackOptions, function(err, stats) {
       if(err) return reject(err)
