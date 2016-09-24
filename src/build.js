@@ -54,10 +54,12 @@ export function buildServer() {
   return build(WEBPACK_OPTIONS_SERVER)
 }
 
-function index_src() {
-  return fs.readFileSync(`${UI}/index.html`, 'utf8')
+function index_src(dev) {
+  if(dev) return fs.readFileSync(`${UI}/index.html`, 'utf8')
+  let url = require('./ui/index.html')
+  return Buffer.from(url.split(',')[1], 'base64').toString()
 }
 
-export function index({vanilla=false}={}) {
-  return index_src().replace('{{ q }}', vanilla ? '?vanilla=y' : '')
+export function index({vanilla=false, dev=true}={}) {
+  return index_src(dev).replace('{{ q }}', vanilla ? '?vanilla=y' : '')
 }
