@@ -5,7 +5,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware'
 const UI = `${__dirname}/ui`
 const BUILD = `${__dirname}/../build`
 
-const webpackOptions = {
+const WEBPACK_OPTIONS_UI = {
   entry: `${UI}/main.js`,
   devtool: '#inline-source-map',
   output: {path: BUILD, filename: 'ui.js'},
@@ -18,12 +18,12 @@ const webpackOptions = {
 }
 
 export function devMiddleware() {
-  return webpackDevMiddleware(webpack(webpackOptions), {publicPath: '/'})
+  return webpackDevMiddleware(webpack(WEBPACK_OPTIONS_UI), {publicPath: '/'})
 }
 
 export function buildUi() {
   return new Promise((resolve, reject) => {
-    webpack(webpackOptions, function(err, stats) {
+    webpack(WEBPACK_OPTIONS_UI, function(err, stats) {
       if(err) return reject(err)
       resolve(stats)
     })
