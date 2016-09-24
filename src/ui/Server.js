@@ -19,6 +19,7 @@ const SECOND = 1000
 const PING_LOOP_INTERVAL = SECOND
 const PING_INTERVAL = 10 * SECOND
 const PING_THRESHOLD = 2.5 * PING_INTERVAL
+const MESSAGES_LIMIT = 32
 
 export default class Server {
 
@@ -100,7 +101,9 @@ export default class Server {
     let peers = await this.call('getPeers')
     for(let peer of peers) {
       this.store.dispatch(newPeer(peer))
-      let messages = await this.call('getMessages', peer.id)
+      let messages = await this.call('getMessages', peer.id, {
+        limit: MESSAGES_LIMIT,
+      })
       for(let message of messages) {
         this.store.dispatch(newMessage(peer.id, message))
       }
