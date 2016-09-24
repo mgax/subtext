@@ -17,6 +17,21 @@ const WEBPACK_OPTIONS_UI = {
   },
 }
 
+const WEBPACK_OPTIONS_SERVER = {
+  target: 'node',
+  entry: ['babel-polyfill', './cmd/server.js'],
+  output: {path: BUILD, filename: 'server.js'},
+  module: {
+    loaders: [
+      {test: /\.js$/, loader: 'babel', query: {presets: 'es2015,stage-0,react'}},
+    ],
+  },
+  externals: (context, request, cb) => {
+    // https://github.com/webpack/webpack/issues/839#issuecomment-76736465
+    if(request.match(/^\./)) cb(); else cb(null, 'commonjs ' + request)
+  },
+}
+
 export function devMiddleware() {
   return webpackDevMiddleware(webpack(WEBPACK_OPTIONS_UI), {publicPath: '/'})
 }
@@ -32,6 +47,10 @@ function build(options) {
 
 export function buildUi() {
   return build(WEBPACK_OPTIONS_UI)
+}
+
+export function buildServer() {
+  return build(WEBPACK_OPTIONS_SERVER)
 }
 
 export function index({vanilla=false}={}) {
