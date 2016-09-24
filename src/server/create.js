@@ -1,13 +1,7 @@
 import express from 'express'
 import identityServer from './identityserver.js'
 import cron from './cron.js'
-
-function getConfig(env, name, message) {
-  let value = env[name]
-  if(value) return value
-  console.error(`Missing environment variable ${name}: ${message}`)
-  process.exit(1)
-}
+import getConfig from './getConfig.js'
 
 export default async function main() {
   let env = process.env
