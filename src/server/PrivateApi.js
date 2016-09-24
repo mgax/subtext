@@ -105,10 +105,14 @@ export default class PrivateApi {
       await this.core.sendMessage(peer, message)
     })
 
-    on('getMessages', async (peerId) => {
+    on('getMessages', async (peerId, options) => {
+      options = {
+        limit: 10,
+        ... options,
+      }
       let peer = await this.core.getPeer(peerId)
       let rows = await this.core.db.run(`SELECT * FROM message
-        WHERE peer_id = ? ORDER BY id DESC LIMIT 10`, peer.id)
+        WHERE peer_id = ? ORDER BY id DESC LIMIT ?`, peer.id, options.limit)
       return rows.map(this.core.loadMessage)
     })
 
