@@ -53,7 +53,10 @@ export function buildServer() {
   return build(WEBPACK_OPTIONS_SERVER)
 }
 
-export function index({vanilla=false}={}) {
+function index_src() {
   return fs.readFileSync(`${UI}/index.html`, 'utf8')
-    .replace('{{ q }}', vanilla ? '?vanilla=y' : '')
+}
+
+export function index({vanilla=false}={}) {
+  return index_src().replace('{{ q }}', vanilla ? '?vanilla=y' : '')
 }
