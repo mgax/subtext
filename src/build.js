@@ -21,13 +21,17 @@ export function devMiddleware() {
   return webpackDevMiddleware(webpack(WEBPACK_OPTIONS_UI), {publicPath: '/'})
 }
 
-export function buildUi() {
+function build(options) {
   return new Promise((resolve, reject) => {
-    webpack(WEBPACK_OPTIONS_UI, function(err, stats) {
+    webpack(options, function(err, stats) {
       if(err) return reject(err)
       resolve(stats)
     })
   })
+}
+
+export function buildUi() {
+  return build(WEBPACK_OPTIONS_UI)
 }
 
 export function index({vanilla=false}={}) {
