@@ -26,7 +26,8 @@ case $COMMAND in
 
   server)
     set -x
-    exec ./run babel-node cmd/server.js "$@"
+    export SUBTEXT_UI_JS="$(pwd)/build/ui.js"
+    exec node build/server.js "$@"
     ;;
 
   shell)
