@@ -26,6 +26,5 @@ waiter((async function() {
     res.set('Content-Type', 'application/javascript')
     res.send(getUi(uiUrl))
   })
-  app.use(express.static(BUILD))
 
 })())
