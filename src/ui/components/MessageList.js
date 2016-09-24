@@ -37,6 +37,7 @@ export default class MessageList extends React.Component {
         node.scrollTop = node.scrollHeight - node.offsetHeight
       }
     }
+    this.updateScroll()
     window.addEventListener('resize', this.updateScroll)
   }
 
